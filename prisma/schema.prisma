@@ -1,0 +1,206 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  APPLICANT
+  JURY
+}
+
+enum ApplicationStatus {
+  DRAFT
+  SUBMITTED
+  IN_REVIEW
+  EVALUATED
+  SUPPORTED
+  REJECTED
+}
+
+enum PeriodStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+}
+
+model User {
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  name                String?
+  role                Role      @default(APPLICANT)
+  passwordHash        String?
+  emailVerified       DateTime?
+  onboardingCompleted Boolean   @default(false)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  applications    Application[]
+  juryAssignments JuryAssignment[]
+  evaluations     Evaluation[]
+  fileNotes       FileNote[]
+  decisions       SupportDecision[]
+  notifications   Notification[]
+  auditLogs       AuditLog[]
+}
+
+model ApplicationPeriod {
+  id        String       @id @default(cuid())
+  title     String
+  startDate DateTime
+  endDate   DateTime
+  status    PeriodStatus @default(DRAFT)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  applications Application[]
+}
+
+model Application {
+  id          String            @id @default(cuid())
+  title       String
+  description String
+  status      ApplicationStatus @default(DRAFT)
+  submittedAt DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  userId   String
+  user     User              @relation(fields: [userId], references: [id])
+  periodId String
+  period   ApplicationPeriod @relation(fields: [periodId], references: [id])
+
+  files           File[]
+  juryAssignments JuryAssignment[]
+  evaluation      Evaluation?
+  decision        SupportDecision?
+  project         Project?
+}
+
+model File {
+  id            String   @id @default(cuid())
+  name          String
+  url           String
+  size          Int
+  mimeType      String
+  bucket        String
+  key           String
+  createdAt     DateTime @default(now())
+
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id])
+  projectId     String?
+  project       Project?     @relation(fields: [projectId], references: [id])
+
+  notes FileNote[]
+}
+
+model JuryAssignment {
+  id          String   @id @default(cuid())
+  assignedAt  DateTime @default(now())
+
+  juryId        String
+  jury          User        @relation(fields: [juryId], references: [id])
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id])
+
+  @@unique([juryId, applicationId])
+}
+
+model Evaluation {
+  id        String   @id @default(cuid())
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  juryId        String
+  jury          User        @relation(fields: [juryId], references: [id])
+  applicationId String      @unique
+  application   Application @relation(fields: [applicationId], references: [id])
+
+  scores EvaluationScore[]
+}
+
+model EvaluationScore {
+  id            String @id @default(cuid())
+  criteria      String
+  score         Int
+  justification String
+
+  evaluationId String
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
+}
+
+model FileNote {
+  id        String   @id @default(cuid())
+  note      String
+  createdAt DateTime @default(now())
+
+  fileId String
+  file   File   @relation(fields: [fileId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model SupportDecision {
+  id        String   @id @default(cuid())
+  scope     String
+  notes     String?
+  decidedAt DateTime @default(now())
+
+  applicationId String      @unique
+  application   Application @relation(fields: [applicationId], references: [id])
+  decidedById   String
+  decidedBy     User        @relation(fields: [decidedById], references: [id])
+
+  project Project?
+}
+
+model Project {
+  id        String   @id @default(cuid())
+  status    String   @default("ACTIVE")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  applicationId String          @unique
+  application   Application     @relation(fields: [applicationId], references: [id])
+  decisionId    String          @unique
+  decision      SupportDecision @relation(fields: [decisionId], references: [id])
+
+  files   File[]
+  reports ProjectReport[]
+}
+
+model ProjectReport {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
