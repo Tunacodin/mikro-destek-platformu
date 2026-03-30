@@ -26,3 +26,6 @@ yarn-error.log*
 # misc
 .DS_Store
 *.pem
+
+# docs (reference only, not versioned)
+*.pdf
