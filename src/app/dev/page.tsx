@@ -52,29 +52,34 @@ export default function DevPortalPage() {
           Geliştirici Portalı
         </h1>
 
-        <div className="divide-y divide-[#e9ecef] border border-[#e9ecef]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {services.map((s) => (
-            <div key={s.name} className="flex items-center justify-between gap-8 px-5 py-4 hover:bg-[#f6f7f9] transition-colors">
-              <div className="flex items-center gap-6 min-w-0">
-                <p className="text-sm font-medium text-[#212121] w-36 shrink-0">{s.name}</p>
-                {s.credentials.map((c) => (
-                  <div key={c.label} className="flex items-center gap-2 min-w-0">
-                    <span className="text-xs text-[#60697b] shrink-0">{c.label}</span>
-                    <code className="text-xs font-mono text-[#212121] bg-[#f6f7f9] border border-[#e9ecef] px-2 py-0.5 truncate">
-                      {c.value}
-                    </code>
-                  </div>
-                ))}
-              </div>
-              <a
-                href={s.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-medium text-[#212121] hover:text-[#fab758] transition-colors shrink-0 underline underline-offset-4"
-              >
+            <a
+              key={s.name}
+              href={s.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group bg-white border border-[#e9ecef] p-5 hover:border-[#212121] transition-all flex flex-col"
+            >
+              <p className="font-semibold text-sm text-[#212121]">{s.name}</p>
+
+              {s.credentials.length > 0 && (
+                <div className="mt-3 space-y-1.5">
+                  {s.credentials.map((c) => (
+                    <div key={c.label} className="flex items-start gap-2">
+                      <span className="text-xs text-[#60697b] shrink-0 pt-0.5">{c.label}</span>
+                      <code className="text-xs font-mono text-[#212121] bg-[#f6f7f9] border border-[#e9ecef] px-2 py-0.5 break-all">
+                        {c.value}
+                      </code>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <p className="mt-auto pt-4 text-xs font-mono text-[#60697b] group-hover:text-[#212121] transition-colors">
                 {s.url}
-              </a>
-            </div>
+              </p>
+            </a>
           ))}
         </div>
       </div>
