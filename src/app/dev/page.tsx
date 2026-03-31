@@ -60,25 +60,23 @@ export default function DevPortalPage() {
               href={s.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group bg-white border border-[#e9ecef] rounded-xl p-5 hover:border-[#fab758] hover:shadow-sm transition-all flex flex-col"
+              className="group bg-[#212121] border border-[#212121] rounded-xl p-5 hover:border-[#fab758] hover:shadow-sm transition-all flex flex-col"
             >
-              <p className="font-bold text-[#212121] text-lg">{s.name}</p>
+              <p className="font-bold text-white text-lg">{s.name}</p>
 
               {s.credentials.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-[#e9ecef] space-y-1.5">
+                <div className="mt-3 space-y-1">
                   {s.credentials.map((c) => (
                     <div key={c.label} className="flex items-start gap-2">
-                      <span className="text-xs text-[#60697b] shrink-0 pt-0.5">{c.label}</span>
-                      <code className="text-xs font-mono text-[#212121] bg-[#f6f7f9] px-2 py-0.5 rounded break-all">
-                        {c.value}
-                      </code>
+                      <span className="text-xs text-white/40 shrink-0 pt-0.5">{c.label}</span>
+                      <span className="text-xs text-white/80 break-all">{c.value}</span>
                     </div>
                   ))}
                 </div>
               )}
 
-              <p className="mt-auto pt-4 text-sm font-semibold text-[#fab758] group-hover:underline">
-                Aç →
+              <p className="mt-auto pt-4 text-xs text-white/30 group-hover:text-[#fab758] transition-colors truncate">
+                {s.url}
               </p>
             </a>
           ))}
