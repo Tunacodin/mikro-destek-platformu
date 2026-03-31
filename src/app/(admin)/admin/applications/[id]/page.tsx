@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
 import { JuryAssignPanel } from "@/components/admin/JuryAssignPanel"
+import { ApplicationDecisionButtons } from "@/components/admin/ApplicationDecisionButtons"
 import type { ApplicationStatus } from "@prisma/client"
 
 const STATUS_LABELS: Record<ApplicationStatus, string> = {
@@ -127,8 +128,12 @@ export default async function AdminApplicationDetailPage({
           )}
         </div>
 
-        {/* Sağ — Jüri Atama */}
+        {/* Sağ — Karar + Jüri Atama */}
         <div className="space-y-5">
+          <ApplicationDecisionButtons
+            applicationId={application.id}
+            status={application.status}
+          />
           <JuryAssignPanel
             applicationId={application.id}
             applicationStatus={application.status}

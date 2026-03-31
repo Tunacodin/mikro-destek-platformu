@@ -49,7 +49,7 @@ export function CreatePeriodForm() {
           id="title" name="title" type="text" value={form.title}
           onChange={handleChange} required
           placeholder="örn. 2025 Bahar Dönemi"
-          className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900"
+          className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#fab758]"
         />
       </div>
 
@@ -59,7 +59,7 @@ export function CreatePeriodForm() {
           <input
             id="startDate" name="startDate" type="datetime-local"
             value={form.startDate} onChange={handleChange} required
-            className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900"
+            className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#fab758]"
           />
         </div>
         <div className="space-y-1">
@@ -67,7 +67,7 @@ export function CreatePeriodForm() {
           <input
             id="endDate" name="endDate" type="datetime-local"
             value={form.endDate} onChange={handleChange} required
-            className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900"
+            className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#fab758]"
           />
         </div>
       </div>
@@ -78,7 +78,7 @@ export function CreatePeriodForm() {
 
       <button
         type="submit" disabled={loading}
-        className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-md hover:bg-slate-700 disabled:opacity-50 transition-colors"
+        className="px-4 py-2 bg-[#212121] text-white text-sm font-medium rounded-md hover:bg-[#fab758] hover:text-[#212121] disabled:opacity-50 transition-colors"
       >
         {loading ? "Oluşturuluyor…" : "Dönem Oluştur"}
       </button>

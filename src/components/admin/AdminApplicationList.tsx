@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import Link from "next/link"
 import type { ApplicationStatus } from "@prisma/client"
 
 type App = {
@@ -103,16 +104,19 @@ export function AdminApplicationList({
       ) : (
         <div className="bg-white border rounded-lg divide-y">
           {applications.map((app) => (
-            <div key={app.id} className="p-4 flex items-center justify-between gap-4">
-              <div className="min-w-0">
+            <div key={app.id} className="flex items-center justify-between gap-4 hover:bg-[#f6f7f9] transition-colors">
+              <Link
+                href={`/admin/applications/${app.id}`}
+                className="flex-1 min-w-0 p-4"
+              >
                 <p className="font-medium text-sm truncate">{app.title}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {app.user.name ?? app.user.email} · {app.period.title} ·{" "}
                   {app._count.files} belge · {app._count.juryAssignments} jüri
                 </p>
-              </div>
+              </Link>
 
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-2 shrink-0 pr-4">
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[app.status]}`}>
                   {STATUS_LABELS[app.status]}
                 </span>
@@ -121,7 +125,7 @@ export function AdminApplicationList({
                   <button
                     onClick={() => moveToReview(app.id)}
                     disabled={movingId === app.id}
-                    className="text-xs px-3 py-1 bg-[#212121] text-white rounded-md hover:bg-[#fab758] hover:text-[#212121] disabled:opacity-50 transition-colors"
+                    className="text-xs px-3 py-1.5 bg-[#212121] text-white rounded-md hover:bg-[#fab758] hover:text-[#212121] disabled:opacity-50 transition-colors font-medium"
                   >
                     {movingId === app.id ? "…" : "İncelemeye Al"}
                   </button>

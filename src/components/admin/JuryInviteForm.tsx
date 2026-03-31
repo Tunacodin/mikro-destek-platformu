@@ -55,7 +55,7 @@ export function JuryInviteForm() {
             onChange={(e) => setEmail(e.target.value)}
             required
             placeholder="juri@ornek.com"
-            className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent"
+            className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#fab758] focus:border-transparent"
           />
         </div>
 
@@ -69,7 +69,7 @@ export function JuryInviteForm() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Adı Soyadı"
-            className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent"
+            className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#fab758] focus:border-transparent"
           />
         </div>
       </div>
@@ -97,7 +97,7 @@ export function JuryInviteForm() {
       <button
         type="submit"
         disabled={status === "loading"}
-        className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-md hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="px-4 py-2 bg-[#212121] text-white text-sm font-medium rounded-md hover:bg-[#fab758] hover:text-[#212121] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {status === "loading" ? "Gönderiliyor…" : "Davet Gönder"}
       </button>

@@ -107,7 +107,7 @@ export function JuryAssignPanel({
             <select
               value={selectedJuryId}
               onChange={(e) => setSelectedJuryId(e.target.value)}
-              className="flex-1 text-sm border rounded-md px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
+              className="flex-1 text-sm border rounded-md px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#fab758] bg-white"
             >
               <option value="">— Seçin —</option>
               {available.map((j) => (
@@ -119,7 +119,7 @@ export function JuryAssignPanel({
             <button
               onClick={assign}
               disabled={!selectedJuryId || loading === "assign"}
-              className="text-sm px-3 py-1.5 bg-slate-900 text-white rounded-md hover:bg-slate-700 disabled:opacity-50 transition-colors shrink-0"
+              className="text-sm px-3 py-1.5 bg-[#212121] text-white rounded-md hover:bg-[#fab758] hover:text-[#212121] disabled:opacity-50 transition-colors shrink-0"
             >
               {loading === "assign" ? "…" : "Ata"}
             </button>
