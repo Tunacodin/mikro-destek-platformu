@@ -62,7 +62,7 @@ export default function DevPortalPage() {
               rel="noopener noreferrer"
               className="group bg-[#212121] border border-[#212121] rounded-xl p-5 hover:border-[#fab758] hover:shadow-sm transition-all flex flex-col"
             >
-              <p className="font-bold text-white text-lg">{s.name}</p>
+              <p className="font-bold text-[#fab758] text-lg">{s.name}</p>
 
               {s.credentials.length > 0 && (
                 <div className="mt-3 space-y-1">
@@ -75,7 +75,7 @@ export default function DevPortalPage() {
                 </div>
               )}
 
-              <p className="mt-auto pt-4 text-xs text-white/30 group-hover:text-[#fab758] transition-colors truncate">
+              <p className="mt-auto pt-4 text-xs text-white/30 truncate">
                 {s.url}
               </p>
             </a>
