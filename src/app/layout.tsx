@@ -14,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr">
-      <body>
+      <body suppressHydrationWarning>
         <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
