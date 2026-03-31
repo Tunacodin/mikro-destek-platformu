@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation"
 import Image from "next/image"
-import Link from "next/link"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -8,7 +7,6 @@ export const metadata: Metadata = {
   icons: { icon: "/favicon.png", shortcut: "/favicon.png" },
 }
 
-// Yalnızca geliştirme ortamında erişilebilir
 export default function DevPortalPage() {
   if (process.env.NODE_ENV !== "development") redirect("/")
 
@@ -17,49 +15,37 @@ export default function DevPortalPage() {
       name: "MDF Uygulaması",
       description: "Next.js uygulama — Admin, Başvuru ve Jüri panelleri",
       url: "http://localhost",
-      port: ":80",
       icon: "🚀",
-      color: "#212121",
+      credentials: [{ label: "Admin", value: "admin@mikrodestekfonu.com / Admin1234!" }],
     },
     {
       name: "pgAdmin",
       description: "PostgreSQL veritabanı yönetim arayüzü",
       url: "http://localhost:5050",
-      port: ":5050",
       icon: "🐘",
-      color: "#336791",
+      credentials: [{ label: "Giriş", value: "admin@mikrodestekfonu.com / Admin1234!" }],
     },
     {
       name: "MinIO Console",
       description: "S3-uyumlu dosya depolama arayüzü",
       url: "http://localhost:9001",
-      port: ":9001",
       icon: "📦",
-      color: "#C72E49",
+      credentials: [{ label: "Giriş", value: "mdfminio / mdfminio123" }],
     },
     {
       name: "Prisma Studio",
       description: "Veritabanı içeriğini görsel olarak incele ve düzenle",
       url: "http://localhost:5555",
-      port: ":5555",
       icon: "🔷",
-      color: "#5A67D8",
+      credentials: [{ label: "DB", value: "mdfuser / mdfpass123 → mikro_destek" }],
     },
     {
       name: "API Docs",
       description: "REST API dokümantasyonu — Scalar ile",
       url: "http://localhost:3000/api/reference",
-      port: ":3000/api/reference",
       icon: "📄",
-      color: "#16A34A",
+      credentials: [],
     },
-  ]
-
-  const credentials = [
-    { label: "Admin Girişi",    value: "admin@mikrodestekfonu.com / Admin1234!" },
-    { label: "PostgreSQL",      value: "mdfuser / mdfpass123 → mikro_destek" },
-    { label: "MinIO",           value: "mdfminio / mdfminio123" },
-    { label: "pgAdmin",         value: "admin@mikrodestekfonu.com / Admin1234!" },
   ]
 
   return (
@@ -80,50 +66,42 @@ export default function DevPortalPage() {
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-8 py-10 space-y-10">
-        {/* Servisler */}
-        <section>
-          <h2 className="text-lg font-semibold text-[#212121] mb-4">Servisler</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {services.map((s) => (
-              <a
-                key={s.name}
-                href={s.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group bg-white border border-[#e9ecef] rounded-xl p-5 hover:border-[#fab758] hover:shadow-sm transition-all"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <span className="text-4xl">{s.icon}</span>
-                  <span className="text-sm text-[#60697b] font-mono bg-[#f6f7f9] px-2.5 py-1 rounded">
-                    {s.port}
-                  </span>
-                </div>
-                <p className="font-bold text-[#212121] text-lg">{s.name}</p>
-                <p className="text-sm text-[#60697b] mt-1.5 leading-relaxed">{s.description}</p>
-                <p className="mt-4 text-sm font-semibold text-[#fab758] group-hover:underline">
-                  Aç →
-                </p>
-              </a>
-            ))}
-          </div>
-        </section>
-
-        {/* Hızlı Erişim Bilgileri */}
-        <section>
-          <h2 className="text-lg font-semibold text-[#212121] mb-4">Erişim Bilgileri</h2>
-          <div className="bg-white border border-[#e9ecef] rounded-xl divide-y divide-[#e9ecef]">
-            {credentials.map((c) => (
-              <div key={c.label} className="flex items-center justify-between px-5 py-3.5">
-                <span className="text-sm text-[#60697b]">{c.label}</span>
-                <code className="text-sm font-mono text-[#212121] bg-[#f6f7f9] px-3 py-1 rounded">
-                  {c.value}
-                </code>
+      <div className="max-w-5xl mx-auto px-8 py-10">
+        <h2 className="text-lg font-semibold text-[#212121] mb-4">Servisler</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {services.map((s) => (
+            <a
+              key={s.name}
+              href={s.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group bg-white border border-[#e9ecef] rounded-xl p-5 hover:border-[#fab758] hover:shadow-sm transition-all flex flex-col"
+            >
+              <div className="mb-4">
+                <span className="text-4xl">{s.icon}</span>
               </div>
-            ))}
-          </div>
-        </section>
+              <p className="font-bold text-[#212121] text-lg">{s.name}</p>
+              <p className="text-sm text-[#60697b] mt-1.5 leading-relaxed">{s.description}</p>
 
+              {s.credentials.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-[#e9ecef] space-y-1.5">
+                  {s.credentials.map((c) => (
+                    <div key={c.label} className="flex items-start gap-2">
+                      <span className="text-xs text-[#60697b] shrink-0 pt-0.5">{c.label}</span>
+                      <code className="text-xs font-mono text-[#212121] bg-[#f6f7f9] px-2 py-0.5 rounded break-all">
+                        {c.value}
+                      </code>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <p className="mt-auto pt-4 text-sm font-semibold text-[#fab758] group-hover:underline">
+                Aç →
+              </p>
+            </a>
+          ))}
+        </div>
       </div>
     </div>
   )
