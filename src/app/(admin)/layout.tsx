@@ -10,9 +10,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="flex h-screen bg-[#f6f7f9]">
       <AdminSidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-14 border-b bg-white flex items-center justify-between px-7 shrink-0">
-          <span className="text-sm font-semibold text-foreground">Mikro Destek Fonu</span>
-          <span className="text-sm text-muted-foreground">
+        <header className="h-16 border-b bg-white flex items-center justify-between px-7 shrink-0">
+          <span className="text-base font-semibold text-foreground">Mikro Destek Fonu</span>
+          <span className="text-base text-muted-foreground">
             {session.user.name ?? session.user.email}
           </span>
         </header>

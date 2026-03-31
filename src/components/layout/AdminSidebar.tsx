@@ -27,8 +27,8 @@ export function AdminSidebar() {
 
   return (
     <aside className="w-64 bg-[#212121] flex flex-col shrink-0">
-      <div className="px-5 py-5 border-b border-white/10">
-        <Image src="/logo-light.png" alt="Divizyon" width={110} height={28} priority />
+      <div className="px-5 py-6 border-b border-white/10">
+        <Image src="/logo-light.png" alt="Divizyon" width={120} height={32} priority />
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-0.5">
@@ -39,7 +39,7 @@ export function AdminSidebar() {
               key={href}
               href={href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                "flex items-center gap-3 px-3 py-3 rounded-lg text-base font-medium transition-colors",
                 isActive
                   ? "bg-[#fab758] text-[#212121]"
                   : "text-white/70 hover:text-white hover:bg-white/10"
@@ -55,7 +55,7 @@ export function AdminSidebar() {
       <div className="px-3 py-4 border-t border-white/10">
         <button
           onClick={() => signOut({ callbackUrl: "/login" })}
-          className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+          className="flex w-full items-center gap-3 px-3 py-3 rounded-lg text-base text-white/70 hover:text-white hover:bg-white/10 transition-colors"
         >
           <LogOut className="h-4 w-4 shrink-0" />
           Çıkış Yap
