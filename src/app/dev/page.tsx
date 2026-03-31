@@ -14,27 +14,27 @@ export default function DevPortalPage() {
     {
       name: "MDF Uygulaması",
       url: "http://localhost",
-      credentials: [{ label: "Admin", value: "admin@mikrodestekfonu.com / Admin1234!" }],
+      credentials: { username: "admin@mikrodestekfonu.com", password: "Admin1234!" },
     },
     {
       name: "pgAdmin",
       url: "http://localhost:5050",
-      credentials: [{ label: "Giriş", value: "admin@mikrodestekfonu.com / Admin1234!" }],
+      credentials: { username: "admin@mikrodestekfonu.com", password: "Admin1234!" },
     },
     {
       name: "MinIO Console",
       url: "http://localhost:9001",
-      credentials: [{ label: "Giriş", value: "mdfminio / mdfminio123" }],
+      credentials: { username: "mdfminio", password: "mdfminio123" },
     },
     {
       name: "Prisma Studio",
       url: "http://localhost:5555",
-      credentials: [{ label: "DB", value: "mdfuser / mdfpass123 → mikro_destek" }],
+      credentials: { username: "mdfuser", password: "mdfpass123" },
     },
     {
       name: "API Docs",
       url: "http://localhost:3000/api/reference",
-      credentials: [],
+      credentials: null,
     },
   ]
 
@@ -64,14 +64,16 @@ export default function DevPortalPage() {
             >
               <p className="font-bold text-[#fab758] text-lg">{s.name}</p>
 
-              {s.credentials.length > 0 && (
-                <div className="mt-3 space-y-1">
-                  {s.credentials.map((c) => (
-                    <div key={c.label} className="flex items-start gap-2">
-                      <span className="text-xs text-white/40 shrink-0 pt-0.5">{c.label}</span>
-                      <span className="text-xs text-white/80 break-all">{c.value}</span>
-                    </div>
-                  ))}
+              {s.credentials && (
+                <div className="mt-3 space-y-1.5">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-white/40">kullanıcı adı:</span>
+                    <span className="text-sm text-white/80 break-all">{s.credentials.username}</span>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-white/40">şifre:</span>
+                    <span className="text-sm text-white/80">{s.credentials.password}</span>
+                  </div>
                 </div>
               )}
 
