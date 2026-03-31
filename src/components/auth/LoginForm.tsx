@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { signIn } from "next-auth/react"
-import Link from "next/link"
 
 export function LoginForm() {
   const router = useRouter()
@@ -91,12 +90,6 @@ export function LoginForm() {
         </button>
       </form>
 
-      <p className="text-center text-sm text-muted-foreground">
-        Hesabınız yok mu?{" "}
-        <Link href="/register" className="font-medium text-[#212121] hover:text-[#fab758] transition-colors">
-          Kayıt olun
-        </Link>
-      </p>
     </div>
   )
 }
