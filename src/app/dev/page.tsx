@@ -68,7 +68,7 @@ export default function DevPortalPage() {
       <header className="bg-[#212121] px-8 py-5">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Image src="/logo-dark.png" alt="Divizyon" width={120} height={30} priority />
+            <Image src="/logo-light.png" alt="Divizyon" width={120} height={30} priority />
             <div>
               <p className="text-white font-semibold text-base">Mikro Destek Fonu</p>
               <p className="text-white/40 text-xs">Geliştirici Portalı</p>
