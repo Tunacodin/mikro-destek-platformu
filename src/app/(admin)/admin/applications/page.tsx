@@ -35,7 +35,7 @@ export default async function AdminApplicationsPage({
   })
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Başvurular</h1>
         <p className="text-sm text-muted-foreground mt-1">{applications.length} başvuru</p>

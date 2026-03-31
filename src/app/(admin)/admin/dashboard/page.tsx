@@ -60,7 +60,7 @@ export default async function AdminDashboardPage() {
     new Date(d).toLocaleDateString("tr-TR", { day: "numeric", month: "short" })
 
   return (
-    <div className="space-y-4 max-w-6xl">
+    <div className="space-y-4">
       <div>
         <h1 className="text-xl font-bold">Genel Bakış</h1>
         <p className="text-sm text-muted-foreground">
