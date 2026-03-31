@@ -57,14 +57,12 @@ export default function DevPortalPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#f6f7f9]">
+    <div className="min-h-screen bg-[#f6f7f9] overscroll-none">
       {/* Header */}
       <header className="bg-[#212121] px-8 py-5">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="bg-white rounded-lg px-3 py-1.5">
-              <Image src="/logo.png" alt="Divizyon" width={100} height={26} priority />
-            </div>
+            <Image src="/logo.png" alt="Divizyon" width={110} height={28} priority className="brightness-0 invert" />
             <div>
               <p className="text-white font-semibold text-base">Mikro Destek Fonu</p>
               <p className="text-white/40 text-xs">Geliştirici Portalı</p>
@@ -89,15 +87,15 @@ export default function DevPortalPage() {
                 rel="noopener noreferrer"
                 className="group bg-white border border-[#e9ecef] rounded-xl p-5 hover:border-[#fab758] hover:shadow-sm transition-all"
               >
-                <div className="flex items-start justify-between mb-3">
-                  <span className="text-2xl">{s.icon}</span>
-                  <span className="text-xs text-[#60697b] font-mono bg-[#f6f7f9] px-2 py-0.5 rounded">
+                <div className="flex items-start justify-between mb-4">
+                  <span className="text-4xl">{s.icon}</span>
+                  <span className="text-sm text-[#60697b] font-mono bg-[#f6f7f9] px-2.5 py-1 rounded">
                     {s.port}
                   </span>
                 </div>
-                <p className="font-semibold text-[#212121] text-sm">{s.name}</p>
-                <p className="text-xs text-[#60697b] mt-1 leading-relaxed">{s.description}</p>
-                <p className="mt-3 text-xs font-medium text-[#fab758] group-hover:underline">
+                <p className="font-bold text-[#212121] text-lg">{s.name}</p>
+                <p className="text-sm text-[#60697b] mt-1.5 leading-relaxed">{s.description}</p>
+                <p className="mt-4 text-sm font-semibold text-[#fab758] group-hover:underline">
                   Aç →
                 </p>
               </a>
