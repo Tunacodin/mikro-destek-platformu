@@ -47,7 +47,8 @@ export default function DevPortalPage() {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-8 py-12">
+      <div className="px-8 py-12">
+      <div className="max-w-4xl mx-auto">
         <h1 className="text-sm font-semibold text-[#212121] uppercase tracking-widest mb-8">
           Geliştirici Portalı
         </h1>
@@ -82,6 +83,7 @@ export default function DevPortalPage() {
             </a>
           ))}
         </div>
+      </div>
       </div>
     </div>
   )
