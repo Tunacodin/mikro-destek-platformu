@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    /* Temel — Divizyon marka renkleri */
+    /* Temel - Divizyon marka renkleri */
     --background: 0 0% 100%;           /* #fefefe */
     --foreground: 0 0% 13%;            /* #212121 */
 
@@ -15,7 +15,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 13%;
 
-    /* Primary — Divizyon sarı #fab758 */
+    /* Primary - Divizyon sari #fab758 */
     --primary: 38 94% 66%;
     --primary-foreground: 0 0% 13%;
 
@@ -36,14 +36,14 @@
     --ring: 38 94% 66%;
     --radius: 0.5rem;
 
-    /* Grafik renkleri — durum makinesi */
+    /* Grafik renkleri - durum makinesi */
     --chart-1: 38 94% 66%;            /* warning / IN_REVIEW */
     --chart-2: 152 69% 31%;           /* success / SUPPORTED */
     --chart-3: 210 33% 38%;           /* info / SUBMITTED */
     --chart-4: 284 42% 42%;           /* purple / EVALUATED */
     --chart-5: 0 72% 51%;             /* danger / REJECTED */
 
-    /* Sidebar — koyu #212121 tema */
+    /* Sidebar - koyu #212121 tema */
     --sidebar-background: 0 0% 13%;
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 38 94% 66%;
