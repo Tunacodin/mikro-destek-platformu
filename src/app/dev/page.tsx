@@ -59,13 +59,13 @@ export default function DevPortalPage() {
   return (
     <div className="min-h-screen bg-[#f6f7f9] overscroll-none">
       {/* Header */}
-      <header className="bg-white border-b border-[#e9ecef] px-8 py-5">
+      <header className="bg-[#212121] px-8 py-5">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Image src="/logo.png" alt="Divizyon" width={110} height={28} priority />
+            <Image src="/logo-dark.png" alt="Divizyon" width={120} height={30} priority />
             <div>
-              <p className="text-[#212121] font-semibold text-base">Mikro Destek Fonu</p>
-              <p className="text-[#60697b] text-xs">Geliştirici Portalı</p>
+              <p className="text-white font-semibold text-base">Mikro Destek Fonu</p>
+              <p className="text-white/40 text-xs">Geliştirici Portalı</p>
             </div>
           </div>
           <span className="text-xs font-medium bg-[#fab758] text-[#212121] px-3 py-1 rounded-full">
