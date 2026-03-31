@@ -118,28 +118,6 @@ export default function DevPortalPage() {
           </div>
         </section>
 
-        {/* Hızlı linkler */}
-        <section>
-          <h2 className="text-lg font-semibold text-[#212121] mb-4">Hızlı Bağlantılar</h2>
-          <div className="flex flex-wrap gap-3">
-            {[
-              { label: "Admin Girişi",    href: "http://localhost/login" },
-              { label: "Admin Paneli",    href: "http://localhost/admin/dashboard" },
-              { label: "Başvuru Paneli",  href: "http://localhost/dashboard" },
-              { label: "Jüri Paneli",     href: "http://localhost/jury/dashboard" },
-            ].map((l) => (
-              <a
-                key={l.label}
-                href={l.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 bg-[#212121] text-white text-sm font-medium rounded-lg hover:bg-[#fab758] hover:text-[#212121] transition-colors"
-              >
-                {l.label}
-              </a>
-            ))}
-          </div>
-        </section>
       </div>
     </div>
   )
