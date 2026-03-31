@@ -29,7 +29,6 @@ export function AdminSidebar() {
     <aside className="w-64 bg-[#212121] flex flex-col shrink-0">
       <div className="px-5 py-5 border-b border-white/10">
         <Image src="/logo-light.png" alt="Divizyon" width={110} height={28} priority />
-        <p className="text-white/40 text-xs mt-3">Program Yöneticisi</p>
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-0.5">
