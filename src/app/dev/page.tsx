@@ -1,6 +1,12 @@
 import { redirect } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Dev Portal — Mikro Destek Fonu",
+  icons: { icon: "/favicon.png", shortcut: "/favicon.png" },
+}
 
 // Yalnızca geliştirme ortamında erişilebilir
 export default function DevPortalPage() {
