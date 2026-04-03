@@ -63,23 +63,23 @@ export function FileUploader({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {/* Drop zone */}
       <div
         onClick={() => inputRef.current?.click()}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => { e.preventDefault(); handleFiles(e.dataTransfer.files) }}
-        className="border-2 border-dashed border-slate-200 rounded-lg p-8 text-center cursor-pointer hover:border-slate-400 hover:bg-slate-50 transition-colors"
+        className="rounded-2xl border-2 border-dashed border-[#e0e0e0] bg-[#f5f5f5] p-8 text-center cursor-pointer hover:border-[#aeaeb2] hover:bg-[#efefef] transition-colors"
       >
         {uploading ? (
-          <Loader2 className="w-8 h-8 animate-spin text-slate-400 mx-auto" />
+          <Loader2 className="w-7 h-7 animate-spin text-[#aeaeb2] mx-auto" />
         ) : (
-          <Upload className="w-8 h-8 text-slate-300 mx-auto" />
+          <Upload className="w-7 h-7 text-[#c7c7cc] mx-auto" />
         )}
-        <p className="text-sm font-medium mt-2">
-          {uploading ? "Yükleniyor…" : "Tıklayın veya dosyayı buraya sürükleyin"}
+        <p className="text-[13px] font-semibold text-[#6e6e73] mt-2.5">
+          {uploading ? "Yükleniyor…" : "Tıklayın veya sürükleyin"}
         </p>
-        <p className="text-xs text-muted-foreground mt-1">PDF, Word, Excel · maks. 10 MB</p>
+        <p className="text-[11px] text-[#aeaeb2] mt-0.5">PDF, Word, Excel · maks. 10 MB</p>
         <input
           ref={inputRef} type="file" multiple className="hidden"
           accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
@@ -88,24 +88,28 @@ export function FileUploader({
       </div>
 
       {error && (
-        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-2">{error}</p>
+        <div className="bg-red-50 rounded-xl px-4 py-2.5">
+          <p className="text-[13px] text-red-600">{error}</p>
+        </div>
       )}
 
       {/* Yüklenen dosyalar */}
       {files.length > 0 && (
-        <ul className="divide-y border rounded-lg overflow-hidden">
+        <ul className="bg-white rounded-2xl border border-black/[0.06] overflow-hidden divide-y divide-black/[0.04]">
           {files.map((f) => (
-            <li key={f.id} className="flex items-center gap-3 px-4 py-3 bg-white">
-              <FileText className="w-4 h-4 text-slate-400 shrink-0" />
+            <li key={f.id} className="flex items-center gap-3 px-4 py-3.5">
+              <div className="w-8 h-8 rounded-lg bg-[#f5f5f5] border border-black/[0.05] flex items-center justify-center shrink-0">
+                <FileText className="w-4 h-4 text-[#aeaeb2]" />
+              </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm truncate">{f.name}</p>
-                <p className="text-xs text-muted-foreground">{formatSize(f.size)}</p>
+                <p className="text-[13px] font-medium text-[#1c1c1c] truncate">{f.name}</p>
+                <p className="text-[11px] text-[#aeaeb2]">{formatSize(f.size)}</p>
               </div>
               <button
                 onClick={() => removeFile(f.id)}
-                className="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-[#aeaeb2] hover:bg-red-50 hover:text-red-400 transition-colors"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5" />
               </button>
             </li>
           ))}

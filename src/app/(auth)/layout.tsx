@@ -1,13 +1,9 @@
-import Image from "next/image"
-
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background flex flex-col justify-center">
-      <main className="flex-1 flex flex-col justify-center">
-        <div className="mx-auto w-full max-w-[420px] px-6 py-8">
-          {children}
-        </div>
-      </main>
+    <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center px-4">
+      <div className="w-full max-w-[400px]">
+        {children}
+      </div>
     </div>
   )
 }

@@ -10,10 +10,13 @@ const STATUS_LABELS: Record<ApplicationStatus, string> = {
   DRAFT: "Taslak", SUBMITTED: "Gönderildi", IN_REVIEW: "İncelemede",
   EVALUATED: "Değerlendirildi", SUPPORTED: "Desteklendi", REJECTED: "Reddedildi",
 }
-const STATUS_COLORS: Record<ApplicationStatus, string> = {
-  DRAFT: "bg-slate-100 text-slate-700", SUBMITTED: "bg-blue-100 text-blue-700",
-  IN_REVIEW: "bg-amber-100 text-amber-700", EVALUATED: "bg-purple-100 text-purple-700",
-  SUPPORTED: "bg-green-100 text-green-700", REJECTED: "bg-red-100 text-red-700",
+const STATUS_STYLES: Record<ApplicationStatus, string> = {
+  DRAFT:     "bg-[#f0f0f0] text-[#6e6e73]",
+  SUBMITTED: "bg-blue-50 text-blue-600",
+  IN_REVIEW: "bg-amber-50 text-amber-600",
+  EVALUATED: "bg-purple-50 text-purple-600",
+  SUPPORTED: "bg-emerald-50 text-emerald-600",
+  REJECTED:  "bg-red-50 text-red-500",
 }
 
 export default async function JuryAssignmentsPage() {
@@ -36,103 +39,95 @@ export default async function JuryAssignmentsPage() {
   })
 
   const pending = assignments.filter((a) => a.application.status === "IN_REVIEW")
-  const done = assignments.filter((a) => a.application.status !== "IN_REVIEW")
+  const done    = assignments.filter((a) => a.application.status !== "IN_REVIEW")
 
   return (
     <div className="p-6 overflow-auto h-full">
-    <div className="space-y-6 max-w-4xl">
-      <div>
-        <h1 className="text-2xl font-bold">Atamalarım</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          {pending.length} bekleyen · {done.length} tamamlanan
-        </p>
-      </div>
+      <div className="max-w-3xl space-y-5">
 
-      {assignments.length === 0 && (
-        <div className="bg-white border rounded-lg p-8 text-center">
-          <p className="text-sm text-muted-foreground">Henüz atama yapılmadı.</p>
+        {/* Başlık */}
+        <div>
+          <h1 className="text-xl font-semibold text-[#1c1c1c]">Atamalarım</h1>
+          <p className="text-[13px] text-[#6e6e73] mt-0.5">
+            {pending.length} bekleyen · {done.length} tamamlanan
+          </p>
         </div>
-      )}
 
-      {pending.length > 0 && (
-        <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-            Değerlendirme Bekliyor
-          </h2>
-          <AssignmentList items={pending} />
-        </section>
-      )}
+        {/* Boş */}
+        {assignments.length === 0 && (
+          <div className="bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.06)] p-10 text-center">
+            <p className="text-[14px] font-medium text-[#1c1c1c]">Henüz atama yapılmadı</p>
+            <p className="text-[13px] text-[#6e6e73] mt-1">Program yöneticisi başvuruları atadığında burada görünecek.</p>
+          </div>
+        )}
 
-      {done.length > 0 && (
-        <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-            Tamamlanan
-          </h2>
-          <AssignmentList items={done} />
-        </section>
-      )}
-    </div>
+        {/* Bekleyen */}
+        {pending.length > 0 && (
+          <section className="space-y-2.5">
+            <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em]">Değerlendirme Bekliyor</p>
+            <div className="bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.06)] overflow-hidden divide-y divide-black/[0.04]">
+              {pending.map(({ application: app }) => (
+                <AssignmentRow key={app.id} app={app} canEval />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Tamamlanan */}
+        {done.length > 0 && (
+          <section className="space-y-2.5">
+            <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em]">Tamamlanan</p>
+            <div className="bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.06)] overflow-hidden divide-y divide-black/[0.04]">
+              {done.map(({ application: app }) => (
+                <AssignmentRow key={app.id} app={app} canEval={false} />
+              ))}
+            </div>
+          </section>
+        )}
+
+      </div>
     </div>
   )
 }
 
-function AssignmentList({
-  items,
+function AssignmentRow({
+  app, canEval,
 }: {
-  items: Awaited<ReturnType<typeof prisma.juryAssignment.findMany<{
-    include: {
-      application: {
-        include: {
-          user: { select: { name: true; email: true } }
-          period: { select: { title: true } }
-          evaluation: { select: { id: true } }
-          _count: { select: { files: true } }
-        }
-      }
-    }
-  }>>>
+  app: {
+    id: string; title: string; status: ApplicationStatus;
+    user: { name: string | null; email: string };
+    period: { title: string };
+    evaluation: { id: string } | null;
+    _count: { files: number };
+  }
+  canEval: boolean
 }) {
   return (
-    <div className="bg-white border rounded-lg divide-y">
-      {items.map(({ application: app }) => {
-        const canEval = app.status === "IN_REVIEW"
-        return (
-          <div key={app.id} className="p-4 flex items-center justify-between gap-4">
-            <div className="min-w-0">
-              <p className="font-medium text-sm truncate">{app.title}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {app.user.name ?? app.user.email} · {app.period.title} ·{" "}
-                {app._count.files} dosya
-              </p>
-            </div>
+    <div className="px-5 py-4 flex items-center justify-between gap-4 hover:bg-[#fafafa] transition-colors">
+      <div className="min-w-0 space-y-1">
+        <p className="text-[14px] font-semibold text-[#1c1c1c] truncate">{app.title}</p>
+        <p className="text-[12px] text-[#6e6e73]">
+          {app.user.name ?? app.user.email} · {app.period.title} · {app._count.files} dosya
+        </p>
+      </div>
 
-            <div className="flex items-center gap-2 shrink-0">
-              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[app.status]}`}>
-                {STATUS_LABELS[app.status]}
-              </span>
-              {app.evaluation && (
-                <span className="text-xs text-purple-600 font-medium">✓ Değerlendirildi</span>
-              )}
-              {canEval && (
-                <Link
-                  href={`/jury/evaluate/${app.id}`}
-                  className="text-xs px-3 py-1 bg-slate-900 text-white rounded-md hover:bg-slate-700 transition-colors"
-                >
-                  Değerlendir
-                </Link>
-              )}
-              {!canEval && (
-                <Link
-                  href={`/jury/evaluate/${app.id}`}
-                  className="text-xs px-3 py-1 border rounded-md hover:bg-slate-50 transition-colors"
-                >
-                  Görüntüle
-                </Link>
-              )}
-            </div>
-          </div>
-        )
-      })}
+      <div className="flex items-center gap-2.5 shrink-0">
+        <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLES[app.status]}`}>
+          {STATUS_LABELS[app.status]}
+        </span>
+        {app.evaluation && (
+          <span className="text-[11px] font-medium text-emerald-600">✓</span>
+        )}
+        <Link
+          href={`/jury/evaluate/${app.id}`}
+          className={canEval
+            ? "text-[12px] font-semibold px-3 py-1.5 bg-[#212121] text-white rounded-xl hover:opacity-80 transition-opacity"
+            : "text-[12px] font-medium px-3 py-1.5 bg-[#f0f0f0] text-[#6e6e73] rounded-xl hover:bg-[#e8e8e8] transition-colors"
+          }
+        >
+          {canEval ? "Değerlendir" : "Görüntüle"}
+        </Link>
+      </div>
     </div>
   )
 }

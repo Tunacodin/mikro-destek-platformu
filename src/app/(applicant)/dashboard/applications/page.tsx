@@ -7,21 +7,17 @@ import type { ApplicationStatus } from "@prisma/client"
 export const metadata = { title: "Başvurularım — Mikro Destek Fonu" }
 
 const STATUS_LABELS: Record<ApplicationStatus, string> = {
-  DRAFT: "Taslak",
-  SUBMITTED: "Gönderildi",
-  IN_REVIEW: "İncelemede",
-  EVALUATED: "Değerlendirildi",
-  SUPPORTED: "Desteklendi",
-  REJECTED: "Reddedildi",
+  DRAFT: "Taslak", SUBMITTED: "Gönderildi", IN_REVIEW: "İncelemede",
+  EVALUATED: "Değerlendirildi", SUPPORTED: "Desteklendi", REJECTED: "Reddedildi",
 }
 
-const STATUS_COLORS: Record<ApplicationStatus, string> = {
-  DRAFT: "bg-slate-100 text-slate-700",
-  SUBMITTED: "bg-blue-100 text-blue-700",
-  IN_REVIEW: "bg-amber-100 text-amber-700",
-  EVALUATED: "bg-purple-100 text-purple-700",
-  SUPPORTED: "bg-green-100 text-green-700",
-  REJECTED: "bg-red-100 text-red-700",
+const STATUS_STYLES: Record<ApplicationStatus, string> = {
+  DRAFT:     "bg-[#f0f0f0] text-[#6e6e73]",
+  SUBMITTED: "bg-blue-50 text-blue-600",
+  IN_REVIEW: "bg-amber-50 text-amber-600",
+  EVALUATED: "bg-purple-50 text-purple-600",
+  SUPPORTED: "bg-emerald-50 text-emerald-600",
+  REJECTED:  "bg-red-50 text-red-500",
 }
 
 export default async function ApplicationsPage({
@@ -47,73 +43,79 @@ export default async function ApplicationsPage({
     new Date(d).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })
 
   return (
-    <div className="space-y-6 max-w-3xl">
-      <div className="flex items-center justify-between">
+    <div className="space-y-7">
+      {/* Başlık */}
+      <div className="flex items-start justify-between gap-4 pb-6 border-b border-black/[0.06]">
         <div>
-          <h1 className="text-2xl font-bold">Başvurularım</h1>
-          <p className="text-sm text-muted-foreground mt-1">{applications.length} başvuru</p>
+          <p className="text-[11px] font-semibold text-[#aeaeb2] uppercase tracking-widest mb-2">
+            Başvuru Sahibi
+          </p>
+          <h1 className="text-[26px] font-semibold tracking-tight text-[#1c1c1c] leading-none">Başvurularım</h1>
+          <p className="text-[13px] text-[#6e6e73] mt-2">{applications.length} başvuru</p>
         </div>
         <Link
           href="/dashboard/apply"
-          className="px-4 py-2 bg-[#212121] text-white text-sm font-medium rounded-lg hover:bg-[#fab758] hover:text-[#212121] transition-colors"
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-[#212121] text-white text-[13px] font-semibold rounded-xl hover:opacity-80 transition-opacity shrink-0"
         >
           + Yeni Başvuru
         </Link>
       </div>
 
+      {/* Gönderim başarı bildirimi */}
       {submitted && (
-        <div className="bg-green-50 border border-green-200 text-green-800 text-sm rounded-lg p-4">
-          Başvurunuz başarıyla gönderildi. Değerlendirme sürecini buradan takip edebilirsiniz.
+        <div className="bg-emerald-50 border border-emerald-100 rounded-2xl px-5 py-4">
+          <p className="text-[13px] font-medium text-emerald-700">
+            Başvurunuz başarıyla gönderildi. Değerlendirme sürecini buradan takip edebilirsiniz.
+          </p>
         </div>
       )}
 
+      {/* Boş durum */}
       {applications.length === 0 ? (
-        <div className="bg-white border rounded-lg p-10 text-center">
-          <p className="font-medium">Henüz başvurunuz yok.</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Aktif bir dönemde başvurunuzu oluşturabilirsiniz.
-          </p>
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] p-12 text-center space-y-3">
+          <p className="text-[16px] font-semibold text-[#1c1c1c]">Henüz başvurunuz yok</p>
+          <p className="text-[13px] text-[#6e6e73]">Aktif bir dönemde başvurunuzu oluşturabilirsiniz.</p>
           <Link
             href="/dashboard/apply"
-            className="inline-block mt-4 px-4 py-2 bg-[#212121] text-white text-sm font-medium rounded-lg hover:bg-[#fab758] hover:text-[#212121] transition-colors"
+            className="inline-flex items-center gap-1.5 mt-2 px-4 py-2.5 bg-[#212121] text-white text-[13px] font-semibold rounded-xl hover:opacity-80 transition-opacity"
           >
             Başvuru Yap
           </Link>
         </div>
       ) : (
-        <div className="space-y-3">
+        /* Liste */
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] overflow-hidden divide-y divide-black/[0.04]">
           {applications.map((app) => {
             const daysLeft = Math.ceil(
               (new Date(app.period.endDate).getTime() - Date.now()) / 86_400_000
             )
-
             return (
-              <div key={app.id} className="bg-white border rounded-lg p-5">
+              <div key={app.id} className="px-6 py-5 hover:bg-[#fafafa] transition-colors">
                 <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <p className="font-medium truncate">{app.title}</p>
-                    <p className="text-sm text-muted-foreground mt-0.5">
+                  <div className="min-w-0 space-y-1.5">
+                    <p className="text-[14px] font-semibold text-[#1c1c1c] truncate">{app.title}</p>
+                    <p className="text-[12px] text-[#6e6e73]">
                       {app.period.title} · {app._count.files} belge
                     </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Dönem bitiş: {fmt(app.period.endDate)}
+                    <p className="text-[12px] text-[#aeaeb2]">
+                      Dönem bitişi: {fmt(app.period.endDate)}
                       {app.status === "DRAFT" && daysLeft > 0 && daysLeft <= 3 && (
-                        <span className="ml-2 text-amber-600 font-medium">{daysLeft} gün kaldı!</span>
+                        <span className="ml-2 text-amber-600 font-semibold">{daysLeft} gün kaldı</span>
                       )}
                     </p>
                   </div>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${STATUS_COLORS[app.status]}`}>
+                  <span className={`shrink-0 text-[11px] font-semibold px-3 py-1.5 rounded-full ${STATUS_STYLES[app.status]}`}>
                     {STATUS_LABELS[app.status]}
                   </span>
                 </div>
 
                 {app.status === "DRAFT" && (
-                  <div className="mt-3">
+                  <div className="mt-3 pt-3 border-t border-black/[0.05]">
                     <Link
                       href={`/dashboard/applications/${app.id}`}
-                      className="text-sm text-[#212121] font-medium hover:text-[#fab758] transition-colors"
+                      className="text-[13px] font-medium text-[#1c1c1c] hover:opacity-60 transition-opacity"
                     >
-                      Düzenle ve gönder →
+                      Düzenle ve Gönder →
                     </Link>
                   </div>
                 )}
