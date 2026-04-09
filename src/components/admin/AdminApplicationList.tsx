@@ -1,9 +1,10 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useRef } from "react"
 import Link from "next/link"
 import type { ApplicationStatus } from "@prisma/client"
+import { FileText, Users, ArrowRight } from "lucide-react"
 
 type App = {
   id: string
@@ -16,21 +17,30 @@ type App = {
 }
 
 const STATUS_LABELS: Record<ApplicationStatus, string> = {
-  DRAFT: "Taslak",
+  DRAFT:     "Taslak",
   SUBMITTED: "Gönderildi",
   IN_REVIEW: "İncelemede",
   EVALUATED: "Değerlendirildi",
   SUPPORTED: "Desteklendi",
-  REJECTED: "Reddedildi",
+  REJECTED:  "Reddedildi",
 }
 
 const STATUS_COLORS: Record<ApplicationStatus, string> = {
-  DRAFT: "bg-slate-100 text-slate-700",
-  SUBMITTED: "bg-blue-100 text-blue-700",
-  IN_REVIEW: "bg-amber-100 text-amber-700",
-  EVALUATED: "bg-purple-100 text-purple-700",
-  SUPPORTED: "bg-green-100 text-green-700",
-  REJECTED: "bg-red-100 text-red-700",
+  DRAFT:     "bg-slate-100 text-slate-600",
+  SUBMITTED: "bg-blue-50 text-blue-700",
+  IN_REVIEW: "bg-amber-50 text-amber-700",
+  EVALUATED: "bg-purple-50 text-purple-700",
+  SUPPORTED: "bg-emerald-50 text-emerald-700",
+  REJECTED:  "bg-red-50 text-red-600",
+}
+
+const STATUS_DOT: Record<ApplicationStatus, string> = {
+  DRAFT:     "bg-slate-400",
+  SUBMITTED: "bg-blue-500",
+  IN_REVIEW: "bg-amber-400",
+  EVALUATED: "bg-purple-500",
+  SUPPORTED: "bg-emerald-500",
+  REJECTED:  "bg-red-500",
 }
 
 const ALL_STATUSES: ApplicationStatus[] = [
@@ -50,6 +60,7 @@ export function AdminApplicationList({
 }) {
   const router = useRouter()
   const [movingId, setMovingId] = useState<string | null>(null)
+  const pendingRef = useRef(false)
 
   function filter(key: string, value: string | undefined) {
     const params = new URLSearchParams()
@@ -59,15 +70,22 @@ export function AdminApplicationList({
     router.push(`/admin/applications?${params.toString()}`)
   }
 
-  async function moveToReview(id: string) {
+  async function moveToReview(e: React.MouseEvent, id: string) {
+    e.preventDefault()
+    if (pendingRef.current) return
+    pendingRef.current = true
     setMovingId(id)
-    await fetch(`/api/admin/applications/${id}/status`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "IN_REVIEW" }),
-    })
-    setMovingId(null)
-    router.refresh()
+    try {
+      await fetch(`/api/admin/applications/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "IN_REVIEW" }),
+      })
+      router.refresh()
+    } finally {
+      pendingRef.current = false
+      setMovingId(null)
+    }
   }
 
   return (
@@ -77,7 +95,7 @@ export function AdminApplicationList({
         <select
           value={currentStatus ?? ""}
           onChange={(e) => filter("status", e.target.value || undefined)}
-          className="px-3 py-1.5 text-sm border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-[#fab758]"
+          className="px-3.5 py-2 text-[13px] font-medium border border-black/[0.08] rounded-xl bg-white text-[#1c1c1c] focus:outline-none focus:ring-2 focus:ring-[#fab758]/40 focus:border-[#fab758]/30 transition-all cursor-pointer"
         >
           <option value="">Tüm Durumlar</option>
           {ALL_STATUSES.map((s) => (
@@ -88,7 +106,7 @@ export function AdminApplicationList({
         <select
           value={currentPeriod ?? ""}
           onChange={(e) => filter("period", e.target.value || undefined)}
-          className="px-3 py-1.5 text-sm border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-[#fab758]"
+          className="px-3.5 py-2 text-[13px] font-medium border border-black/[0.08] rounded-xl bg-white text-[#1c1c1c] focus:outline-none focus:ring-2 focus:ring-[#fab758]/40 focus:border-[#fab758]/30 transition-all cursor-pointer"
         >
           <option value="">Tüm Dönemler</option>
           {periods.map((p) => (
@@ -98,40 +116,60 @@ export function AdminApplicationList({
       </div>
 
       {applications.length === 0 ? (
-        <div className="bg-white border rounded-lg p-8 text-center">
-          <p className="text-sm text-muted-foreground">Başvuru bulunamadı.</p>
+        <div className="bg-white border border-black/[0.06] rounded-2xl p-10 text-center shadow-[0_1px_6px_rgba(0,0,0,0.04)]">
+          <p className="text-[14px] text-[#6e6e73]">Başvuru bulunamadı.</p>
         </div>
       ) : (
-        <div className="bg-white border rounded-lg divide-y">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
           {applications.map((app) => (
-            <div key={app.id} className="flex items-center justify-between gap-4 hover:bg-[#f6f7f9] transition-colors">
-              <Link
-                href={`/admin/applications/${app.id}`}
-                className="flex-1 min-w-0 p-4"
-              >
-                <p className="font-medium text-sm truncate">{app.title}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {app.user.name ?? app.user.email} · {app.period.title} ·{" "}
-                  {app._count.files} belge · {app._count.juryAssignments} jüri
-                </p>
-              </Link>
-
-              <div className="flex items-center gap-2 shrink-0 pr-4">
-                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[app.status]}`}>
+            <Link
+              key={app.id}
+              href={`/admin/applications/${app.id}`}
+              className="group bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_4px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:border-black/[0.1] transition-all duration-200 p-4 flex flex-col gap-3 cursor-pointer"
+            >
+              {/* Top row */}
+              <div className="flex items-start justify-between gap-2">
+                <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full ${STATUS_COLORS[app.status]}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT[app.status]}`} />
                   {STATUS_LABELS[app.status]}
                 </span>
-
-                {app.status === "SUBMITTED" && (
-                  <button
-                    onClick={() => moveToReview(app.id)}
-                    disabled={movingId === app.id}
-                    className="text-xs px-3 py-1.5 bg-[#212121] text-white rounded-md hover:bg-[#fab758] hover:text-[#212121] disabled:opacity-50 transition-colors font-medium"
-                  >
-                    {movingId === app.id ? "…" : "İncelemeye Al"}
-                  </button>
-                )}
+                <ArrowRight className="w-3.5 h-3.5 text-[#d1d1d6] group-hover:text-[#aeaeb2] shrink-0 mt-0.5 transition-colors" />
               </div>
-            </div>
+
+              {/* Title */}
+              <div>
+                <p className="text-[13px] font-semibold text-[#1c1c1c] leading-snug line-clamp-2">
+                  {app.title}
+                </p>
+                <p className="text-[11px] text-[#aeaeb2] mt-1">
+                  {app.user.name ?? app.user.email}
+                </p>
+              </div>
+
+              {/* Footer */}
+              <div className="flex items-center justify-between mt-auto pt-2 border-t border-black/[0.04]">
+                <span className="text-[11px] text-[#aeaeb2] truncate">{app.period.title}</span>
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <span className="inline-flex items-center gap-1 text-[11px] text-[#aeaeb2]">
+                    <FileText className="w-3 h-3" /> {app._count.files}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[11px] text-[#aeaeb2]">
+                    <Users className="w-3 h-3" /> {app._count.juryAssignments}
+                  </span>
+                </div>
+              </div>
+
+              {/* CTA for SUBMITTED */}
+              {app.status === "SUBMITTED" && (
+                <button
+                  onClick={(e) => moveToReview(e, app.id)}
+                  disabled={movingId === app.id}
+                  className="w-full py-2 text-[12px] font-semibold bg-[#212121] text-white rounded-xl hover:bg-[#2d2d2d] disabled:opacity-50 transition-colors cursor-pointer"
+                >
+                  {movingId === app.id ? "İşleniyor…" : "İncelemeye Al"}
+                </button>
+              )}
+            </Link>
           ))}
         </div>
       )}

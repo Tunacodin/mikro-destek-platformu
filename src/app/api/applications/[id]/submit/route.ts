@@ -53,5 +53,19 @@ export async function POST(
     data: { status: "SUBMITTED", submittedAt: new Date() },
   })
 
+  // Protokol onayını audit log'a kaydet (İş Kuralı #2)
+  await prisma.auditLog.create({
+    data: {
+      action: "PROTOCOL_ACCEPTED",
+      metadata: {
+        applicationId: id,
+        title: application.title,
+        protocolAccepted: true,
+        submittedAt: new Date().toISOString(),
+      },
+      userId: session.user.id,
+    },
+  })
+
   return NextResponse.json(updated)
 }

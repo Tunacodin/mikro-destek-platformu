@@ -69,7 +69,7 @@ export function FileUploader({
         onClick={() => inputRef.current?.click()}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => { e.preventDefault(); handleFiles(e.dataTransfer.files) }}
-        className="rounded-2xl border-2 border-dashed border-[#e0e0e0] bg-[#f5f5f5] p-8 text-center cursor-pointer hover:border-[#aeaeb2] hover:bg-[#efefef] transition-colors"
+        className="rounded-2xl border-2 border-dashed border-[#e0e0e0] bg-[#f5f5f5] p-6 sm:p-8 text-center cursor-pointer hover:border-[#fab758]/50 hover:bg-[#fafafa] transition-colors"
       >
         {uploading ? (
           <Loader2 className="w-7 h-7 animate-spin text-[#aeaeb2] mx-auto" />
@@ -107,7 +107,7 @@ export function FileUploader({
               </div>
               <button
                 onClick={() => removeFile(f.id)}
-                className="w-7 h-7 rounded-lg flex items-center justify-center text-[#aeaeb2] hover:bg-red-50 hover:text-red-400 transition-colors"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-[#aeaeb2] hover:bg-red-50 hover:text-red-400 transition-colors cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>

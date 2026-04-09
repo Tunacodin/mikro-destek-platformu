@@ -95,8 +95,7 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
-      "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   }
 
   ::selection {
@@ -120,5 +119,22 @@
 
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 0, 0, 0.22);
+  }
+}
+
+@keyframes floatToLogo {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(1);
+  }
+  12% {
+    opacity: var(--peak-opacity, 0.38);
+  }
+  75% {
+    opacity: calc(var(--peak-opacity, 0.38) * 0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty)) scale(0.25);
   }
 }

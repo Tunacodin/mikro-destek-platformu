@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
+import { Readable } from "stream"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-import { getPresignedUrl } from "@/lib/minio"
+import { getFileStream } from "@/lib/minio"
 
 export async function GET(
   _req: NextRequest,
@@ -38,6 +39,17 @@ export async function GET(
     }
   }
 
-  const url = await getPresignedUrl(file.bucket, file.key)
-  return NextResponse.redirect(url)
+  const nodeStream = await getFileStream(file.bucket, file.key)
+  const webStream = Readable.toWeb(nodeStream) as ReadableStream
+
+  const safeName = encodeURIComponent(file.name).replace(/%20/g, " ")
+
+  return new NextResponse(webStream, {
+    headers: {
+      "Content-Type": file.mimeType ?? "application/octet-stream",
+      "Content-Disposition": `attachment; filename="${safeName}"`,
+      "Content-Length": file.size.toString(),
+      "Cache-Control": "private, no-store",
+    },
+  })
 }

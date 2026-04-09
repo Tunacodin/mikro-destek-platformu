@@ -15,26 +15,42 @@ async function verifyCircleMembership(email: string): Promise<boolean> {
       console.warn("[register] CIRCLE_API_TOKEN veya CIRCLE_COMMUNITY_ID eksik — doğrulama atlanıyor")
       return true
     }
+    console.error("[register] CIRCLE_API_TOKEN veya CIRCLE_COMMUNITY_ID tanımlı değil")
     return false
   }
 
   try {
-    const res = await fetch(
-      `https://app.circle.so/api/v1/community_members?community_id=${communityId}&email=${encodeURIComponent(email)}`,
-      {
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    )
+    // Circle API v1 — community_members endpoint
+    const url = new URL("https://app.circle.so/api/v1/community_members")
+    url.searchParams.set("community_id", communityId)
+    url.searchParams.set("email", email)
 
-    if (!res.ok) return false
+    const res = await fetch(url.toString(), {
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+      // 5 saniye timeout
+      signal: AbortSignal.timeout(5000),
+    })
+
+    if (!res.ok) {
+      console.error(`[register] Circle API ${res.status}: ${await res.text()}`)
+      return false
+    }
 
     const data = await res.json()
-    // Circle API: members dizisi dolu ise üye var
-    return Array.isArray(data) && data.length > 0
-  } catch {
+
+    // Circle API yanıtı: aktif üyeler dizisi
+    if (!Array.isArray(data)) return false
+
+    // Üye var mı ve aktif mi kontrolü
+    return data.some((member: { email?: string; public_uid?: string }) =>
+      member.email?.toLowerCase() === email.toLowerCase()
+    )
+  } catch (err) {
+    console.error("[register] Circle API erişim hatası:", err)
+    // Timeout veya ağ hatasında üretimde false döndür
     return false
   }
 }

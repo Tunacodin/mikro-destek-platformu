@@ -7,8 +7,8 @@ export const metadata = { title: "Giriş Yap — Mikro Destek Fonu" }
 export default function LoginPage() {
   return (
     <div className="space-y-6">
-      {/* Logo */}
-      <div className="text-center space-y-1.5">
+      {/* Logo + başlık */}
+      <div className="text-center space-y-2">
         <Image
           src="/logo-divizyon.png"
           alt="Divizyon"
@@ -17,17 +17,24 @@ export default function LoginPage() {
           priority
           className="mx-auto"
         />
-        <p className="text-sm text-[#6e6e73]">Mikro Destek Fonu</p>
+        <div className="space-y-0.5">
+          <p className="text-[14px] font-semibold text-[#1c1c1c]">Mikro Destek Fonu</p>
+
+        </div>
       </div>
 
-      {/* Kart */}
-      <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.08)] p-8">
+      {/* Giriş kartı */}
+      <div className="bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-black/[0.04] p-7">
         <Suspense
           fallback={<div className="h-52 animate-pulse rounded-xl bg-[#f5f5f5]" />}
         >
           <LoginForm />
         </Suspense>
       </div>
+
+      <p className="text-center text-[11px] text-[#aeaeb2]">
+        Divizyon © {new Date().getFullYear()}
+      </p>
     </div>
   )
 }

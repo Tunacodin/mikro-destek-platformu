@@ -46,12 +46,21 @@ export async function POST(req: NextRequest) {
     user = await prisma.user.create({
       data: {
         email: record.email,
+        name: record.name ?? null,
         role: "JURY",
         onboardingCompleted: false,
-        // passwordHash yok — magic link ile giriş yapar
       },
     })
-  } else if (user.role !== "JURY") {
+  } else {
+    // Varsa adını güncelle (admin sonradan değiştirmiş olabilir)
+    if (record.name && user.name !== record.name) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { name: record.name },
+      })
+    }
+  }
+  if (user.role !== "JURY") {
     // Farklı rol varsa jüriye yükselt (edge case)
     user = await prisma.user.update({
       where: { id: user.id },

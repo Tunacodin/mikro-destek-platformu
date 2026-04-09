@@ -28,7 +28,7 @@ function getNextAction(status: ApplicationStatus, appId: string) {
     case "SUBMITTED": return { label: "Ön değerlendirme bekleniyor", href: null }
     case "IN_REVIEW": return { label: "Jüri değerlendirmesinde", href: null }
     case "EVALUATED": return { label: "Karar bekleniyor", href: null }
-    case "SUPPORTED": return { label: "Proje takibine git", href: `/dashboard/applications/${appId}` }
+    case "SUPPORTED": return { label: "Proje takibine git", href: `/dashboard/projects/${appId}` }
     case "REJECTED":  return { label: "Başvurunuz kabul edilmedi", href: null }
   }
 }
@@ -60,14 +60,14 @@ export default async function ApplicantDashboardPage() {
     new Date(d).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-6">
       {/* Karşılama + Hızlı Aksiyonlar */}
-      <div className="flex items-start justify-between gap-4 pb-6 border-b border-black/[0.06]">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 pb-5 border-b border-black/[0.06]">
         <div>
           <p className="text-[11px] font-semibold text-[#aeaeb2] uppercase tracking-widest mb-2">
-            Başvuru Sahibi
+            Komünite Üyesi
           </p>
-          <h1 className="text-[26px] font-semibold tracking-tight text-[#1c1c1c] leading-none">
+          <h1 className="text-[22px] sm:text-[26px] font-semibold tracking-tight text-[#1c1c1c] leading-none">
             {firstName ? `Merhaba, ${firstName}` : "Merhaba"}
           </h1>
           <p className="text-[13px] text-[#6e6e73] mt-2">
@@ -76,11 +76,11 @@ export default async function ApplicantDashboardPage() {
         </div>
         <div className="flex gap-2 shrink-0">
           <Link href="/dashboard/apply"
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#212121] text-white text-[13px] font-semibold rounded-xl hover:opacity-80 transition-opacity">
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-[#212121] text-white text-[13px] font-semibold rounded-xl hover:bg-[#2d2d2d] transition-colors cursor-pointer">
             <FilePlus className="w-3.5 h-3.5" /> Yeni Başvuru
           </Link>
           <Link href="/dashboard/applications"
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-[#1c1c1c] text-[13px] font-medium rounded-xl border border-black/[0.07] hover:bg-[#fafafa] transition-colors">
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white text-[#1c1c1c] text-[13px] font-medium rounded-xl border border-black/[0.07] hover:bg-[#fafafa] transition-colors cursor-pointer">
             <FileText className="w-3.5 h-3.5" /> Başvurularım
           </Link>
         </div>

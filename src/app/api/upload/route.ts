@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData()
   const file = formData.get("file") as File | null
   const applicationId = formData.get("applicationId") as string | null
+  const projectId = formData.get("projectId") as string | null
 
   if (!file) {
     return NextResponse.json({ error: "Dosya bulunamadı." }, { status: 400 })
@@ -48,26 +49,34 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Başvuru erişim kontrolü (applicant kendi başvurusuna yükleyebilir)
+  // Başvuru erişim kontrolü
   if (applicationId) {
-    const application = await prisma.application.findUnique({
-      where: { id: applicationId },
-    })
+    const application = await prisma.application.findUnique({ where: { id: applicationId } })
     if (!application) {
       return NextResponse.json({ error: "Başvuru bulunamadı." }, { status: 404 })
     }
-    if (
-      session.user.role === "APPLICANT" &&
-      application.userId !== session.user.id
-    ) {
+    if (session.user.role === "APPLICANT" && application.userId !== session.user.id) {
       return NextResponse.json({ error: "Bu başvuruya erişim yetkiniz yok." }, { status: 403 })
     }
-    // DRAFT veya IN_REVIEW dışında yükleme yapılamaz
     if (!["DRAFT", "SUBMITTED"].includes(application.status)) {
-      return NextResponse.json(
-        { error: "Bu başvuruya artık dosya yüklenemez." },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "Bu başvuruya artık dosya yüklenemez." }, { status: 400 })
+    }
+  }
+
+  // Proje erişim kontrolü
+  if (projectId) {
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      include: { application: { select: { userId: true } } },
+    })
+    if (!project) {
+      return NextResponse.json({ error: "Proje bulunamadı." }, { status: 404 })
+    }
+    if (session.user.role === "APPLICANT" && project.application.userId !== session.user.id) {
+      return NextResponse.json({ error: "Bu projeye erişim yetkiniz yok." }, { status: 403 })
+    }
+    if (project.status !== "ACTIVE") {
+      return NextResponse.json({ error: "Proje aktif değil, dosya yüklenemez." }, { status: 400 })
     }
   }
 
@@ -75,8 +84,9 @@ export async function POST(req: NextRequest) {
   const buffer = Buffer.from(bytes)
 
   const ext = file.name.split(".").pop() ?? "bin"
-  const key = `${applicationId ?? "general"}/${randomUUID()}.${ext}`
-  const bucket = BUCKETS.applications
+  const folder = projectId ? `projects/${projectId}` : (applicationId ?? "general")
+  const key = `${folder}/${randomUUID()}.${ext}`
+  const bucket = projectId ? BUCKETS.projects : BUCKETS.applications
 
   await uploadFile({ bucket, key, buffer, mimeType: file.type, size: file.size })
 
@@ -90,6 +100,7 @@ export async function POST(req: NextRequest) {
       bucket,
       key,
       ...(applicationId ? { applicationId } : {}),
+      ...(projectId ? { projectId } : {}),
     },
   })
 

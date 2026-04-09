@@ -53,7 +53,7 @@ export function ApplicationEditForm({
           type="text"
           value={title}
           onChange={(e) => { setTitle(e.target.value); setSaved(false) }}
-          className="w-full px-3.5 py-2.5 bg-[#f5f5f5] border-0 rounded-xl text-[14px] text-[#1c1c1c] focus:outline-none focus:ring-2 focus:ring-[#fab758]/40 focus:bg-white transition-all"
+          className="w-full px-3.5 py-2.5 bg-[#f5f5f5] border border-transparent rounded-xl text-[14px] text-[#1c1c1c] focus:outline-none focus:ring-2 focus:ring-[#fab758]/50 focus:bg-white focus:border-[#fab758]/30 transition-all"
         />
       </div>
 
@@ -66,7 +66,7 @@ export function ApplicationEditForm({
           value={description}
           onChange={(e) => { setDescription(e.target.value); setSaved(false) }}
           rows={6}
-          className="w-full px-3.5 py-2.5 bg-[#f5f5f5] border-0 rounded-xl text-[14px] text-[#1c1c1c] resize-none focus:outline-none focus:ring-2 focus:ring-[#fab758]/40 focus:bg-white transition-all"
+          className="w-full px-3.5 py-2.5 bg-[#f5f5f5] border border-transparent rounded-xl text-[14px] text-[#1c1c1c] resize-none focus:outline-none focus:ring-2 focus:ring-[#fab758]/50 focus:bg-white focus:border-[#fab758]/30 transition-all"
         />
       </div>
 
@@ -84,7 +84,7 @@ export function ApplicationEditForm({
       <button
         onClick={handleSave}
         disabled={saving || !hasChanges || !isValid}
-        className="px-4 py-2.5 bg-[#212121] text-white text-[13px] font-semibold rounded-xl hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+        className="px-4 py-2.5 bg-[#212121] text-white text-[13px] font-semibold rounded-xl hover:bg-[#2d2d2d] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
       >
         {saving ? "Kaydediliyor…" : "Kaydet"}
       </button>

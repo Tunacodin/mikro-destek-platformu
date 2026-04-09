@@ -19,7 +19,7 @@ export default async function ApplyPage() {
       <div className="space-y-7">
         <div className="pb-6 border-b border-black/[0.06]">
           <p className="text-[11px] font-semibold text-[#aeaeb2] uppercase tracking-widest mb-2">
-            Başvuru Sahibi
+            Komünite Üyesi
           </p>
           <h1 className="text-[26px] font-semibold tracking-tight text-[#1c1c1c] leading-none">
             Yeni Başvuru
@@ -40,9 +40,9 @@ export default async function ApplyPage() {
       {/* Başlık */}
       <div className="pb-6 border-b border-black/[0.06]">
         <p className="text-[11px] font-semibold text-[#aeaeb2] uppercase tracking-widest mb-2">
-          Başvuru Sahibi
+          Komünite Üyesi
         </p>
-        <h1 className="text-[26px] font-semibold tracking-tight text-[#1c1c1c] leading-none">
+        <h1 className="text-[22px] sm:text-[26px] font-semibold tracking-tight text-[#1c1c1c] leading-none">
           Yeni Başvuru
         </h1>
         <p className="text-[13px] text-[#6e6e73] mt-2">

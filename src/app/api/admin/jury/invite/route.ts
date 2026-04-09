@@ -46,22 +46,28 @@ export async function POST(req: NextRequest) {
   const expiresAt = new Date(Date.now() + EXPIRES_DAYS * 24 * 60 * 60 * 1000)
 
   await prisma.magicLinkToken.create({
-    data: { token, email, expiresAt },
+    data: { token, email, name: name ?? null, expiresAt },
   })
 
-  const baseUrl = process.env.AUTH_URL ?? "http://localhost"
-  const magicLink = `${baseUrl}/auth/magic-link?token=${token}`
+  const baseUrl = (process.env.AUTH_URL ?? "http://localhost").replace(/\/$/, "")
+  const magicLink = `${baseUrl}/magic-link?token=${token}`
 
-  // E-posta gönder (RESEND_API_KEY yoksa geliştirmede log'a yaz)
+  // E-posta gönder
+  let emailError: string | null = null
   if (process.env.RESEND_API_KEY) {
-    await sendJuryInviteEmail({ to: email, name, magicLink, expiresInDays: EXPIRES_DAYS })
+    try {
+      await sendJuryInviteEmail({ to: email, name, magicLink, expiresInDays: EXPIRES_DAYS })
+    } catch (err) {
+      emailError = err instanceof Error ? err.message : "E-posta gönderilemedi."
+      console.error("[jury-invite] E-posta hatası:", emailError)
+    }
   } else {
-    console.log(`[jury-invite] Magic link (e-posta gönderilmedi): ${magicLink}`)
+    console.log(`[jury-invite] RESEND_API_KEY yok. Magic link: ${magicLink}`)
   }
 
   return NextResponse.json({
-    message: "Davet gönderildi.",
-    // Geliştirme ortamında link'i de döndür
-    ...(process.env.NODE_ENV === "development" && { devLink: magicLink }),
+    message: emailError ? "Davet oluşturuldu fakat e-posta gönderilemedi." : "Davet gönderildi.",
+    magicLink, // Her zaman döndür (UI'da gösterilebilir veya log'lanabilir)
+    ...(emailError && { emailError }),
   })
 }

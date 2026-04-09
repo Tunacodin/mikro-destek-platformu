@@ -43,18 +43,19 @@ export function MagicLinkHandler() {
         setStatus("signing-in")
         const result = await signIn("credentials", {
           email: data.email,
+          password: "",
           magicToken: token,
           redirect: false,
         })
 
-        if (result?.error) {
+        if (!result || result.error) {
           setStatus("error")
           setErrorMsg("Giriş yapılamadı. Lütfen tekrar deneyin.")
           return
         }
 
         setStatus("success")
-        setTimeout(() => router.push("/jury/dashboard"), 1500)
+        setTimeout(() => { window.location.href = "/onboarding" }, 1500)
       } catch {
         setStatus("error")
         setErrorMsg("Beklenmedik bir hata oluştu.")

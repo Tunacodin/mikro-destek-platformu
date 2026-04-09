@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
+import { createNotification } from "@/lib/notifications"
 
 const scoreSchema = z.object({
   criteria: z.string().min(1),
@@ -82,6 +83,23 @@ export async function POST(req: NextRequest) {
 
     return newEval
   })
+
+  // Yeni değerlendirmede (ilk kez) tüm adminlere bildirim gönder
+  if (!existing) {
+    const admins = await prisma.user.findMany({
+      where: { role: "ADMIN" },
+      select: { id: true },
+    })
+    await Promise.all(
+      admins.map((admin) =>
+        createNotification({
+          userId: admin.id,
+          title: "Başvuru değerlendirildi",
+          message: `Bir başvuru jüri tarafından değerlendirildi ve "Değerlendirildi" durumuna geçti. Destek kararı verebilirsiniz.`,
+        })
+      )
+    )
+  }
 
   return NextResponse.json(evaluation, { status: existing ? 200 : 201 })
 }

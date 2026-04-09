@@ -36,9 +36,14 @@ export default async function AdminApplicationsPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Başvurular</h1>
-        <p className="text-sm text-muted-foreground mt-1">{applications.length} başvuru</p>
+      {/* Başlık */}
+      <div className="pb-5 border-b border-black/[0.06]">
+        <h1 className="text-[22px] sm:text-[26px] font-semibold tracking-tight text-[#1c1c1c] leading-none">
+          Başvurular
+        </h1>
+        <p className="text-[13px] text-[#6e6e73] mt-2">
+          {applications.length} başvuru
+        </p>
       </div>
 
       <AdminApplicationList

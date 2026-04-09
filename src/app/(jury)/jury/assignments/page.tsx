@@ -42,30 +42,39 @@ export default async function JuryAssignmentsPage() {
   const done    = assignments.filter((a) => a.application.status !== "IN_REVIEW")
 
   return (
-    <div className="p-6 overflow-auto h-full">
-      <div className="max-w-3xl space-y-5">
+    <div className="p-4 sm:p-8">
+      <div className="space-y-6">
 
         {/* Başlık */}
-        <div>
-          <h1 className="text-xl font-semibold text-[#1c1c1c]">Atamalarım</h1>
-          <p className="text-[13px] text-[#6e6e73] mt-0.5">
+        <div className="pb-5 border-b border-black/[0.06]">
+          <p className="text-[11px] font-semibold text-[#aeaeb2] uppercase tracking-widest mb-2">
+            Jüri Üyesi
+          </p>
+          <h1 className="text-[22px] sm:text-[26px] font-semibold tracking-tight text-[#1c1c1c] leading-none">
+            Atamalarım
+          </h1>
+          <p className="text-[13px] text-[#6e6e73] mt-2">
             {pending.length} bekleyen · {done.length} tamamlanan
           </p>
         </div>
 
         {/* Boş */}
         {assignments.length === 0 && (
-          <div className="bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.06)] p-10 text-center">
-            <p className="text-[14px] font-medium text-[#1c1c1c]">Henüz atama yapılmadı</p>
-            <p className="text-[13px] text-[#6e6e73] mt-1">Program yöneticisi başvuruları atadığında burada görünecek.</p>
+          <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] p-12 text-center">
+            <p className="text-[15px] font-semibold text-[#1c1c1c]">Henüz atama yapılmadı</p>
+            <p className="text-[13px] text-[#6e6e73] mt-1.5">
+              Program yöneticisi başvuruları atadığında burada görünecek.
+            </p>
           </div>
         )}
 
         {/* Bekleyen */}
         {pending.length > 0 && (
-          <section className="space-y-2.5">
-            <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em]">Değerlendirme Bekliyor</p>
-            <div className="bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.06)] overflow-hidden divide-y divide-black/[0.04]">
+          <section className="space-y-3">
+            <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em]">
+              Değerlendirme Bekliyor
+            </p>
+            <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] overflow-hidden divide-y divide-black/[0.04]">
               {pending.map(({ application: app }) => (
                 <AssignmentRow key={app.id} app={app} canEval />
               ))}
@@ -75,9 +84,11 @@ export default async function JuryAssignmentsPage() {
 
         {/* Tamamlanan */}
         {done.length > 0 && (
-          <section className="space-y-2.5">
-            <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em]">Tamamlanan</p>
-            <div className="bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.06)] overflow-hidden divide-y divide-black/[0.04]">
+          <section className="space-y-3">
+            <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em]">
+              Tamamlanan
+            </p>
+            <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] overflow-hidden divide-y divide-black/[0.04]">
               {done.map(({ application: app }) => (
                 <AssignmentRow key={app.id} app={app} canEval={false} />
               ))}
@@ -103,30 +114,40 @@ function AssignmentRow({
   canEval: boolean
 }) {
   return (
-    <div className="px-5 py-4 flex items-center justify-between gap-4 hover:bg-[#fafafa] transition-colors">
-      <div className="min-w-0 space-y-1">
-        <p className="text-[14px] font-semibold text-[#1c1c1c] truncate">{app.title}</p>
-        <p className="text-[12px] text-[#6e6e73]">
-          {app.user.name ?? app.user.email} · {app.period.title} · {app._count.files} dosya
-        </p>
+    <div className="px-4 sm:px-5 py-4 hover:bg-[#fafafa] transition-colors">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 space-y-1 flex-1">
+          <p className="text-[14px] font-semibold text-[#1c1c1c] truncate">{app.title}</p>
+          <p className="text-[12px] text-[#6e6e73] truncate">
+            {app.user.name ?? app.user.email} · {app.period.title} · {app._count.files} dosya
+          </p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className={`hidden sm:inline-flex text-[11px] font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLES[app.status]}`}>
+            {STATUS_LABELS[app.status]}
+          </span>
+          {app.evaluation && (
+            <span className="hidden sm:inline text-[11px] font-medium text-emerald-600">✓</span>
+          )}
+          <Link
+            href={`/jury/evaluate/${app.id}`}
+            className={canEval
+              ? "text-[12px] font-semibold px-3 py-1.5 bg-[#212121] text-white rounded-xl hover:bg-[#2d2d2d] transition-colors cursor-pointer"
+              : "text-[12px] font-medium px-3 py-1.5 bg-[#f0f0f0] text-[#6e6e73] rounded-xl hover:bg-[#e8e8e8] transition-colors"
+            }
+          >
+            {canEval ? "Değerlendir" : "Görüntüle"}
+          </Link>
+        </div>
       </div>
-
-      <div className="flex items-center gap-2.5 shrink-0">
+      {/* Mobilde durum badge'i alt satırda */}
+      <div className="flex items-center gap-2 mt-2 sm:hidden">
         <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLES[app.status]}`}>
           {STATUS_LABELS[app.status]}
         </span>
         {app.evaluation && (
-          <span className="text-[11px] font-medium text-emerald-600">✓</span>
+          <span className="text-[11px] font-medium text-emerald-600">✓ Değerlendirildi</span>
         )}
-        <Link
-          href={`/jury/evaluate/${app.id}`}
-          className={canEval
-            ? "text-[12px] font-semibold px-3 py-1.5 bg-[#212121] text-white rounded-xl hover:opacity-80 transition-opacity"
-            : "text-[12px] font-medium px-3 py-1.5 bg-[#f0f0f0] text-[#6e6e73] rounded-xl hover:bg-[#e8e8e8] transition-colors"
-          }
-        >
-          {canEval ? "Değerlendir" : "Görüntüle"}
-        </Link>
       </div>
     </div>
   )

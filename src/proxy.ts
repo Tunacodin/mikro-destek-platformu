@@ -9,7 +9,7 @@ const ROLE_HOME: Record<string, string> = {
 }
 
 // Kimlik doğrulama gerektirmeyen public path'ler
-const PUBLIC_PATHS = ["/login", "/register", "/api/auth", "/auth/magic-link"]
+const PUBLIC_PATHS = ["/login", "/register", "/api/auth", "/magic-link"]
 
 export default auth((req) => {
   const { pathname } = req.nextUrl

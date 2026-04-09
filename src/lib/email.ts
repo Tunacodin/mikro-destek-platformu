@@ -57,5 +57,8 @@ export async function sendJuryInviteEmail({
     `,
   })
 
-  if (error) throw new Error(`E-posta gönderilemedi: ${error.message}`)
+  if (error) {
+    console.error("[resend] Hata detayı:", JSON.stringify(error))
+    throw new Error(`E-posta gönderilemedi: ${JSON.stringify(error)}`)
+  }
 }

@@ -215,7 +215,7 @@ export function EvaluationForm({
           <button
             onClick={submit}
             disabled={!allFilled || submitting}
-            className="w-full py-2.5 bg-[#212121] text-white text-[13px] font-semibold rounded-xl hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+            className="w-full py-2.5 bg-[#212121] text-white text-[13px] font-semibold rounded-xl hover:bg-[#2d2d2d] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             {submitting ? "Kaydediliyor…" : existingEvaluation ? "Değerlendirmeyi Güncelle" : "Değerlendirmeyi Gönder"}
           </button>

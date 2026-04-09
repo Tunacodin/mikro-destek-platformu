@@ -34,45 +34,47 @@ export default async function JuryDashboardPage() {
   const firstName = session.user.name?.split(" ")[0] ?? null
 
   return (
-    <div className="space-y-7">
+    <div className="p-4 sm:p-8">
+    <div className="space-y-6 max-w-4xl">
 
       {/* Karşılama */}
-      <div className="flex items-start justify-between gap-4 pb-6 border-b border-black/[0.06]">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 pb-5 border-b border-black/[0.06]">
         <div>
-          <p className="text-[11px] font-semibold text-[#aeaeb2] uppercase tracking-widest mb-2">
-            Jüri Üyesi
-          </p>
-          <h1 className="text-[26px] font-semibold tracking-tight text-[#1c1c1c] leading-none">
+          <h1 className="text-[22px] sm:text-[26px] font-semibold tracking-tight text-[#1c1c1c] leading-none">
             {firstName ? `Merhaba, ${firstName}` : "Merhaba"}
           </h1>
           <p className="text-[13px] text-[#6e6e73] mt-2">Jüri paneli · {assignments.length} atama</p>
         </div>
-        <Link href="/jury/assignments"
-          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white border border-black/[0.07] text-[#1c1c1c] text-[13px] font-medium rounded-xl hover:bg-[#fafafa] transition-colors shrink-0">
+        <Link
+          href="/jury/assignments"
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white border border-black/[0.07] text-[#1c1c1c] text-[13px] font-medium rounded-xl hover:bg-[#fafafa] transition-colors shrink-0 self-start cursor-pointer"
+        >
           Tüm Atamalarım <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
 
       {/* İstatistik */}
-      <div className="grid grid-cols-3 gap-4">
-        <StatCard label="Bekleyen"   count={pending.length}    accent="text-amber-500"   bg="bg-amber-50"   border="border-amber-100" />
-        <StatCard label="Devam Eden" count={inProgress.length} accent="text-blue-500"    bg="bg-blue-50"    border="border-blue-100" />
-        <StatCard label="Tamamlanan" count={completed.length}  accent="text-emerald-500" bg="bg-emerald-50" border="border-emerald-100" />
+      <div className="grid grid-cols-3 gap-3 sm:gap-4">
+        <StatCard label="Bekleyen"   count={pending.length}    accent="text-amber-600"   bg="bg-amber-50"   border="border-amber-100" dot="bg-amber-500" />
+        <StatCard label="Devam Eden" count={inProgress.length} accent="text-blue-600"    bg="bg-blue-50"    border="border-blue-100"  dot="bg-blue-500" />
+        <StatCard label="Tamamlanan" count={completed.length}  accent="text-emerald-600" bg="bg-emerald-50" border="border-emerald-100" dot="bg-emerald-500" />
       </div>
 
       {/* Bekleyen listesi */}
       {pending.length > 0 && (
-        <section className="space-y-3">
-          <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em]">Değerlendirme Bekliyor</p>
+        <section className="space-y-2.5">
+          <p className="text-[11px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em]">Değerlendirme Bekliyor</p>
           <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] overflow-hidden divide-y divide-black/[0.04]">
             {pending.map(({ application: app }) => (
-              <div key={app.id} className="px-6 py-5 flex items-center justify-between gap-4 hover:bg-[#fafafa] transition-colors">
+              <div key={app.id} className="px-5 py-4 flex items-center justify-between gap-3 hover:bg-[#fafafa] transition-colors">
                 <div className="min-w-0">
                   <p className="text-[14px] font-semibold text-[#1c1c1c] truncate">{app.title}</p>
-                  <p className="text-[12px] text-[#6e6e73] mt-1">{app.user.name ?? app.user.email} · {app.period.title}</p>
+                  <p className="text-[12px] text-[#6e6e73] mt-0.5">{app.user.name ?? app.user.email} · {app.period.title}</p>
                 </div>
-                <Link href={`/jury/evaluate/${app.id}`}
-                  className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#212121] text-white text-[12px] font-semibold rounded-xl hover:opacity-80 transition-opacity whitespace-nowrap">
+                <Link
+                  href={`/jury/evaluate/${app.id}`}
+                  className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#212121] text-white text-[12px] font-semibold rounded-xl hover:bg-[#2d2d2d] transition-colors whitespace-nowrap cursor-pointer"
+                >
                   Değerlendir <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
@@ -83,17 +85,19 @@ export default async function JuryDashboardPage() {
 
       {/* Devam Eden listesi */}
       {inProgress.length > 0 && (
-        <section className="space-y-3">
-          <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em]">Devam Eden</p>
+        <section className="space-y-2.5">
+          <p className="text-[11px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em]">Devam Eden</p>
           <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] overflow-hidden divide-y divide-black/[0.04]">
             {inProgress.map(({ application: app }) => (
-              <div key={app.id} className="px-6 py-5 flex items-center justify-between gap-4 hover:bg-[#fafafa] transition-colors">
+              <div key={app.id} className="px-5 py-4 flex items-center justify-between gap-3 hover:bg-[#fafafa] transition-colors">
                 <div className="min-w-0">
                   <p className="text-[14px] font-semibold text-[#1c1c1c] truncate">{app.title}</p>
-                  <p className="text-[12px] text-[#6e6e73] mt-1">{app.user.name ?? app.user.email} · {app.period.title}</p>
+                  <p className="text-[12px] text-[#6e6e73] mt-0.5">{app.user.name ?? app.user.email} · {app.period.title}</p>
                 </div>
-                <Link href={`/jury/evaluate/${app.id}`}
-                  className="shrink-0 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#6e6e73] hover:text-[#1c1c1c] transition-colors whitespace-nowrap">
+                <Link
+                  href={`/jury/evaluate/${app.id}`}
+                  className="shrink-0 inline-flex items-center gap-1 text-[13px] font-medium text-[#6e6e73] hover:text-[#1c1c1c] transition-colors whitespace-nowrap cursor-pointer"
+                >
                   Düzenle <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
@@ -111,8 +115,8 @@ export default async function JuryDashboardPage() {
       )}
 
       {/* Rehber */}
-      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] p-6 space-y-3">
-        <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em]">Değerlendirme Rehberi</p>
+      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] p-6">
+        <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em] mb-3">Değerlendirme Rehberi</p>
         <p className="text-[13px] text-[#6e6e73] leading-relaxed">
           Her başvuru 5 kriter üzerinden değerlendirilir:{" "}
           <span className="text-[#1c1c1c] font-medium">
@@ -123,14 +127,24 @@ export default async function JuryDashboardPage() {
       </div>
 
     </div>
+    </div>
   )
 }
 
-function StatCard({ label, count, accent, bg, border }: { label: string; count: number; accent: string; bg: string; border: string; icon?: ReactNode }) {
+function StatCard({
+  label, count, accent, bg, border, dot,
+}: {
+  label: string; count: number; accent: string; bg: string; border: string; dot: string
+}) {
   return (
     <div className={`${bg} rounded-2xl border ${border} p-5`}>
-      <p className={`text-[32px] font-bold leading-none tabular-nums tracking-tight ${accent}`}>{count}</p>
-      <p className="text-[12px] text-[#6e6e73] mt-2.5 font-medium">{label}</p>
+      <div className="flex items-center gap-1.5 mb-3">
+        <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
+        <p className="text-[11px] font-medium text-[#6e6e73]">{label}</p>
+      </div>
+      <p className={`text-[32px] font-bold leading-none tabular-nums tracking-tight ${accent}`}>
+        {count}
+      </p>
     </div>
   )
 }

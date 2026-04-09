@@ -88,7 +88,7 @@ export function FileNotePanel({ fileId, canEvaluate }: { fileId: string; canEval
               <button
                 onClick={handleSave}
                 disabled={saving || !noteText.trim()}
-                className="text-[12px] font-semibold px-3 py-1.5 bg-[#212121] text-white rounded-lg hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+                className="text-[12px] font-semibold px-3 py-1.5 bg-[#212121] text-white rounded-lg hover:bg-[#2d2d2d] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
                 {saving ? "Kaydediliyor…" : "Kaydet"}
               </button>

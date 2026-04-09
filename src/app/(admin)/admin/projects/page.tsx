@@ -2,22 +2,22 @@ import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
+import { FolderOpen, ArrowRight, FileText, Calendar, Send } from "lucide-react"
 
 export const metadata = { title: "Projeler — Mikro Destek Fonu" }
 
 const SCOPE_LABELS: Record<string, string> = {
-  UNSUPPORTED: "Desteklenmedi",
-  LIMITED: "Sınırlı Destek",
+  LIMITED:  "Sınırlı Destek",
   EXTENDED: "Genişletilmiş Destek",
   PRIORITY: "Öncelikli Destek",
 }
 
-const SCOPE_COLORS: Record<string, string> = {
-  UNSUPPORTED: "bg-red-100 text-red-700",
-  LIMITED: "bg-amber-100 text-amber-700",
-  EXTENDED: "bg-blue-100 text-blue-700",
-  PRIORITY: "bg-green-100 text-green-700",
+const SCOPE_STYLES: Record<string, string> = {
+  LIMITED:  "bg-amber-50 text-amber-700",
+  EXTENDED: "bg-blue-50 text-blue-700",
+  PRIORITY: "bg-emerald-50 text-emerald-700",
 }
+
 
 export default async function AdminProjectsPage() {
   const session = await auth()
@@ -28,14 +28,13 @@ export default async function AdminProjectsPage() {
     include: {
       application: {
         include: {
-          user: { select: { name: true, email: true } },
+          user:   { select: { name: true, email: true } },
           period: { select: { title: true } },
         },
       },
-      decision: {
-        select: { scope: true, decidedAt: true },
-      },
-      reports: { select: { id: true } },
+      decision: { select: { scope: true, decidedAt: true } },
+      reports:  { select: { id: true } },
+      files:    { select: { id: true } },
     },
   })
 
@@ -44,69 +43,106 @@ export default async function AdminProjectsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Projeler</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Desteklenen başvurulardan oluşturulan aktif projeler
+      {/* Başlık */}
+      <div className="pb-5 border-b border-black/[0.06]">
+        <h1 className="text-[22px] sm:text-[26px] font-semibold tracking-tight text-[#1c1c1c] leading-none">
+          Projeler
+        </h1>
+        <p className="text-[13px] text-[#6e6e73] mt-2">
+          {projects.length === 0
+            ? "Henüz proje yok."
+            : `${projects.length} desteklenen proje`}
         </p>
       </div>
 
       {projects.length === 0 ? (
-        <div className="bg-white border rounded-xl p-10 text-center">
-          <p className="text-sm text-muted-foreground">Henüz proje yok.</p>
-          <p className="text-xs text-muted-foreground mt-1">
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] p-14 text-center">
+          <div className="w-12 h-12 rounded-2xl bg-[#f5f5f5] flex items-center justify-center mx-auto mb-4">
+            <FolderOpen className="w-6 h-6 text-[#aeaeb2]" />
+          </div>
+          <p className="text-[15px] font-semibold text-[#1c1c1c]">Henüz proje yok</p>
+          <p className="text-[13px] text-[#6e6e73] mt-1.5 mb-5">
             Başvurulara destek kararı verildikçe projeler burada görünür.
           </p>
           <Link
             href="/admin/applications?status=EVALUATED"
-            className="mt-4 inline-block text-sm font-medium text-[#fab758] hover:underline"
+            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#1c1c1c] hover:opacity-60 transition-opacity cursor-pointer"
           >
-            Değerlendirilen başvuruları gör →
+            Değerlendirilen başvurulara git <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       ) : (
-        <div className="bg-white border rounded-xl divide-y">
-          {projects.map((p) => (
-            <div key={p.id} className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-[#f6f7f9] transition-colors">
-              <div className="min-w-0">
-                <p className="text-sm font-medium truncate">{p.application.title}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {p.application.user.name ?? p.application.user.email}
-                  {" · "}
-                  {p.application.period.title}
-                  {" · "}
-                  {fmt(p.decision.decidedAt)} tarihinde kararlandı
-                  {" · "}
-                  {p.reports.length} rapor
-                </p>
-              </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+          {projects.map((p) => {
+            const scopeStyle = SCOPE_STYLES[p.decision.scope] ?? "bg-slate-50 text-slate-600"
+            const scopeLabel = SCOPE_LABELS[p.decision.scope] ?? p.decision.scope
+            const scopeDot: Record<string, string> = {
+              LIMITED:  "bg-[#fab758]",
+              EXTENDED: "bg-blue-400",
+              PRIORITY: "bg-emerald-500",
+            }
+            const dot      = scopeDot[p.decision.scope] ?? "bg-slate-400"
+            const isActive = p.status === "ACTIVE"
+            const endingSoon = p.supportEndDate
+              && (p.supportEndDate.getTime() - Date.now()) < 7 * 24 * 3_600_000
+              && isActive
 
-              <div className="flex items-center gap-3 shrink-0">
-                <span
-                  className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                    SCOPE_COLORS[p.decision.scope] ?? "bg-slate-100 text-slate-700"
-                  }`}
-                >
-                  {SCOPE_LABELS[p.decision.scope] ?? p.decision.scope}
-                </span>
-                <span
-                  className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                    p.status === "ACTIVE"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-slate-100 text-slate-600"
-                  }`}
-                >
-                  {p.status === "ACTIVE" ? "Aktif" : p.status}
-                </span>
-                <Link
-                  href={`/admin/applications/${p.application.id}`}
-                  className="text-xs font-medium text-[#fab758] hover:underline"
-                >
-                  Başvuruya Git →
-                </Link>
-              </div>
-            </div>
-          ))}
+            return (
+              <Link
+                key={p.id}
+                href={`/admin/projects/${p.id}`}
+                className="block bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_4px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:border-black/[0.1] transition-all duration-200 cursor-pointer p-5 space-y-4"
+              >
+                {/* Üst satır: ikon + badge'ler */}
+                <div className="flex items-start justify-between gap-2">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${scopeStyle}`}>
+                    <FolderOpen className="w-4 h-4" />
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
+                      {isActive ? "Aktif" : p.status}
+                    </span>
+                    {endingSoon && (
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                        Bitiyor
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Başlık */}
+                <div>
+                  <p className="text-[14px] font-semibold text-[#1c1c1c] line-clamp-2 leading-snug">
+                    {p.application.title}
+                  </p>
+                  <p className="text-[12px] text-[#6e6e73] mt-1 truncate">
+                    {p.application.user.name ?? p.application.user.email}
+                  </p>
+                </div>
+
+                {/* Alt bilgiler */}
+                <div className="space-y-1.5 pt-1 border-t border-black/[0.04]">
+                  <div className="flex items-center gap-1.5">
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dot}`} />
+                    <span className={`text-[11px] font-semibold ${scopeStyle.split(" ")[1]}`}>{scopeLabel}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-[11px] text-[#aeaeb2]">
+                    <span className="inline-flex items-center gap-1">
+                      <Send className="w-3 h-3" /> {p.reports.length} rapor
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <FileText className="w-3 h-3" /> {p.files.length} dosya
+                    </span>
+                    {p.supportEndDate && (
+                      <span className="inline-flex items-center gap-1 ml-auto">
+                        <Calendar className="w-3 h-3" /> {fmt(p.supportEndDate)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            )
+          })}
         </div>
       )}
     </div>

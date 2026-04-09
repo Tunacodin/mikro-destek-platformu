@@ -56,15 +56,16 @@ export async function deleteFile(bucket: string, key: string): Promise<void> {
 }
 
 /**
- * Geçici indirme URL'i oluşturur (presigned, 1 saat geçerli).
+ * Dosyayı MinIO'dan stream olarak döndürür.
+ * Presigned URL yerine proxy yaklaşımı kullanılır — Docker içi hostname
+ * (minio:9000) tarayıcıya gönderilmez.
  */
-export async function getPresignedUrl(
+export async function getFileStream(
   bucket: string,
-  key: string,
-  expiry = 3600
-): Promise<string> {
+  key: string
+): Promise<NodeJS.ReadableStream> {
   const client = getClient()
-  return client.presignedGetObject(bucket, key, expiry)
+  return client.getObject(bucket, key)
 }
 
 /**
