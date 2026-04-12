@@ -7,8 +7,8 @@ import type { ApplicationStatus } from "@prisma/client"
 export const metadata = { title: "Atamalarım — Mikro Destek Fonu" }
 
 const STATUS_LABELS: Record<ApplicationStatus, string> = {
-  DRAFT: "Taslak", SUBMITTED: "Gönderildi", IN_REVIEW: "İncelemede",
-  EVALUATED: "Değerlendirildi", SUPPORTED: "Desteklendi", REJECTED: "Reddedildi",
+  DRAFT: "Taslak", SUBMITTED: "Gönderildi", IN_REVIEW: "Ön İnceleme Sürecinde",
+  EVALUATED: "Jüri Değerlendirme Sürecinde", SUPPORTED: "Desteklendi", REJECTED: "Reddedildi",
 }
 const STATUS_STYLES: Record<ApplicationStatus, string> = {
   DRAFT:     "bg-[#f0f0f0] text-[#6e6e73]",
@@ -29,8 +29,9 @@ export default async function JuryAssignmentsPage() {
       application: {
         include: {
           user: { select: { name: true, email: true } },
-          period: { select: { title: true } },
-          evaluation: { select: { id: true } },
+          period:  { select: { title: true } },
+          program: { select: { title: true } },
+          evaluations: { where: { juryId: session.user.id }, select: { id: true } },
           _count: { select: { files: true } },
         },
       },
@@ -107,36 +108,37 @@ function AssignmentRow({
   app: {
     id: string; title: string; status: ApplicationStatus;
     user: { name: string | null; email: string };
-    period: { title: string };
-    evaluation: { id: string } | null;
+    period:  { title: string } | null;
+    program: { title: string } | null;
+    evaluations: { id: string }[];
     _count: { files: number };
   }
   canEval: boolean
 }) {
   return (
-    <div className="px-4 sm:px-5 py-4 hover:bg-[#fafafa] transition-colors">
+    <div className="px-4 sm:px-5 py-4 hover:bg-[#f4f4f4] transition-colors">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-1 flex-1">
           <p className="text-[14px] font-semibold text-[#1c1c1c] truncate">{app.title}</p>
           <p className="text-[12px] text-[#6e6e73] truncate">
-            {app.user.name ?? app.user.email} · {app.period.title} · {app._count.files} dosya
+            {app.user.name ?? app.user.email} · {app.period?.title ?? app.program?.title ?? "—"} · {app._count.files} dosya
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <span className={`hidden sm:inline-flex text-[11px] font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLES[app.status]}`}>
             {STATUS_LABELS[app.status]}
           </span>
-          {app.evaluation && (
+          {app.evaluations.length > 0 && (
             <span className="hidden sm:inline text-[11px] font-medium text-emerald-600">✓</span>
           )}
           <Link
             href={`/jury/evaluate/${app.id}`}
             className={canEval
-              ? "text-[12px] font-semibold px-3 py-1.5 bg-[#212121] text-white rounded-xl hover:bg-[#2d2d2d] transition-colors cursor-pointer"
+              ? "text-[12px] font-semibold px-3 py-1.5 bg-[#212121] text-white rounded-xl hover:bg-[#383838] transition-colors cursor-pointer"
               : "text-[12px] font-medium px-3 py-1.5 bg-[#f0f0f0] text-[#6e6e73] rounded-xl hover:bg-[#e8e8e8] transition-colors"
             }
           >
-            {canEval ? "Değerlendir" : "Görüntüle"}
+            Görüntüle
           </Link>
         </div>
       </div>
@@ -145,8 +147,8 @@ function AssignmentRow({
         <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLES[app.status]}`}>
           {STATUS_LABELS[app.status]}
         </span>
-        {app.evaluation && (
-          <span className="text-[11px] font-medium text-emerald-600">✓ Değerlendirildi</span>
+        {app.evaluations.length > 0 && (
+          <span className="text-[11px] font-medium text-emerald-600">✓ Tamamlandı</span>
         )}
       </div>
     </div>

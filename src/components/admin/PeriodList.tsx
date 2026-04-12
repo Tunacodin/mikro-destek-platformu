@@ -68,7 +68,7 @@ export function PeriodList({ periods }: { periods: Period[] }) {
       {periods.map((p) => {
         const next = NEXT_STATUS[p.status]
         return (
-          <div key={p.id} className="py-4 flex items-center justify-between gap-4">
+          <div key={p.id} className="px-5 py-4 flex items-center justify-between gap-4">
             <div className="min-w-0">
               <p className="text-[14px] font-semibold text-[#1c1c1c] truncate">{p.title}</p>
               <p className="text-[12px] text-[#6e6e73] mt-0.5">
@@ -87,7 +87,7 @@ export function PeriodList({ periods }: { periods: Period[] }) {
                 <button
                   onClick={() => changeStatus(p.id, next.status)}
                   disabled={loading === p.id}
-                  className="text-[12px] font-semibold px-3 py-1.5 bg-[#212121] text-white rounded-xl hover:bg-[#2d2d2d] disabled:opacity-40 transition-colors cursor-pointer"
+                  className="text-[12px] font-semibold px-3 py-1.5 bg-[#212121] text-white rounded-xl hover:bg-[#383838] disabled:opacity-40 transition-colors cursor-pointer"
                 >
                   {loading === p.id ? "…" : next.label}
                 </button>

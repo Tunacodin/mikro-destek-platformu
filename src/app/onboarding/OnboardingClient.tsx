@@ -68,7 +68,7 @@ const STEPS: Record<Role, { icon: React.ElementType; title: string; desc: string
     {
       icon: FolderKanban,
       title: "Proje Takip",
-      desc: "Destek aldığınızda projeniz takip paneline taşınır. Dönemsel ilerleme raporlarınızı buradan gönderirsiniz.",
+      desc: "Destek aldığınızda projeniz takip paneline taşınır. Dönemsel güncelleme notlarınızı buradan gönderirsiniz.",
     },
   ],
   JURY: [
@@ -266,7 +266,7 @@ export function OnboardingClient({
         <button
           onClick={handleNext}
           disabled={submitting || (isPasswordStep && !password)}
-          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[#212121] text-white text-[14px] font-semibold rounded-xl hover:bg-[#2d2d2d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[#212121] text-white text-[14px] font-semibold rounded-xl shadow-sm hover:bg-[#383838] hover:shadow disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
         >
           {submitting ? (
             "Yükleniyor…"

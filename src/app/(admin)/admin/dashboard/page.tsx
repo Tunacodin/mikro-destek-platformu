@@ -8,7 +8,6 @@ import {
   Clock,
   Layers,
   Users,
-  TrendingUp,
   AlertCircle,
   CheckCircle2,
 } from "lucide-react"
@@ -16,8 +15,8 @@ import {
 export const metadata = { title: "Yönetim Paneli — Mikro Destek Fonu" }
 
 const STATUS_LABELS: Record<ApplicationStatus, string> = {
-  DRAFT: "Taslak", SUBMITTED: "Gönderildi", IN_REVIEW: "İncelemede",
-  EVALUATED: "Değerlendirildi", SUPPORTED: "Desteklendi", REJECTED: "Reddedildi",
+  DRAFT: "Taslak", SUBMITTED: "Gönderildi", IN_REVIEW: "Ön İnceleme Sürecinde",
+  EVALUATED: "Jüri Değerlendirme Sürecinde", SUPPORTED: "Desteklendi", REJECTED: "Reddedildi",
 }
 
 const STATUS_COLORS: Record<ApplicationStatus, string> = {
@@ -42,14 +41,8 @@ export default async function AdminDashboardPage() {
   const session = await auth()
   if (!session || session.user.role !== "ADMIN") redirect("/login")
 
-  const now = new Date()
-
-  const [statusCounts, activePeriod, recentApps, totalJury] = await Promise.all([
+  const [statusCounts, recentApps, totalJury] = await Promise.all([
     prisma.application.groupBy({ by: ["status"], _count: { _all: true } }),
-    prisma.applicationPeriod.findFirst({
-      where: { status: "ACTIVE" },
-      include: { _count: { select: { applications: true } } },
-    }),
     prisma.application.findMany({
       take: 6,
       orderBy: { createdAt: "desc" },
@@ -65,31 +58,27 @@ export default async function AdminDashboardPage() {
     statusCounts.map((s) => [s.status, s._count._all])
   ) as Partial<Record<ApplicationStatus, number>>
 
-  const pending  = countMap.SUBMITTED ?? 0
-  const inReview = countMap.IN_REVIEW ?? 0
+  const pending   = countMap.SUBMITTED ?? 0
+  const inReview  = countMap.IN_REVIEW ?? 0
   const evaluated = countMap.EVALUATED ?? 0
-  const total    = Object.values(countMap).reduce((a, b) => a + b, 0)
-
-  const daysLeft = activePeriod
-    ? Math.max(0, Math.ceil((new Date(activePeriod.endDate).getTime() - now.getTime()) / 86_400_000))
-    : null
+  const total     = Object.values(countMap).reduce((a, b) => a + b, 0)
 
   const fmt = (d: Date) =>
     new Date(d).toLocaleDateString("tr-TR", { day: "numeric", month: "short" })
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="space-y-8">
 
       {/* Sayfa başlığı */}
-      <div>
-        <h1 className="text-[22px] font-bold text-[#1c1c1c] tracking-tight">Genel Bakış</h1>
-        <p className="text-[13px] text-[#6e6e73] mt-0.5">
+      <div className="pb-6 border-b border-[#e8e8e8]">
+        <h1 className="text-[26px] font-bold text-[#1c1c1c] tracking-tight">Genel Bakış</h1>
+        <p className="text-[14px] text-[#b0b0b0] mt-1">
           Hoş geldiniz, {session.user.name ?? session.user.email}
         </p>
       </div>
 
       {/* Stat kartları */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
         {[
           {
             label: "Toplam Başvuru",
@@ -145,73 +134,96 @@ export default async function AdminDashboardPage() {
         })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {/* Sol kolon */}
         <div className="space-y-4">
-          {/* Aktif dönem */}
-          <div>
-            <h2 className="text-[12px] font-semibold text-[#aeaeb2] uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-              <TrendingUp className="w-3 h-3" /> Aktif Dönem
-            </h2>
-            {activePeriod ? (
-              <div className="bg-white border border-[#fab758]/30 rounded-2xl p-5 shadow-[0_0_0_3px_rgba(250,183,88,0.06)]">
-                <p className="text-[14px] font-semibold text-[#1c1c1c]">{activePeriod.title}</p>
-                <p className="text-[12px] text-[#6e6e73] mt-1">
-                  {fmt(activePeriod.startDate)} — {fmt(activePeriod.endDate)}
-                </p>
-                <div className="mt-4 pt-4 border-t border-black/[0.05] flex items-end justify-between">
-                  <div>
-                    <p className="text-[36px] font-bold text-[#1c1c1c] leading-none tabular-nums">{daysLeft}</p>
-                    <p className="text-[12px] text-[#6e6e73] mt-0.5">gün kaldı</p>
+
+          {/* Durum dağılımı — donut chart */}
+          {(() => {
+            const CHART_STATUSES: ApplicationStatus[] = ["SUBMITTED", "IN_REVIEW", "EVALUATED", "SUPPORTED", "REJECTED"]
+            const CHART_COLORS: Record<ApplicationStatus, string> = {
+              DRAFT:     "#94a3b8",
+              SUBMITTED: "#3b82f6",
+              IN_REVIEW: "#f59e0b",
+              EVALUATED: "#a855f7",
+              SUPPORTED: "#10b981",
+              REJECTED:  "#ef4444",
+            }
+            const segments = CHART_STATUSES.map((s) => ({
+              status: s,
+              count: countMap[s] ?? 0,
+              color: CHART_COLORS[s],
+            }))
+            const chartTotal = segments.reduce((a, s) => a + s.count, 0)
+            const radius = 72
+            const stroke = 16
+            const circumference = 2 * Math.PI * radius
+            let offset = 0
+
+            return (
+              <div className="bg-white border border-black/[0.06] rounded-2xl shadow-[0_1px_6px_rgba(0,0,0,0.04)] p-5">
+                <h2 className="text-[12px] font-semibold text-[#aeaeb2] uppercase tracking-wider mb-4">
+                  Durum Dağılımı
+                </h2>
+                <div className="flex items-center gap-6">
+                  {/* Donut */}
+                  <div className="relative shrink-0 flex-1 flex justify-center">
+                    <svg width="180" height="180" viewBox="0 0 180 180">
+                      {/* Boş arka plan halkası */}
+                      <circle cx="90" cy="90" r={radius} fill="none" stroke="#f0f0f0" strokeWidth={stroke} />
+                      {chartTotal > 0 && segments.map((seg) => {
+                        if (seg.count === 0) return null
+                        const segLen = (seg.count / chartTotal) * circumference
+                        const gap = segments.filter(s => s.count > 0).length > 1 ? 3 : 0
+                        const el = (
+                          <circle
+                            key={seg.status}
+                            cx="90" cy="90" r={radius}
+                            fill="none"
+                            stroke={seg.color}
+                            strokeWidth={stroke}
+                            strokeDasharray={`${Math.max(0, segLen - gap)} ${circumference - Math.max(0, segLen - gap)}`}
+                            strokeDashoffset={-offset}
+                            strokeLinecap="round"
+                            transform="rotate(-90 90 90)"
+                            className="transition-all duration-500"
+                          />
+                        )
+                        offset += segLen
+                        return el
+                      })}
+                    </svg>
+                    {/* Merkez sayı */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-[26px] font-bold text-[#1c1c1c] tabular-nums leading-none">{chartTotal}</span>
+                      <span className="text-[10px] text-[#aeaeb2] mt-0.5">toplam</span>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-[20px] font-bold text-[#1c1c1c] tabular-nums">{activePeriod._count.applications}</p>
-                    <p className="text-[11px] text-[#aeaeb2]">başvuru</p>
+
+                  {/* Legend */}
+                  <div className="flex-1 space-y-2.5">
+                    {segments.map((seg) => (
+                      <Link
+                        key={seg.status}
+                        href={`/admin/applications?status=${seg.status}`}
+                        className="flex items-center justify-between py-1.5 hover:opacity-70 transition-opacity cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: seg.color }} />
+                          <span className="text-[13px] text-[#6e6e73]">{STATUS_LABELS[seg.status]}</span>
+                        </div>
+                        <span className="text-[14px] font-semibold text-[#1c1c1c] tabular-nums">{seg.count}</span>
+                      </Link>
+                    ))}
                   </div>
                 </div>
               </div>
-            ) : (
-              <div className="bg-white border border-black/[0.06] rounded-2xl p-5 text-center shadow-[0_1px_6px_rgba(0,0,0,0.04)]">
-                <p className="text-[13px] text-[#6e6e73]">Aktif dönem yok.</p>
-                <Link
-                  href="/admin/periods"
-                  className="mt-2 inline-block text-[13px] font-medium text-[#fab758] hover:opacity-70 transition-opacity"
-                >
-                  Dönem Oluştur →
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* Durum dağılımı */}
-          <div>
-            <h2 className="text-[12px] font-semibold text-[#aeaeb2] uppercase tracking-wider mb-2.5">
-              Durum Dağılımı
-            </h2>
-            <div className="bg-white border border-black/[0.06] rounded-2xl overflow-hidden shadow-[0_1px_6px_rgba(0,0,0,0.04)] divide-y divide-black/[0.04]">
-              {(["SUBMITTED", "IN_REVIEW", "EVALUATED", "SUPPORTED", "REJECTED"] as ApplicationStatus[]).map((s) => (
-                <Link
-                  key={s}
-                  href={`/admin/applications?status=${s}`}
-                  className="flex items-center justify-between px-4 py-2.5 hover:bg-[#fafafa] transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${STATUS_DOT[s]}`} />
-                    <span className={`text-[12px] font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[s]}`}>
-                      {STATUS_LABELS[s]}
-                    </span>
-                  </div>
-                  <span className="text-[13px] font-semibold text-[#1c1c1c] tabular-nums">
-                    {countMap[s] ?? 0}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
+            )
+          })()}
         </div>
 
         {/* Sağ kolon */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="space-y-4">
           {/* Bekleyen işlemler */}
           {(pending > 0 || evaluated > 0) && (
             <div className="space-y-2">
@@ -255,7 +267,7 @@ export default async function AdminDashboardPage() {
               <h2 className="text-[12px] font-semibold text-[#aeaeb2] uppercase tracking-wider flex items-center gap-1.5">
                 <CheckCircle2 className="w-3 h-3" /> Son Başvurular
               </h2>
-              <Link href="/admin/applications" className="text-[12px] font-medium text-[#fab758] hover:opacity-70 transition-opacity">
+              <Link href="/admin/applications" className="text-[12px] font-medium text-[#fab758] hover:opacity-80 underline-offset-2 hover:underline transition-all">
                 Tümünü gör →
               </Link>
             </div>
@@ -267,7 +279,7 @@ export default async function AdminDashboardPage() {
                   <Link
                     key={app.id}
                     href={`/admin/applications/${app.id}`}
-                    className="flex items-center justify-between px-5 py-3.5 hover:bg-[#fafafa] transition-colors cursor-pointer"
+                    className="flex items-center justify-between px-5 py-3.5 hover:bg-[#f4f4f4] transition-colors cursor-pointer"
                   >
                     <div className="min-w-0">
                       <p className="text-[13px] font-medium text-[#1c1c1c] truncate">{app.title}</p>

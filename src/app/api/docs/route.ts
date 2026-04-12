@@ -1,6 +1,7 @@
 import { ApiReference } from "@scalar/nextjs-api-reference"
 
-export const GET = ApiReference({
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const GET = (ApiReference as any)({
   spec: { url: "/openapi.json" },
   pageTitle: "MDF API Dokümantasyonu",
   theme: "default",

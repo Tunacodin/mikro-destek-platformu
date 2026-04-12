@@ -40,7 +40,8 @@ export async function GET(
   }
 
   const nodeStream = await getFileStream(file.bucket, file.key)
-  const webStream = Readable.toWeb(nodeStream) as ReadableStream
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const webStream = (Readable as any).toWeb(nodeStream) as ReadableStream
 
   const safeName = encodeURIComponent(file.name).replace(/%20/g, " ")
 

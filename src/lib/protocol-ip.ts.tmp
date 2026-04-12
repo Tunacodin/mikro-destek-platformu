@@ -1,0 +1,402 @@
+Divizyon | Komünite
+Fikri, Sınai ve ​
+Mülkiyet Hakları Protokolü
+
+1. GİRİŞ VE AMAÇ
+Bu belge, Divizyon’un fikrî ve sınai mülkiyet yönetimine ilişkin kurumsal yaklaşımını, benimsediği temel
+ilkeleri ve paydaşlarına yönelik niyetlerini açıklamak üzere hazırlanmıştır. Belge, herhangi bir sözleşme yahut
+bağlayıcı bir protokol niteliği taşımamakta; yalnızca Divizyon ekosisteminde faaliyet gösteren katılımcılar,
+partnerler ve destekçi kurumlar için yol gösterici, şeffaf ve ilkeler bütününü yansıtan bir rehber olma
+özelliğini taşımaktadır. Bu itibarla, metin bağlayıcı hükümler tesis etmeyi değil, Divizyon’un üretim
+süreçlerinde fikrî mülkiyet haklarını nasıl konumlandırdığını ortaya koymayı amaçlamaktadır.
+Divizyon, hibrit topluluk modeli çerçevesinde, farklı disiplinlerden gelen bireyleri, kurumsal paydaşları ve
+destekçi aktörleri aynı üretim zemini üzerinde bir araya getirmektedir. Yazılım geliştirme, dijital sanat, içerik
+üretimi ve metodoloji tasarımı gibi çeşitli alanlarda yürütülen faaliyetler, katılımcıların bireysel yaratıcılığı ile
+kolektif üretim dinamiklerinin kesişmesine imkân tanımaktadır. Bu kesişimden doğan eser, fikir ve
+yöntemlerin adil, şeffaf ve öngörülebilir bir sistem içerisinde değerlendirilmesi, hem bireysel yaratıcılığın
+korunması hem de ortak üretimlerin kamuya ve topluluğa fayda sağlayacak şekilde yönlendirilmesi açısından
+zorunluluk arz etmektedir.
+Belgenin hazırlanmasındaki temel amaç, Divizyon’un üretim ekosisteminde yer alan tüm aktörler için ortak
+bir anlayış zemini tesis etmektir. Katılımcıların özgün eserlerini ve kişisel katkılarını güvence altına almak,
+ortak projelerden doğan hakların dengeli biçimde paylaştırılmasını sağlamak, Divizyon’un sunduğu mekânsal,
+teknik ve kurumsal desteklerin görünürlüğünü teminat altına almak ve nihayetinde ortaya çıkan her türlü fikrî
+değerin kamu yararına uygun şekilde değerlendirilmesine aracılık etmek bu belgenin özünü oluşturmaktadır.
+Divizyon’un yaklaşımı, kar amacı gütmeyen bir topluluk anlayışına dayanmaktadır. Bu bağlamda, üretim
+süreçlerinde maddi pay ya da doğrudan ekonomik çıkar beklentisi değil; topluluk hafızasının güçlendirilmesi,
+sürdürülebilir bir görünürlük modelinin tesis edilmesi ve kamu faydasının öncelenmesi esastır. Katılımcıların
+üretim özgürlüğünü kısıtlamak yerine geliştirmeyi, bireysel yaratıcılığın önünü açmayı ve kolektif üretimlerin
+kamuya mal olmasını teşvik etmeyi hedefleyen bu yaklaşım, Divizyon’un değer sisteminin ve uzun vadeli
+vizyonunun ayrılmaz bir parçasıdır.
+Bu belge, aynı zamanda şeffaflık ilkesinin somut bir yansımasıdır. Divizyon’da yürütülen her türlü sprint, proje
+veya üretim faaliyetinin başlangıcında, katılımcılara bu çerçeve aktarılmakta; hangi koşullarda hangi hakların
+doğduğu, kimlerin hangi sorumlulukları üstlendiği en baştan açıklığa kavuşturulmaktadır. Böylelikle, topluluk
+üyeleri güven ortamında üretim yapabilmekte, potansiyel ihtilafların önüne geçilmekte ve herkesin eşit
+şartlar altında sürece dâhil olması sağlanmaktadır.
+Sonuç itibarıyla, bu belge Divizyon’un fikrî ve sınai mülkiyet haklarına ilişkin niyet ve ilkelerini yansıtan bir
+beyan niteliğindedir. Burada zikredilen esasların, katılımcıların üretim özgürlüğünü güvence altına alırken,
+Divizyon’un topluluk odaklı rolünü ve kamu yararına dayalı misyonunu görünür kılacak şekilde
+değerlendirilmesi esastır. Bu yönüyle belge, ne bir sözleşme ne de bağlayıcı bir protokol olarak görülmeli;
+Divizyon’un kurumsal yaklaşımını, paydaşlarına sunduğu güvenceleri ve topluluk için benimsediği vizyonu
+ifade eden bir niyet çerçevesi olarak anlaşılmalıdır.
+
+2. TANIMLAR VE KAVRAMSAL ÇERÇEVE
+Bu belge kapsamında kullanılan kavramlar aşağıda açıklanmış olup, Divizyon’un fikrî ve sınai mülkiyet
+yaklaşımının anlaşılması ve sonraki bölümlerde yapılacak atıfların doğru yorumlanabilmesi için yol gösterici
+nitelik arz etmektedir.
+●​ Fikrî Haklar (Copyright): Edebi, sanatsal, bilimsel eserler, yazılım, görsel ve işitsel içerikler
+üzerinde doğan manevi ve mali hakları ifade eder.
+●​ Sınai Haklar (Industrial Property): Patent, faydalı model, marka, tasarım ve coğrafi işaret
+gibi sınai mülkiyet unsurlarını kapsar.
+●​ Bireysel Katkı: Katılımcının kendi emeğiyle, tek başına ürettiği özgün kod, tasarım, metin,
+görsel veya benzeri ürünleri ifade eder.
+●​ Kolektif Üretim: Birden fazla katılımcının işbirliği ile ortaya çıkan, bireysel katkıların
+ayrıştırılamadığı ve ortak mülkiyet niteliği taşıyan çıktılardır.
+●​ Ortak Yaratım (Co-Creation): Katılımcılar, partnerler ve Divizyon’un birlikte geliştirdiği,
+mülkiyeti paylaşılan üretimlerdir.
+●​ Divizyon Çerçevesi: Divizyon’a ait olan metodolojiler, sprint şablonları, süreç tasarımları,
+teknik altyapılar ve araçlar bütünüdür. Katılımcılar bunlardan yalnızca üretim süreçlerinde
+yararlanabilir, bağımsız mülkiyet iddiasında bulunamaz.
+●​ Know-How (Bilgi Birikimi): Resmî olarak tescillenmemiş olsa da stratejik nitelikte kabul
+edilen ve korunması gereken teknik bilgi, yöntem ve deneyim bütünüdür.
+●​ Açık Kaynak (Open Source): Üretimlerin herkesin erişimine, paylaşımına ve öğrenme
+amacıyla kullanımına açık bırakıldığı modeldir. Creative Commons benzeri lisanslama biçimleri bu
+kapsama dâhildir.
+●​ Divizyon Açık Lisansı (DOL): Divizyon’un topluluk içi üretimlerde uyguladığı, atıf, ticari
+olmama ve aynı lisansla paylaşım ilkelerini esas alan özel lisanslama yaklaşımıdır.
+●​ Açık Kaynak Değeri: Ticarileştirmeye konu edilmeyen tüm çıktılar için geçerli olup, topluluk
+içinde serbest erişim, paylaşım ve öğrenme amaçlı kullanım hakkını ifade eder.
+●​ Görünürlük Hakkı (Attribution Right): Divizyon’un herhangi bir maddi talepte
+bulunmaksızın yalnızca Divizyon isim ve logosu, Divizyon’un bir KBB kuruluşu olduğuna dair
+koordinatörlük tarafından periyodik olarak güncelleme hakkı saklı tutulan çeşitli ibare ve materyaller
+ile katkısının görünür kılınması yönündeki hakkıdır.
+●​ Manevi Haklar (Moral Rights): Eser sahibinin adının belirtilmesi, eserin bütünlüğünün
+korunması ve eserin onuruna zarar verecek şekilde değiştirilmemesi gibi kişisel haklardır.
+●​ Mali Haklar (Economic Rights): Eserin çoğaltılması, yayılması, işlenmesi, temsil edilmesi ve
+ticari kazanca dönüştürülmesine ilişkin haklardır.
+●​ Ticarileştirme (Commercialization): Üretimlerin ürün, hizmet, lisans, spin-off şirket veya
+yatırım aracılığıyla ekonomik değere dönüştürülmesi sürecidir.
+●​ Spin-Off: Divizyon projelerinden doğarak bağımsız şirketleşmeye giden yeni girişim.
+●​ IP Portföyü: Katılımcıların ve Divizyon’un birlikte oluşturduğu, tescillenmiş veya
+tescillenmeye aday tüm fikrî ve sınai mülkiyet varlıklarının bütünüdür.
+●​ IP Değerleme (Valuation): Ortaya çıkan fikrî mülkiyet unsurlarının maddi ve manevi
+değerinin belirlenmesi sürecidir.
+●​ Royalty (Telif Payı): Bir fikrî ürünün ticari kullanımı karşılığında eser sahibine ödenen
+düzenli gelir.
+●​ Lisans Türleri:
+○​ Münhasır Lisans (Exclusive License): Ürünün veya hakkın yalnızca tek bir kullanıcıya
+tanındığı lisans modelidir.
+
+○​ Münhasır Olmayan Lisans (Non-Exclusive License): Aynı hakkın birden fazla kullanıcıya
+tanınabildiği lisans modelidir.
+●​ Türev Eser (Derivative Work): Mevcut bir eserden yola çıkarak geliştirilen, değiştirilen veya
+dönüştürülen yeni eserdir.
+●​ Atıf Zorunluluğu (Attribution): Bir eserin kullanımında üretici kişi veya kurumun adının
+belirtilmesi yükümlülüğüdür.
+●​ Adil Kullanım (Fair Use): Belirli koşullar altında eserin eğitim, araştırma veya kişisel kullanım
+için sınırlı biçimde değerlendirilmesidir.
+●​ Bilgi Güvenliği ve Gizlilik: Katılımcılara, partnerlere ve Divizyon’a ait gizli bilgilerin, ticari
+sırların ve kişisel verilerin korunmasına ilişkin ilkelerdir.
+●​ Çıkar Çatışması (Conflict of Interest): Katılımcı veya partnerin, kişisel menfaatleri ile
+Divizyon’un çıkarları arasında doğabilecek uyumsuzluk hâlidir.
+●​ Gizlilik Anlaşması (Non-Disclosure Agreement / NDA): Özellikle dış partnerliklerde
+bilgilerin korunmasını güvence altına alan anlaşma modelidir.
+●​ Topluluk Hafızası (Collective Memory): Üretim süreçlerinden doğan tüm bilgi ve eserlerin
+arşivlenerek geleceğe aktarılması ve sürekli öğrenme kaynağına dönüşmesidir.
+●​ İnovasyon Alanı (Innovation Space): Henüz ticarileştirilmemiş, ancak ilham verici ve
+geliştirici potansiyel taşıyan çıktılar için ayrılan kavramsal çerçevedir.
+●​ Önceki Bilgi/Eser (Prior Art): Patent veya eser başvurusunda, daha önce kamuya mal
+olmuş bilginin veya eserin varlığıdır.
+●​ Açıklama (Disclosure): Bir fikrî ürünün, belirli koşullar altında üçüncü kişilerle paylaşılması
+veya kamuya duyurulmasıdır.
+●​ Güven Sorumluluğu (Fiduciary Duty): Katılımcıların Divizyon’un kaynaklarını kullanırken
+üstlendikleri etik ve kurumsal sorumluluktur.
+●​ İyi Niyet İlkesi (Good Faith Principle): Katılımcıların, topluluk değerlerine uygun şekilde
+dürüst ve samimi davranma yükümlülüğünü ifade eder.
+●​ Kolaylaştırıcı Rol (Facilitator Role): Uyuşmazlık çözümünde Divizyon yönetiminin
+üstlenebileceği arabulucu ve dengeleyici roldür.
+
+3. İLKE VE ESASLAR
+Divizyon’un fikrî ve sınai mülkiyet yönetimine ilişkin yaklaşımı, yalnızca teknik bir hak düzenlemesi değil, aynı
+zamanda kurumsal kimliğin ve topluluk değerlerinin bir yansımasıdır. Bu yaklaşım, açık inovasyon
+felsefesine, topluluk önceliğine, etik sorumluluklara ve şeffaflık ilkesine dayandırılmaktadır. Aşağıda belirtilen
+esaslar, Divizyon’un bağlayıcı hükümler koymak amacıyla değil, niyet ve yaklaşımını net biçimde ortaya
+koymak amacıyla benimsenmiş temel ilkeleridir.
+Açık İnovasyon İlkesi: Divizyon, bilgi ve deneyimin paylaşıldıkça çoğaldığına inanır. Bu nedenle, üretilen her
+bir çıktı yalnızca bireysel yaratıcılığın ürünü olarak değil, aynı zamanda topluluğun ortak öğrenme sürecinin
+bir parçası olarak değerlendirilir. Ortaya çıkan ürünler, ticarileştirilmedikleri sürece açık kaynak değeri olarak
+kabul edilir ve topluluğun kullanımına sunulur.
+Topluluk Önceliği İlkesi: Divizyon’un tüm süreçlerinde, bireylerin özgürce öğrenmesi, üretmesi ve kendilerini
+geliştirmesi desteklenir. Katılımcıların üretim özgürlüğünü sınırlayan maddi engellerin önüne geçilir.
+Divizyon’un katkısı, maddi pay beklentisiyle değil, görünürlük hakkı ve sürdürülebilirlik temeli üzerinden
+tanımlanır.
+Şeffaflık İlkesi: Katılımcıların hangi koşullarda hangi haklara sahip olduğu, süreçlerin başlangıcında açık
+biçimde açıklanır. Böylece her aktör, üretim sürecine dahil olurken hak ve yükümlülüklerini bilir. Şeffaflık,
+yalnızca güven tesis eden bir unsur değil, aynı zamanda potansiyel anlaşmazlıkların önleyici bir
+mekanizmasıdır.
+Adalet ve Dengeli Paylaşım İlkesi: Bireysel katkıların korunması ve kolektif üretimlerin hakkaniyetli biçimde
+paylaştırılması esastır. Hiçbir katılımcının emeği göz ardı edilmez; aynı zamanda Divizyon’un sağladığı
+kaynakların görünürlük hakkı korunur. Bu denge, topluluğun güven ortamında üretim yapmasını mümkün
+kılar.
+Etik ve Sorumlu Kullanım İlkesi: Katılımcılar, Divizyon’da ürettikleri eser ve çıktıları yalnızca topluluk
+değerleriyle uyumlu biçimde kullanmayı taahhüt eder. Yapay zekâ tabanlı içerikler, generatif üretimler, veri
+güvenliği ve kişisel verilerin korunması gibi konularda etik duyarlılık esas alınır. Çıkar çatışmalarının
+önlenmesi, iyi niyet ilkesine uygun davranılması ve topluluk yararının kişisel menfaatlerin önünde tutulması
+temel beklentidir.
+Kamu Yararına Katkı İlkesi: Divizyon’un yaklaşımı, kar amacı gütmeyen bir model üzerine kuruludur. Bu
+nedenle, üretilen her bir değer yalnızca bireysel faydaya değil, aynı zamanda kamu yararına da hizmet
+etmelidir. Ticarileşmeye konu olan projelerde dahi, Divizyon’un katkısı görünürlük hakkı üzerinden tanınarak
+kamuoyuna mal edilir.
+Sürdürülebilirlik İlkesi: Divizyon’un katkılarının kalıcı ve sürekli olması esastır. Bu nedenle, üretilen değerler
+yalnızca tek seferlik çıktılar olarak kalmaz; arşiv, sergi, yayın ve diğer yöntemlerle topluluk hafızasına
+kazandırılır. Bu döngü, Divizyon’un uzun vadeli misyonunu destekler.
+Sonuç olarak, Divizyon’un fikrî ve sınai mülkiyet yaklaşımı; açık inovasyon, topluluk önceliği, şeffaflık, adalet,
+etik sorumluluk, kamu yararı ve sürdürülebilirlik ilkeleri üzerine inşa edilmiştir. Bu esaslar, bağlayıcı bir hüküm
+koymaktan ziyade, tüm aktörlere yön gösterici bir çerçeve sunmakta; Divizyon ekosisteminde güvene,
+işbirliğine ve uzun vadeli ortak faydaya dayalı bir üretim ortamının tesis edilmesini amaçlamaktadır.
+
+4. HAK SAHİPLİĞİ DÜZENİ
+Divizyon ekosisteminde ortaya çıkan her türlü fikrî ve sınai mülkiyet unsuru, katkı biçimine göre farklı hak
+sahipliği düzenlerine tabi tutulur. Bu düzenlemelerin amacı, bireysel emeğin korunması, kolektif
+üretimlerden doğan hakların adil biçimde paylaşılması ve Divizyon’un sunduğu kaynakların görünürlük
+hakkının teminat altına alınmasıdır. Hak sahipliği düzeni, katılımcıların üretim özgürlüğünü güvence altına
+alırken, Divizyon’un kamu yararına dayalı misyonunu da sürdürülebilir kılar.
+Bireysel Katkılar: Katılımcının kendi emeğiyle tek başına ortaya koyduğu özgün kod parçaları, tasarımlar,
+görseller, metinler, animasyonlar veya benzeri nitelikteki üretimler, ilgili katılımcının mülkiyetinde kalır. Bu
+ürünler üzerinde Divizyon herhangi bir maddi hak iddiasında bulunmaz. Katılımcılar, bu üretimleri
+portföylerinde sergileyebilir, kişisel gelişim süreçlerinde kullanabilir ve toplulukla paylaşabilir. Divizyon’un
+rolü, bireysel katkıların görünürlüğünü artırmak ve topluluk hafızasına kazandırılmasını teşvik etmektir.
+Kolektif Üretimler: Birden fazla katılımcının işbirliği ile ortaya çıkan ve bireysel katkıların ayrıştırılamadığı
+üretimler, tüm ekip üyelerinin ortak mülkiyeti sayılır. Kolektif üretimlerde her bir katılımcı, çıktıyı kendi
+portföyünde kullanma, eğitim ve tanıtım faaliyetlerinde değerlendirme hakkına sahiptir. Divizyon, kolektif
+üretimlerin görünürlüğünü sağlamak amacıyla bu çıktıları arşivler, sergiler veya yayınlar. Ancak, kolektif
+mülkiyet doğuran üretimlerde Divizyon’un herhangi bir maddi pay talebi bulunmaz; katkısı yalnızca
+görünürlük hakkı çerçevesinde tanınır.
+Ortak Yaratım: Katılımcıların, partnerlerin ve Divizyon’un doğrudan katkısıyla üretilen projeler “ortak yaratım”
+kapsamında değerlendirilir. Bu durumda, eser üzerinde birden fazla tarafın mülkiyet hakkı söz konusu olabilir.
+Ortak yaratım projelerinde mülkiyet paylaşımı, tarafların katkı düzeyine göre adil biçimde tanımlanır.
+Divizyon’un katkısı, mekân, mentorluk, hızlandırma, teknik altyapı veya finansman desteği gibi unsurlardan
+kaynaklandığında, Divizyon’un görünürlük hakkı saklı tutulur.
+Divizyon Çerçevesi: Divizyon’un metodolojileri, sprint şablonları, süreç tasarımları, teknik altyapılar ve
+araçlar, münhasıran Divizyon’a aittir. Katılımcılar bu çerçeveyi yalnızca üretim süreçlerinde kullanma hakkına
+sahiptir. Söz konusu unsurlar, bağımsız mülkiyet iddiasına konu edilemez ve gizlilik ilkeleri doğrultusunda
+korunmak zorundadır. Bu yapı, Divizyon’un sistematik katkısını güvence altına alırken, tüm katılımcıların eşit
+imkânlarla sürece dâhil olmasını sağlar.
+Ticarileşmeyen Çıktılar: Ticarileşmeye konu edilmeyen tüm üretimler, topluluğun “açık kaynak değeri” olarak
+kabul edilir. Bu üretimler, Divizyon Açık Lisansı kapsamında yayımlanır ve topluluk üyelerinin serbest
+kullanımına sunulur. Katılımcılar bu çalışmalardan öğrenebilir, türev eserler geliştirebilir, ancak türevler aynı
+lisansla topluluğa geri kazandırılmak zorundadır.
+Ticarileşen Çıktılar: Bir üretim, Divizyon’un sunduğu kaynaklar kullanılarak ticari bir ürüne, hizmete veya
+lisansa dönüşürse, Divizyon’un co-creator (ortak yaratıcı) statüsü doğar. Bu statü yalnızca isim ve katkının
+görünür kılınması hakkını kapsar; Divizyon, herhangi bir maddi pay veya royalty talep etmez. Katılımcılar,
+ticari girişimlerinde özgürlüklerini korurken, Divizyon’un kamu yararına dayalı katkısı da görünürlük aracılığıyla
+kamuoyuna mal edilir.
+Sonuç olarak, Divizyon’daki hak sahipliği düzeni; bireysel emeği koruyan, kolektif üretimleri adil biçimde
+paylaşan, Divizyon’un katkılarını ise yalnızca görünürlük hakkı çerçevesinde tanıyan bir model üzerine inşa
+edilmiştir. Bu düzen, katılımcıların üretim özgürlüğünü güvence altına alırken, aynı zamanda Divizyon’un
+şeffaflık, topluluk önceliği ve kamu yararına katkı ilkeleri doğrultusunda sürdürülebilir bir topluluk yapısı inşa
+etmesine hizmet etmektedir.
+
+5. KULLANIM VE LİSANSLAMA ESASLARI
+Divizyon bünyesinde ortaya çıkan fikrî ve sınai mülkiyet unsurlarının kullanımına ve lisanslanmasına ilişkin
+yaklaşım, katılımcıların üretim özgürlüğünü korurken, topluluğun ortak faydasını ve Divizyon’un kamu
+yararına dayalı rolünü güvence altına almayı hedefler. Aşağıda belirtilen esaslar, bağlayıcı bir hüküm
+doğurmaksızın, Divizyon’un niyet ve prensiplerini yansıtan temel çerçeveyi teşkil etmektedir.
+Bireysel Kullanım: Katılımcılar, kendi katkılarıyla ortaya çıkardıkları eserleri portföylerinde sergileme, eğitim
+ve sunum faaliyetlerinde kullanma ve kişisel gelişimlerinde değerlendirme hakkına sahiptir. Divizyon,
+bireysel üretimlere ilişkin herhangi bir kısıtlama getirmez; yalnızca söz konusu üretimlerin topluluk hafızasına
+kazandırılması yönünde teşvikte bulunur.
+Topluluk İçi Kullanım: Divizyon ekosisteminde üretilen çıktılar, topluluk üyelerinin serbest erişimine açıktır.
+Katılımcılar bu üretimlerden öğrenebilir, türev çalışmalar geliştirebilir ve portföylerinde kullanabilir. Bu
+yaklaşım, bireysel emeğin görünürlüğünü artırırken, aynı zamanda kolektif öğrenme döngüsünü besler.
+Açık Kaynak Değeri: Ticarileştirmeye konu edilmeyen tüm çıktılar, topluluğun “açık kaynak değeri” olarak
+kabul edilir. Bu üretimler, Divizyon Açık Lisansı (DOL) kapsamında yayımlanır. DOL, üç temel ilkeye dayanır:
+●​ Atıf Zorunluluğu: Çıktının kullanımında üretici ekip ve Divizyon’un adı belirtilir.
+●​ Ticari Olmama Şartı: Çıktılar doğrudan ticari kazanç sağlamak amacıyla kullanılamaz.
+●​ Aynı Lisansla Paylaşım: Çıktılardan türetilen yeni eserler aynı koşullarla topluluğa geri
+kazandırılır.
+Ticarileştirme ve Görünürlük Hakkı: Divizyon kaynaklarının (mekân, mentorluk, hızlandırma, teknik destek,
+fon veya yatırım yönlendirmesi) kullanılması suretiyle ticari değere dönüşen üretimlerde Divizyon’un
+“co-creator” statüsü doğar. Bu statü, Divizyon’a yalnızca isim ve katkısının görünür kılınması hakkını tanır.
+Divizyon, hiçbir koşulda maddi pay, royalty veya lisans geliri talep etmez. Katılımcılar ticari girişimlerinde
+özgürdür; ancak Divizyon’un katkısı kamuoyuna mal edilecek şekilde tanınmalıdır.
+Lisanslama Türleri: Divizyon, ekosisteminde üretilen çıktılara ilişkin lisanslama yaklaşımında esneklik tanır.
+Bireysel veya kolektif üretimler için münhasır (exclusive) ya da münhasır olmayan (non-exclusive) lisans
+modelleri uygulanabilir. Münhasır lisans, hakkın tek bir kullanıcıya devredildiği; münhasır olmayan lisans ise
+aynı hakkın birden fazla kullanıcıya tanındığı durumları ifade eder. Lisanslama süreçlerinde adil paylaşım,
+şeffaflık ve tarafların rızası esastır.
+Türev Eserler: Divizyon ekosisteminde geliştirilen ürünlerden türetilen yeni eserler, mevcut eserin temel
+karakterini koruduğu sürece “türev eser” sayılır ve ilgili lisans koşullarına tabi olur. Türev eserler de,
+ticarileştirilmediği sürece topluluğa aynı lisansla geri kazandırılır.
+Adil Kullanım ve Eğitim Amaçlı Kullanım: Divizyon, eserlerin eğitim, araştırma veya kişisel gelişim amacıyla
+sınırlı ölçüde kullanılmasına olumlu yaklaşır. Bu tür kullanımlar, topluluk değerleriyle uyumlu olduğu sürece
+teşvik edilir. Ancak ticari kazanç elde etmeye yönelik doğrudan kullanımlar bu kapsamda değerlendirilemez.
+Sonuç olarak, Divizyon’un kullanım ve lisanslama yaklaşımı; katılımcıların üretim özgürlüğünü koruyan, açık
+kaynak ruhunu besleyen, ticarileştirme süreçlerinde görünürlük hakkı ile yetinen ve her koşulda kamu yararını
+önceleyen bir modeldir. Bu model, bağlayıcı bir hüküm doğurmamakla birlikte, katılımcılar ve partnerler için
+yol gösterici bir çerçeve sunmakta; Divizyon ekosisteminde güvene, işbirliğine ve sürdürülebilirliğe dayalı bir
+üretim ortamının oluşmasına katkı sağlamaktadır.
+
+6. KORUMA VE KAYIT MEKANİZMALARI
+Divizyon ekosisteminde ortaya çıkan fikrî ve sınai mülkiyet unsurlarının korunması ve kayıt altına alınması,
+yalnızca bireysel ve kolektif üretimlerin güvenceye alınmasını değil, aynı zamanda topluluk hafızasının
+güçlendirilmesini ve şeffaf bir öğrenme kültürünün sürekliliğini hedeflemektedir. Bu kapsamda uygulanacak
+mekanizmalar, bağlayıcı hükümler koymaktan ziyade Divizyon’un niyet ve yaklaşımını yansıtan rehber
+niteliğindedir.
+Kayıt ve Arşivleme: Divizyon’da gerçekleştirilen tüm üretimler, süreç sonunda kayıt altına alınır ve dijital arşiv
+sistemine kazandırılır. Bu kayıt, katılımcıların üretim süreçlerinin belgelenmesine, topluluk içinde görünür
+kılınmasına ve gelecekteki projeler için referans teşkil etmesine hizmet eder. Arşiv, yalnızca statik bir kayıt
+değil, aynı zamanda dinamik bir öğrenme kaynağı olarak işlev görür.
+Tescil Süreçleri: Patent, marka, tasarım, telif hakkı veya benzeri koruma mekanizmalarına konu olabilecek
+üretimlerde, katılımcılar bireysel veya kolektif başvurular gerçekleştirebilir. Divizyon, tescil sürecinde
+yönlendirici rol üstlenebilir, ancak hak sahipliği iddiasında bulunmaz. Ulusal mevzuat, uluslararası
+düzenlemeler ve ilgili standartlarla uyumlu hareket edilmesi esastır.
+Öncelik İlkesi: Bir üretimin kime ait olduğu hususunda öncelikli referans, kayıt tarihi ve arşivdeki
+dokümantasyon olur. Bu uygulama, olası anlaşmazlıklarda delil niteliği taşıyan bir unsur olarak
+değerlendirilebilir. Ancak, bu düzenleme hukuki bağlayıcılık doğurmaz; yalnızca Divizyon’un şeffaflık ve
+güven esasına dayalı yaklaşımını pekiştirir.
+Şeffaflık ve İzlenebilirlik: Her üretim sürecinde hangi katılımcının hangi aşamada nasıl bir katkı sunduğu açık
+biçimde kaydedilir. Bu uygulama, topluluk içinde emeğin görünür kılınmasını, katkıların adil biçimde
+değerlendirilmesini ve kolektif üretimlerde mülkiyet paylaşımının şeffaflık temelinde yürütülmesini sağlar.
+Bilgi Güvenliği: Divizyon, arşivlerinde tutulan tüm bilgi, eser ve yöntemlerin güvenliğini sağlamak için gerekli
+önlemleri almayı niyet edinir. Gizlilik kapsamında değerlendirilen unsurlar, yalnızca ilgili yetkilendirmelere
+sahip kişiler tarafından erişilebilir. Böylelikle hem bireysel katkılar hem de kolektif üretimler, yetkisiz
+kullanımlara karşı korunur.
+Topluluk Hafızasının Güçlendirilmesi: Kayıt ve koruma mekanizmaları yalnızca hukuki ihtilafların önüne
+geçmek amacıyla değil, aynı zamanda topluluk hafızasının sürekliliği için hayata geçirilir. Divizyon, her üretimi
+yalnızca bir defalık bir çıktı olarak değil, gelecekteki öğrenme süreçlerini ve yeni üretimleri besleyecek bir bilgi
+kaynağı olarak görür. Bu nedenle, üretimler düzenli olarak sergilere, yayınlara, eğitimlere ve dijital
+platformlara taşınarak topluluk üyelerine geri kazandırılır.
+Sonuç itibarıyla, Divizyon’un koruma ve kayıt mekanizmaları; bireysel ve kolektif üretimleri güvence altına
+alan, şeffaflığı ve izlenebilirliği teminat altına alan ve aynı zamanda topluluk hafızasını güçlendiren bir yapı
+sunmaktadır. Bu mekanizmalar, bağlayıcı nitelikte olmayıp, Divizyon’un fikrî mülkiyet yönetiminde şeffaflık,
+adalet, sürdürülebilirlik ve kamu yararı ilkelerini hayata geçirme niyetini yansıtmaktadır.
+
+7. YETKİ VE SORUMLULUKLAR
+Divizyon ekosisteminde fikrî ve sınai mülkiyet yönetimi, yalnızca kurumsal yapı tarafından değil, tüm
+aktörlerin ortak katkısı ve sorumluluğu ile sürdürülen bir süreçtir. Bu bölümde belirtilen yetki ve
+sorumluluklar, hukuken bağlayıcı görevler değil; Divizyon’un topluluk odaklı yaklaşımını, aktörlerden
+beklentilerini ve işleyişin sağlıklı biçimde yürütülmesine yönelik niyetlerini yansıtan ilkelerdir.
+Divizyon Yönetiminin Rolü:​
+Divizyon yönetimi, ekosistemde ortaya çıkan fikrî ve sınai mülkiyet unsurlarının şeffaf, adil ve sürdürülebilir
+şekilde yönetilmesi için kolaylaştırıcı rol üstlenir. Yönetimin sorumluluğu, katılımcıların üretim süreçlerini kayıt
+altına almak, arşivlemek, lisanslama modellerini şeffaf biçimde açıklamak ve olası anlaşmazlıklarda topluluk
+değerlerine uygun şekilde arabuluculuk yapmaktır. Yönetim, mülkiyet iddiasında bulunmamakla birlikte,
+Divizyon’un sağladığı kaynakların görünürlük hakkını korur ve kamu yararına dayalı misyonun sürdürülmesini
+temin eder.
+Katılımcıların Sorumlulukları:​
+Katılımcılar, bireysel katkılarını ve kolektif üretimlerdeki rollerini şeffaf biçimde beyan etmekle yükümlüdür.
+Üretim süreçlerinde iyi niyet, dürüstlük ve topluluk değerlerine uygun hareket etmek, eserlerin etik
+kullanımına riayet etmek ve gizlilik esaslarına bağlı kalmak beklenir. Katılımcılar, kendi eserleri üzerinde tam
+tasarruf hakkına sahip olmakla birlikte, türev üretimlerde Divizyon Açık Lisansı koşullarına uymayı kabul eder.
+Ayrıca, Divizyon’un kamu yararına dayalı katkısının görünür kılınmasına özen göstermek, katılımcıların etik
+sorumlulukları arasındadır.
+Partnerlerin ve İşbirliği Aktörlerinin Rolü:​
+Üniversiteler, özel sektör kuruluşları, kamu kurumları ve sivil toplum örgütleri gibi partnerler, Divizyon
+ekosistemine dâhil olduklarında, ortak üretim süreçlerinde mülkiyet paylaşımını şeffaf ve adil esaslar
+doğrultusunda kabul etmiş sayılırlar. Bu aktörlerden beklenen, kendi katkılarını açık biçimde beyan etmeleri,
+Divizyon’un değerlerini gözetmeleri ve ortaya çıkan çıktılarda görünürlük hakkına riayet etmeleridir. Partnerlik
+süreçlerinde lisanslama, ticarileştirme ve spin-off gibi mekanizmalar tarafların mutabakatı ile şekillenir.
+Ortak Yükümlülükler:​
+Tüm aktörlerin ortak sorumluluğu, Divizyon’un topluluk ruhunu, şeffaflık anlayışını ve kamu yararına
+odaklanan vizyonunu sürdürmeye katkıda bulunmaktır. Katılımcılar ve partnerler, Divizyon’un sağladığı
+kaynakları kullanırken güven sorumluluğunu gözetir; çıkar çatışmalarından kaçınır ve iyi niyet ilkesi
+doğrultusunda hareket eder.
+Katılımcılar, alliance partnerleri ve diğer işbirliği aktörleri arasındaki ikili veya çok taraflı anlaşmazlıklar,
+öncelikle tarafların kendi sorumlulukları kapsamında değerlendirilir ve çözülür. Divizyon bu tür ihtilaflarda
+doğrudan taraf olarak konumlanmaz. Bununla birlikte, Divizyon’un doğrudan muhatap olduğu
+yükümlülüklerin —özellikle görünürlük hakkının ihlali, Divizyon Açık Lisansı koşullarının yerine getirilmemesi,
+etik ilkelerden sapma veya gizlilik ihlali— söz konusu olduğu hallerde, Divizyon gerekli gördüğü takdirde ilgili
+taraflara karşı yasal yollara başvurma ve gerekli işlemleri yürütme hakkını saklı tutar.
+Sonuç olarak, Divizyon’un fikrî ve sınai mülkiyet yönetiminde yetki ve sorumluluklar, bağlayıcı görev
+tanımlarına değil, topluluk değerleri çerçevesinde şekillenen bir etik anlayışa dayanmaktadır. Bu yaklaşım
+sayesinde, yönetim kolaylaştırıcı bir rol üstlenirken, katılımcılar ve partnerler de üretim süreçlerinde aktif,
+sorumlu ve şeffaf bir tavır sergiler. Böylece Divizyon ekosistemi, güven ve işbirliğine dayalı bir üretim ortamı
+olarak sürdürülebilirliğini korur.
+
+9. GİZLİLİK VE BİLGİ GÜVENLİĞİ
+Divizyon ekosisteminde yürütülen tüm faaliyetlerde, katılımcıların ve partnerlerin paylaştığı bilgi, belge, eser
+ve yöntemlerin güvenliği temel öncelikler arasında yer almaktadır. Bu bağlamda gizlilik ve bilgi güvenliği,
+yalnızca bireysel ve kurumsal hakların korunması için değil, aynı zamanda topluluk içinde güven ortamının
+sürekliliği için de hayati önem taşır. İşbu bölümde yer alan esaslar, bağlayıcı yükümlülükler tesis etmeyip,
+Divizyon’un bu alandaki yaklaşımını ve aktörlerden beklentilerini yansıtan rehber niteliğindedir.
+Gizlilik İlkesi: Katılımcılar ve partnerler, Divizyon süreçlerinde elde ettikleri ticari sır, özel nitelikli bilgi, kişisel
+veri ve henüz kamuya açıklanmamış proje çıktılarının gizliliğine riayet eder. Bu tür bilgiler, yalnızca
+yetkilendirilmiş kişilerle ve belirlenen sınırlar çerçevesinde paylaşılabilir. Gizlilik ilkesinin ihlali, topluluk
+değerlerini zedeleyici bir davranış olarak kabul edilir.
+Bilgi Güvenliği: Divizyon, dijital arşivlerinde ve kayıt sistemlerinde saklanan tüm veri ve dokümanların
+güvenliği için gerekli önlemleri almayı niyet edinir. Bu kapsamda erişim yetkileri sınırlandırılır, verilerin
+bütünlüğü korunur ve kayıplara karşı yedekleme mekanizmaları uygulanır. Amaç, katılımcıların üretimlerini ve
+Divizyon’a emanet ettikleri bilgileri güvenilir bir ortamda muhafaza etmektir.
+Kişisel Verilerin Korunması: Katılımcıların ve partnerlerin kişisel verileri, yalnızca Divizyon faaliyetlerinin
+yürütülmesi amacıyla işlenir ve ilgili mevzuatın öngördüğü çerçevede korunur. Bu veriler üçüncü kişilerle
+katılımcının açık rızası olmaksızın paylaşılmaz. Böylelikle Divizyon, bireylerin mahremiyetine saygı
+gösterdiğini ve şeffaflıkla hareket ettiğini ortaya koyar.
+Şeffaflık–Gizlilik Dengesi: Divizyon, üretim süreçlerinde şeffaflık ilkesini temel almakla birlikte, topluluk içi
+bilgilerin ve eserlerin korunması noktasında hassasiyet gösterir. Bu nedenle, hangi bilgilerin paylaşılabilir
+olduğu ile hangi bilgilerin gizli kalacağı süreçlerin başında netleştirilir. Şeffaflık, güveni pekiştirirken; gizlilik,
+hak ve menfaatlerin korunmasına hizmet eder.
+Etik ve Sorumluluk: Katılımcıların, Divizyon çerçevesinde eriştikleri bilgilere yalnızca üretim süreçlerinde ve
+topluluk yararına olacak şekilde başvurmaları beklenir. Bu bilgilerin yetkisiz şekilde paylaşılması, kişisel
+menfaat için kullanılması veya üçüncü taraflara aktarılması etik dışı kabul edilir.
+Sonuç olarak, gizlilik ve bilgi güvenliği, Divizyon’un üretim süreçlerinin ayrılmaz bir parçasıdır. Bu çerçevede
+benimsenen yaklaşım, katılımcıların ve partnerlerin bilgi ve verilerini korumayı, güven ortamını sürdürmeyi
+ve topluluk değerlerini gözetmeyi hedeflemektedir. Belirtilen esaslar, bağlayıcı bir protokol hükmü
+doğurmamakla birlikte, Divizyon’un bu konudaki kurumsal niyetini ve topluluk üyelerinden beklentilerini açık
+biçimde ortaya koymaktadır.
+
+10. YÜRÜRLÜK VE GEÇERLİLİK
+Bu belge, Divizyon’un fikrî ve sınai mülkiyet yönetimine ilişkin yaklaşımını ortaya koymak üzere hazırlanmış
+olup, imza veya onay şartına bağlı olmaksızın yürürlüğe girer. Belge, bağlayıcı bir protokol veya sözleşme
+niteliği taşımamakta; Divizyon’un kurumsal vizyonunu, topluluk değerlerini ve paydaşlarına yönelik
+niyetlerini açıklayan bir çerçeve olarak geçerlilik kazanmaktadır.
+Belgenin yürürlüğü, Divizyon ekosisteminde faaliyet gösteren tüm katılımcılar, partnerler ve destekçi
+kurumlar açısından “ortak anlayış zemini” tesis etmeye yöneliktir. Bu yönüyle, belgenin hükümleri herhangi
+bir yasal yaptırım doğurmaz; ancak Divizyon ekosistemine katılan her aktörün, burada yer verilen esasları iyi
+niyet çerçevesinde gözetmesi beklenir. Belgeye konu edilen yaklaşım, topluluk içinde güvenin korunması,
+şeffaflık ilkesinin işletilmesi ve kamu yararının öncelenmesi amacıyla yol gösterici niteliğe sahiptir.
+Geçerlilik bakımından, bu belge statik bir metin olarak değerlendirilmez. Fikrî ve sınai mülkiyet alanındaki
+gelişmeler, ulusal ve uluslararası standartlardaki değişiklikler, Divizyon ekosisteminin ihtiyaçları veya topluluk
+içinden gelen öneriler doğrultusunda revizyona tabi tutulabilir. Bu çerçevede, belgenin güncellenmesi
+Divizyon yönetiminin sorumluluğunda olup, revize edilen metinler tüm paydaşlarla şeffaflıkla paylaşılır.
+Revizyonlar, katılımcıların üretim özgürlüğünü korumak, kolektif faydayı güçlendirmek ve Divizyon’un kamu
+yararına dayalı misyonunu desteklemek amacıyla gerçekleştirilir. Bu nedenle, belgenin her yeni sürümü
+yalnızca bir düzenleme değişikliği değil, aynı zamanda Divizyon’un değerlerini ve vizyonunu yeniden teyit
+eden bir irade beyanı niteliği taşır.
+Sonuç olarak, bu belge yürürlükte olduğu sürece, Divizyon ekosisteminde üretilen her türlü fikrî ve sınai
+mülkiyet unsurunun değerlendirilmesinde yol gösterici bir kaynak olarak kabul edilecektir. Katılımcıların ve
+partnerlerin, burada yer verilen ilkelere iyi niyetle riayet etmeleri, Divizyon’un sürdürülebilirliğini güvence
+altına alırken, topluluk kültürünün güçlenmesine ve uzun vadeli işbirliklerinin gelişmesine katkı sağlayacaktır.
+
+11. SONUÇ VE GENEL HÜKÜMLER
+Bu belge, Divizyon’un fikrî ve sınai mülkiyet yönetimine ilişkin yaklaşımını, ilke ve esaslarını düzenlemek
+amacıyla hazırlanmıştır. Belge ile ortaya konulan düzenlemeler; katılımcılar, alliance partnerleri ve diğer
+işbirliği aktörleri bakımından yol gösterici olmanın ötesinde, Divizyon ekosistemine dâhil olmakla birlikte
+kabul edilmiş hükümler niteliği taşır.
+Bu belge, Divizyon’un fikrî ve sınai mülkiyet yönetimine ilişkin yaklaşımını, topluluk değerlerini ve
+paydaşlarına yönelik niyetlerini ortaya koymak amacıyla hazırlanmıştır. Belge, herhangi bir sözleşme yahut
+bağlayıcı protokol niteliği taşımamakta olsa da belge ile ortaya konulan düzenlemeler katılımcılar, alliance
+partnerleri ve diğer işbirliği aktörleri bakımından yol gösterici olmanın ötesinde, Divizyon ekosistemine dâhil
+olmakla birlikte kabul edilmiş hükümler niteliği taşır.
+Katılımcılar ve partnerler, Divizyon bünyesinde yürütülen faaliyetlere katılmak suretiyle, bu belgede belirtilen
+ilke, esas ve sorumlulukları okuduklarını, anladıklarını ve kabul ettiklerini beyan etmiş sayılır. Buna göre:
+●​ Bireysel üretimler, ilgili katılımcının mülkiyetinde korunur.
+●​ Kolektif üretimler, ortak mülkiyet kapsamında değerlendirilir ve topluluk öncelikli esaslara
+göre paylaşılır.
+●​ Ticarileştirilmeyen çıktılar, açık kaynak değeri olarak topluluğa kazandırılır.
+●​ Ticarileştirilen projelerde Divizyon’un görünürlük hakkı saklı tutulur.
+●​ Gizlilik, etik sorumluluklar ve şeffaflık ilkeleri, tüm aktörler için bağlayıcıdır.
+Belge hükümlerinin ihlali hâlinde, Divizyon gerekli gördüğü ölçüde yasal yollara başvurma, ilgili mercilere
+müracaat etme ve haklarını arama yetkisini saklı tutar.
+Sonuç itibarıyla bu belge, Divizyon ekosisteminde yer alan tüm aktörler için bağlayıcı nitelikte olup,
+katılımcıların üretim özgürlüğünü korurken, Divizyon’un kamu yararına dayalı misyonunu ve topluluk
+değerlerini sürdürülebilir kılmayı amaçlayan bir çerçeve sunmaktadır.
+
+Belgeyi Onaylayan ve Teslim Eden:
+
+Belgeyi Teslim Alan:
+
+İmza ve Tarih:
+
+İmza ve Tarih:
+
+

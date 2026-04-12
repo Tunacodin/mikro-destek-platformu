@@ -8,6 +8,10 @@ import { randomUUID } from "crypto"
 const schema = z.object({
   email: z.string().email("Geçerli bir e-posta giriniz"),
   name: z.string().optional(),
+  juryTitle: z.string().optional(),
+  juryOrganization: z.string().optional(),
+  juryExpertise: z.array(z.string()).optional(),
+  juryBio: z.string().optional(),
 })
 
 const EXPIRES_DAYS = 7
@@ -25,7 +29,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 })
   }
 
-  const { email, name } = parsed.data
+  const { email, name, juryTitle, juryOrganization, juryExpertise, juryBio } = parsed.data
 
   // Zaten JURY rolüyle kayıtlıysa uyar
   const existing = await prisma.user.findUnique({ where: { email } })
@@ -34,6 +38,20 @@ export async function POST(req: NextRequest) {
       { error: "Bu e-posta adresi zaten jüri üyesi olarak kayıtlı." },
       { status: 409 }
     )
+  }
+
+  // Mevcut kullanıcı varsa jüri alanlarını güncelle, yoksa magic link ile oluşturulacak
+  if (existing) {
+    await prisma.user.update({
+      where: { email },
+      data: {
+        role: "JURY",
+        name: name || existing.name,
+        juryTitle, juryOrganization,
+        juryExpertise: juryExpertise ?? [],
+        juryBio,
+      },
+    })
   }
 
   // Kullanılmamış eski token varsa iptal et (yeni token çıkar)
@@ -46,7 +64,10 @@ export async function POST(req: NextRequest) {
   const expiresAt = new Date(Date.now() + EXPIRES_DAYS * 24 * 60 * 60 * 1000)
 
   await prisma.magicLinkToken.create({
-    data: { token, email, name: name ?? null, expiresAt },
+    data: {
+      token, email, name: name ?? null, expiresAt,
+      metadata: JSON.stringify({ juryTitle, juryOrganization, juryExpertise, juryBio }),
+    },
   })
 
   const baseUrl = (process.env.AUTH_URL ?? "http://localhost").replace(/\/$/, "")

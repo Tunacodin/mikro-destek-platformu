@@ -53,7 +53,7 @@ export function ProjectFileUpload({ projectId }: { projectId: string }) {
         onClick={() => !uploading && inputRef.current?.click()}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => { e.preventDefault(); handleFiles(e.dataTransfer.files) }}
-        className={`rounded-xl border-2 border-dashed border-[#e0e0e0] bg-[#f9f9f9] p-5 text-center transition-colors ${uploading ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:border-[#fab758]/50 hover:bg-[#fafafa]"}`}
+        className={`rounded-xl border-2 border-dashed border-[#e0e0e0] bg-[#f9f9f9] p-5 text-center transition-colors ${uploading ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:border-[#fab758]/50 hover:bg-[#f4f4f4]"}`}
       >
         {uploading
           ? <Loader2 className="w-5 h-5 animate-spin text-[#aeaeb2] mx-auto" />

@@ -2,11 +2,11 @@ import { auth } from "@/auth"
 import { redirect, notFound } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import { ApplicationEditForm } from "@/components/application/ApplicationEditForm"
-import { SubmitApplicationButton } from "@/components/application/SubmitApplicationButton"
-import { CountdownTimer } from "@/components/ui/CountdownTimer"
-import { ProcessTracker } from "@/components/ui/ProcessTracker"
-import { ChevronLeft, Download, FileText, AlertTriangle, Lock, RotateCcw } from "lucide-react"
+import { ApplicationForm } from "@/components/application/ApplicationForm"
+import { ApplicationDetailTabs } from "@/components/application/ApplicationDetailTabs"
+import { InlineCountdown } from "@/components/ui/InlineCountdown"
+import { HorizontalProcess } from "@/components/ui/HorizontalProcess"
+import { ChevronLeft, Lock, RotateCcw, Calendar, FileText, Layers } from "lucide-react"
 import type { ApplicationStatus } from "@prisma/client"
 
 export const metadata = { title: "Başvuru Detayı — Mikro Destek Fonu" }
@@ -14,8 +14,8 @@ export const metadata = { title: "Başvuru Detayı — Mikro Destek Fonu" }
 const STATUS_LABELS: Record<ApplicationStatus, string> = {
   DRAFT:     "Taslak",
   SUBMITTED: "Gönderildi",
-  IN_REVIEW: "İncelemede",
-  EVALUATED: "Değerlendirildi",
+  IN_REVIEW: "Ön İnceleme Sürecinde",
+  EVALUATED: "Jüri Değerlendirme Sürecinde",
   SUPPORTED: "Desteklendi",
   REJECTED:  "Reddedildi",
 }
@@ -29,10 +29,12 @@ const STATUS_STYLES: Record<ApplicationStatus, string> = {
   REJECTED:  "bg-red-50 text-red-600",
 }
 
-function formatSize(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`
+function fmtDate(d: Date) {
+  return new Date(d).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })
+}
+
+function fmtShort(d: Date) {
+  return new Date(d).toLocaleDateString("tr-TR", { day: "numeric", month: "short" })
 }
 
 export default async function ApplicationDetailPage({
@@ -45,80 +47,119 @@ export default async function ApplicationDetailPage({
 
   const { id } = await params
 
-  const application = await prisma.application.findUnique({
-    where: { id },
-    include: {
-      period: { select: { title: true, endDate: true, status: true } },
-      files: {
-        select: { id: true, name: true, size: true, mimeType: true },
-        orderBy: { createdAt: "asc" },
+  const [application, userProfile] = await Promise.all([
+    prisma.application.findUnique({
+      where: { id },
+      include: {
+        period:  { select: { id: true, title: true, endDate: true, status: true } },
+        program: { select: { id: true, title: true, endDate: true, status: true } },
+        files: {
+          select: { id: true, name: true, size: true, mimeType: true },
+          orderBy: { createdAt: "asc" },
+        },
+        juryAssignments: { select: { id: true } },
+        _count: { select: { evaluations: true } },
+        project: { select: { supportEndDate: true } },
       },
-      juryAssignments: { select: { id: true } },
-      evaluation: { select: { id: true } },
-      project: { select: { supportEndDate: true } },
-    },
-  })
+    }),
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        name: true, email: true,
+        phone: true, educationStatus: true, department: true,
+        address: true, communityProfileUrl: true,
+        linkedinUrl: true, twitterUrl: true,
+      },
+    }),
+  ])
 
   if (!application || application.userId !== session.user.id) notFound()
 
   const now = Date.now()
-  const hoursLeft = (application.period.endDate.getTime() - now) / 3_600_000
-  const isLocked = hoursLeft < 48
+  const periodOrProgram = application.period ?? application.program
+  const hoursLeft = periodOrProgram ? (periodOrProgram.endDate.getTime() - now) / 3_600_000 : Infinity
+  const presentationHoursLeft = application.presentationDate
+    ? (application.presentationDate.getTime() - now) / 3_600_000
+    : Infinity
+  const isLocked = hoursLeft < 48 || presentationHoursLeft < 48
   const isDraft = application.status === "DRAFT"
-  const showCountdown = isDraft && application.period.status === "ACTIVE" && application.period.endDate.getTime() > now
   const hasJury = application.juryAssignments.length > 0
-  const hasEvaluation = !!application.evaluation
+  const hasEvaluation = application._count.evaluations > 0
   const showPresentationDate = !!application.presentationDate && application.presentationDate.getTime() > now
   const showSupportEnd = !!application.project?.supportEndDate && application.project.supportEndDate.getTime() > now
 
-  const fmt = (d: Date) =>
-    new Date(d).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })
+  let activePeriods:  { id: string; title: string; endDate: Date }[] = []
+  let activePrograms: { id: string; title: string; endDate: Date }[] = []
+  if (isDraft) {
+    ;[activePeriods, activePrograms] = await Promise.all([
+      prisma.applicationPeriod.findMany({ where: { status: "ACTIVE" }, orderBy: { endDate: "asc" } }),
+      prisma.program.findMany({ where: { status: "ACTIVE" }, orderBy: { endDate: "asc" } }),
+    ])
+  }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
 
       {/* Geri navigasyon */}
       <Link
         href="/dashboard/applications"
-        className="inline-flex items-center gap-1 text-[13px] text-[#6e6e73] hover:text-[#1c1c1c] transition-colors cursor-pointer"
+        className="inline-flex items-center gap-1.5 text-[13px] text-[#6e6e73] hover:text-[#1c1c1c] transition-colors cursor-pointer"
       >
         <ChevronLeft className="w-3.5 h-3.5" /> Başvurularım
       </Link>
 
-      {/* Başlık kartı */}
-      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] p-5 sm:p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <h1 className="text-[17px] font-semibold text-[#1c1c1c] leading-snug">{application.title}</h1>
-            <p className="text-[12px] text-[#6e6e73] mt-1.5">
-              {application.period.title} · Bitiş: {fmt(application.period.endDate)}
-            </p>
+      {/* Header: Başlık sol — geri sayım/durum sağ */}
+      <div className="pb-6 border-b border-[#e8e8e8]">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div className="min-w-0 space-y-2">
+            <span className={`inline-flex items-center text-[11px] font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLES[application.status]}`}>
+              {STATUS_LABELS[application.status]}
+            </span>
+            <h1 className="text-[22px] font-bold text-[#1c1c1c] tracking-tight leading-snug">
+              {application.title}
+            </h1>
+            <div className="flex items-center gap-3 flex-wrap text-[12px] text-[#6e6e73]">
+              {periodOrProgram && (
+                <span className="inline-flex items-center gap-1">
+                  <Layers className="w-3 h-3 text-[#aeaeb2]" /> {periodOrProgram.title}
+                </span>
+              )}
+              <span className="inline-flex items-center gap-1">
+                <FileText className="w-3 h-3 text-[#aeaeb2]" /> {application.files.length} belge
+              </span>
+              {periodOrProgram && (
+                <span className="inline-flex items-center gap-1">
+                  <Calendar className="w-3 h-3 text-[#aeaeb2]" /> Bitiş: {fmtShort(periodOrProgram.endDate)}
+                </span>
+              )}
+            </div>
           </div>
-          <span className={`shrink-0 text-[11px] font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLES[application.status]}`}>
-            {STATUS_LABELS[application.status]}
-          </span>
+
+          {/* Sağ: geri sayım veya durum */}
+          <div className="shrink-0">
+            {showPresentationDate ? (
+              <InlineCountdown targetDate={application.presentationDate!} label="Jüri Sunumuna" />
+            ) : showSupportEnd ? (
+              <InlineCountdown targetDate={application.project!.supportEndDate!} label="Destek Bitişine" />
+            ) : null}
+          </div>
         </div>
 
-        {/* Kilitli uyarısı */}
         {isDraft && isLocked && (
-          <div className="mt-4 pt-4 border-t border-black/[0.05] flex items-start gap-2.5">
+          <div className="mt-4 pt-4 border-t border-[#e8e8e8] flex items-start gap-2.5">
             <Lock className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
             <div>
               <p className="text-[13px] font-semibold text-red-600">Düzenleme yetkisi kapalı</p>
-              <p className="text-[12px] text-red-500 mt-0.5">
-                Dönem bitimine 48 saatten az kaldı.
-              </p>
+              <p className="text-[12px] text-red-500 mt-0.5">Dönem bitimine 48 saatten az kaldı.</p>
             </div>
           </div>
         )}
       </div>
 
-      {/* Süreç Takipçisi */}
-      <ProcessTracker
-        status={application.status}
-        hasJury={hasJury}
-        hasEvaluation={hasEvaluation}
-      />
+      {/* Yatay süreç çizgisi */}
+      {!isDraft && (
+        <HorizontalProcess status={application.status} hasJury={hasJury} hasEvaluation={hasEvaluation} />
+      )}
 
       {/* Revize notu */}
       {isDraft && application.reviewNotes && (
@@ -131,115 +172,45 @@ export default async function ApplicationDetailPage({
         </div>
       )}
 
-      {/* Dönem geri sayımı */}
-      {showCountdown && (
-        <CountdownTimer targetDate={application.period.endDate} label="Dönem Bitimine" />
-      )}
-
-      {/* Jüri sunum tarihi */}
-      {showPresentationDate && (
-        <CountdownTimer targetDate={application.presentationDate!} label="Jüri Sunumuna" />
-      )}
-
-      {/* Destek süresi bitişi */}
-      {showSupportEnd && (
-        <CountdownTimer targetDate={application.project!.supportEndDate!} label="Destek Süresi Bitişine" />
-      )}
-
-      {/* Proje açıklaması (sadece görüntüleme) */}
-      {!isDraft && (
-        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] p-5 sm:p-6">
-          <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em] mb-3">
-            Proje Açıklaması
-          </p>
-          <p className="text-[14px] text-[#1c1c1c] whitespace-pre-wrap leading-relaxed">
-            {application.description}
-          </p>
-        </div>
-      )}
-
-      {/* Düzenleme formu (sadece DRAFT) */}
-      {isDraft && (
-        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] p-5 sm:p-6">
-          <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em] mb-4">
-            Başvuru Bilgileri
-          </p>
-          <ApplicationEditForm
-            applicationId={application.id}
-            initialTitle={application.title}
-            initialDescription={application.description}
-            locked={isLocked}
-          />
-        </div>
-      )}
-
-      {/* Belgeler */}
-      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] overflow-hidden">
-        <div className="px-5 sm:px-6 py-4 border-b border-black/[0.05] flex items-center justify-between">
-          <p className="text-[12px] font-semibold text-[#1c1c1c]">
-            Belgeler
-            {application.files.length > 0 && (
-              <span className="ml-2 text-[#aeaeb2] font-normal">{application.files.length} dosya</span>
-            )}
-          </p>
-        </div>
-
-        {application.files.length === 0 ? (
-          <div className="px-5 py-10 text-center">
-            <FileText className="w-6 h-6 text-[#d1d1d6] mx-auto mb-2" />
-            <p className="text-[13px] text-[#aeaeb2]">Belge yüklenmemiş.</p>
-          </div>
-        ) : (
-          <ul className="divide-y divide-black/[0.04]">
-            {application.files.map((f) => (
-              <li key={f.id} className="flex items-center gap-3 px-5 sm:px-6 py-3.5 hover:bg-[#fafafa] transition-colors">
-                <div className="w-8 h-8 rounded-lg bg-[#f5f5f5] border border-black/[0.05] flex items-center justify-center shrink-0">
-                  <FileText className="w-3.5 h-3.5 text-[#aeaeb2]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-medium text-[#1c1c1c] truncate">{f.name}</p>
-                  <p className="text-[11px] text-[#aeaeb2] mt-0.5">{formatSize(f.size)}</p>
-                </div>
-                <a
-                  href={`/api/files/${f.id}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="ml-2 shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium text-[#6e6e73] hover:text-[#1c1c1c] hover:bg-[#f0f0f0] rounded-lg transition-colors cursor-pointer"
-                >
-                  <Download className="w-3.5 h-3.5" /> İndir
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {/* Gönder bölümü */}
-      {isDraft && !isLocked && application.files.length > 0 && (
-        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] p-5 sm:p-6">
-          <div className="flex items-start gap-3 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-              <AlertTriangle className="w-4 h-4 text-amber-600" />
-            </div>
-            <div>
-              <p className="text-[13px] font-semibold text-[#1c1c1c]">Başvuruyu Gönder</p>
-              <p className="text-[12px] text-[#6e6e73] mt-0.5">
-                Gönderildikten sonra başvurunuzu düzenleyemezsiniz. Bilgilerin doğru olduğundan emin olun.
-              </p>
-            </div>
-          </div>
-          <SubmitApplicationButton applicationId={application.id} />
-        </div>
-      )}
-
-      {/* Dosya olmadan gönderim uyarısı */}
-      {isDraft && !isLocked && application.files.length === 0 && (
-        <div className="flex items-start gap-2.5 bg-amber-50 border border-amber-100 rounded-2xl px-5 py-4">
-          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-          <p className="text-[13px] text-amber-700">
-            Başvuruyu göndermeden önce en az bir belge yüklemeniz gerekiyor.
-          </p>
-        </div>
+      {/* İçerik */}
+      {isDraft && !isLocked ? (
+        <ApplicationForm
+          periods={activePeriods}
+          programs={activePrograms}
+          userProfile={userProfile}
+          existingApplication={{
+            id: application.id,
+            periodId:  application.periodId,
+            programId: application.programId,
+            title: application.title,
+            teamName: application.teamName,
+            teamInfo: application.teamInfo,
+            summary: application.summary,
+            targetAudience: application.targetAudience,
+            categories: application.categories,
+            technologyStage: application.technologyStage,
+            artStage: application.artStage,
+            researchStage: application.researchStage,
+            problemStatement: application.problemStatement,
+            solution: application.solution,
+            innovation: application.innovation,
+            outputs: application.outputs,
+            timeline: application.timeline,
+            successCriteria: application.successCriteria,
+            ecosystemCollaboration: application.ecosystemCollaboration,
+            communityContribution: application.communityContribution,
+            divisionContribution: application.divisionContribution,
+            supportTypes: application.supportTypes,
+            supportNotes: application.supportNotes as Record<string, string> | null,
+            files: application.files,
+          }}
+        />
+      ) : isDraft && isLocked ? null : (
+        <ApplicationDetailTabs
+          application={{ ...application, supportNotes: application.supportNotes as Record<string, string> | null }}
+          userProfile={userProfile}
+          files={application.files}
+        />
       )}
     </div>
   )

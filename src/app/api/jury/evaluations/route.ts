@@ -48,8 +48,10 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Zaten değerlendirme yapılmışsa güncelle, yoksa oluştur
-  const existing = await prisma.evaluation.findUnique({ where: { applicationId } })
+  // Bu jürinin bu başvuru için mevcut değerlendirmesini kontrol et
+  const existing = await prisma.evaluation.findUnique({
+    where: { juryId_applicationId: { juryId, applicationId } },
+  })
 
   const evaluation = await prisma.$transaction(async (tx) => {
     if (existing) {
@@ -75,11 +77,18 @@ export async function POST(req: NextRequest) {
       include: { scores: true },
     })
 
-    // Başvuruyu EVALUATED durumuna geçir
-    await tx.application.update({
-      where: { id: applicationId },
-      data: { status: "EVALUATED" },
-    })
+    // Tüm jüriler değerlendirdi mi kontrol et
+    const [assignmentCount, evaluationCount] = await Promise.all([
+      tx.juryAssignment.count({ where: { applicationId } }),
+      tx.evaluation.count({ where: { applicationId } }),
+    ])
+
+    if (evaluationCount >= assignmentCount) {
+      await tx.application.update({
+        where: { id: applicationId },
+        data: { status: "EVALUATED" },
+      })
+    }
 
     return newEval
   })
@@ -128,7 +137,7 @@ export async function GET(req: NextRequest) {
   }
 
   const evaluation = await prisma.evaluation.findUnique({
-    where: { applicationId },
+    where: { juryId_applicationId: { juryId, applicationId } },
     include: { scores: true },
   })
 

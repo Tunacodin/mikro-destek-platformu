@@ -16,39 +16,54 @@ export default async function AdminApplicationsPage({
 
   const { status, period } = await searchParams
 
-  const applications = await prisma.application.findMany({
-    where: {
-      ...(status ? { status: status as ApplicationStatus } : {}),
-      ...(period ? { periodId: period } : {}),
-    },
-    include: {
-      user: { select: { name: true, email: true } },
-      period: { select: { title: true } },
-      _count: { select: { files: true, juryAssignments: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  })
+  const [applications, periods, statusCounts] = await Promise.all([
+    prisma.application.findMany({
+      where: {
+        ...(status ? { status: status as ApplicationStatus } : {}),
+        ...(period ? { periodId: period } : {}),
+      },
+      include: {
+        user:    { select: { name: true, email: true } },
+        period:  { select: { title: true } },
+        program: { select: { title: true } },
+        _count:  { select: { files: true, juryAssignments: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.applicationPeriod.findMany({
+      orderBy: { createdAt: "desc" },
+      select: { id: true, title: true },
+    }),
+    prisma.application.groupBy({
+      by: ["status"],
+      _count: { _all: true },
+    }),
+  ])
 
-  const periods = await prisma.applicationPeriod.findMany({
-    orderBy: { createdAt: "desc" },
-    select: { id: true, title: true },
-  })
+  const countMap = Object.fromEntries(
+    statusCounts.map((s) => [s.status, s._count._all])
+  ) as Partial<Record<ApplicationStatus, number>>
+
+  const total = Object.values(countMap).reduce((a, b) => a + b, 0)
 
   return (
     <div className="space-y-6">
-      {/* Başlık */}
-      <div className="pb-5 border-b border-black/[0.06]">
-        <h1 className="text-[22px] sm:text-[26px] font-semibold tracking-tight text-[#1c1c1c] leading-none">
-          Başvurular
-        </h1>
-        <p className="text-[13px] text-[#6e6e73] mt-2">
-          {applications.length} başvuru
+      <div className="pb-6 border-b border-[#e8e8e8] flex items-end justify-between gap-4">
+        <div>
+          <h1 className="text-[26px] font-bold text-[#1c1c1c] tracking-tight">Başvurular</h1>
+          <p className="text-[14px] text-[#b0b0b0] mt-1">Mikro Destek Platformu başvuruları ve değerlendirme yönetimi</p>
+        </div>
+        <p className="text-[14px] text-[#6e6e73] shrink-0 tabular-nums">
+          Toplam <span className="font-semibold text-[#1c1c1c]">{total}</span> başvuru
+          {(status || period) && <span className="text-[#b0b0b0]"> · {applications.length} sonuç</span>}
         </p>
       </div>
 
       <AdminApplicationList
         applications={applications}
         periods={periods}
+        countMap={countMap}
+        total={total}
         currentStatus={status}
         currentPeriod={period}
       />

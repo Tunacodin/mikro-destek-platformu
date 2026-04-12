@@ -4,12 +4,33 @@ import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 
 const createSchema = z.object({
-  periodId: z.string().min(1, "Dönem seçiniz"),
-  title: z.string().min(3, "Başlık en az 3 karakter olmalıdır"),
-  description: z.string().min(50, "Açıklama en az 50 karakter olmalıdır"),
-})
+  periodId:  z.string().optional(),
+  programId: z.string().optional(),
+  title:         z.string().min(1, "Proje adı zorunludur"),
+  teamName:      z.string().optional().default(""),
+  teamInfo:      z.string().optional().default(""),
+  summary:       z.string().max(1500).optional().default(""),
+  targetAudience:z.string().optional().default(""),
+  categories:    z.array(z.string()).max(2).optional().default([]),
+  technologyStage: z.string().optional().default(""),
+  artStage:        z.string().optional().default(""),
+  researchStage:   z.string().optional().default(""),
+  problemStatement:       z.string().optional().default(""),
+  solution:               z.string().optional().default(""),
+  innovation:             z.string().optional().default(""),
+  outputs:                z.string().optional().default(""),
+  timeline:               z.string().optional().default(""),
+  successCriteria:        z.string().optional().default(""),
+  ecosystemCollaboration: z.string().optional().default(""),
+  communityContribution:  z.string().optional().default(""),
+  divisionContribution:   z.string().optional().default(""),
+  supportTypes:           z.array(z.string()).optional().default([]),
+  supportNotes:           z.record(z.string(), z.string()).optional(),
+}).refine(
+  (d) => Boolean(d.periodId) !== Boolean(d.programId),
+  { message: "Dönem veya program seçiniz (ikisi birden seçilemez)" }
+)
 
-// Başvuru oluştur (DRAFT)
 export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session || session.user.role !== "APPLICANT") {
@@ -22,37 +43,44 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 })
   }
 
-  // Dönem aktif mi?
-  const period = await prisma.applicationPeriod.findUnique({
-    where: { id: parsed.data.periodId },
-  })
-  if (!period || period.status !== "ACTIVE") {
-    return NextResponse.json({ error: "Dönem aktif değil." }, { status: 400 })
+  const { periodId, programId, ...rest } = parsed.data
+
+  // Dönem veya Program aktif mi? + 48 saat kuralı (yalnızca dönem için)
+  if (periodId) {
+    const period = await prisma.applicationPeriod.findUnique({ where: { id: periodId } })
+    if (!period || period.status !== "ACTIVE") {
+      return NextResponse.json({ error: "Dönem aktif değil." }, { status: 400 })
+    }
+    const hoursLeft = (period.endDate.getTime() - Date.now()) / 3_600_000
+    if (hoursLeft < 48) {
+      return NextResponse.json(
+        { error: "Dönem bitimine 48 saatten az kaldığı için yeni başvuru alınamaz." },
+        { status: 400 }
+      )
+    }
   }
 
-  // 48 saat kuralı: bitiş tarihine 48 saatten az kaldıysa başvuru yapılamaz
-  const hoursLeft = (period.endDate.getTime() - Date.now()) / 3_600_000
-  if (hoursLeft < 48) {
-    return NextResponse.json(
-      { error: "Dönem bitimine 48 saatten az kaldığı için yeni başvuru alınamaz." },
-      { status: 400 }
-    )
+  if (programId) {
+    const program = await prisma.program.findUnique({ where: { id: programId } })
+    if (!program || program.status !== "ACTIVE") {
+      return NextResponse.json({ error: "Program aktif değil." }, { status: 400 })
+    }
   }
 
   const application = await prisma.application.create({
     data: {
-      title: parsed.data.title,
-      description: parsed.data.description,
-      status: "DRAFT",
-      userId: session.user.id,
-      periodId: parsed.data.periodId,
+      ...rest,
+      categories: rest.categories ?? [],
+      status:     "DRAFT",
+      userId:     session.user.id,
+      ...(periodId  ? { periodId }  : {}),
+      ...(programId ? { programId } : {}),
     },
   })
 
   return NextResponse.json(application, { status: 201 })
 }
 
-// Başvurularımı listele
 export async function GET() {
   const session = await auth()
   if (!session) return NextResponse.json({ error: "Yetkisiz." }, { status: 401 })
@@ -67,8 +95,9 @@ export async function GET() {
   const applications = await prisma.application.findMany({
     where,
     include: {
-      period: { select: { title: true, endDate: true } },
-      _count: { select: { files: true } },
+      period:  { select: { title: true, endDate: true } },
+      program: { select: { title: true, endDate: true } },
+      _count:  { select: { files: true } },
     },
     orderBy: { createdAt: "desc" },
   })

@@ -11,7 +11,7 @@ type Notif = {
   createdAt: string
 }
 
-export function NotificationBell() {
+export function NotificationBell({ dropUp = false, dark = false, openRight = false }: { dropUp?: boolean; dark?: boolean; openRight?: boolean }) {
   const [notifications, setNotifications] = useState<Notif[]>([])
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -54,7 +54,11 @@ export function NotificationBell() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="relative p-2 rounded-xl text-[#6e6e73] hover:text-[#1c1c1c] hover:bg-[#f0f0f0] transition-colors"
+        className={`relative p-2 rounded-xl transition-colors ${
+          dark
+            ? "text-white/40 hover:text-white/80 hover:bg-white/[0.07]"
+            : "text-[#6e6e73] hover:text-[#1c1c1c] hover:bg-[#f0f0f0]"
+        }`}
         aria-label="Bildirimler"
       >
         <Bell className="w-4 h-4" />
@@ -66,7 +70,7 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-[calc(100%+6px)] w-80 bg-white border border-black/[0.08] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] z-50 overflow-hidden">
+        <div className={`absolute w-80 bg-white border border-black/[0.08] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] z-50 overflow-hidden ${dropUp ? "bottom-[calc(100%+6px)]" : "top-[calc(100%+6px)]"} ${openRight ? "left-0" : "right-0"}`}>
           {/* Başlık */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-black/[0.06]">
             <div className="flex items-center gap-2">

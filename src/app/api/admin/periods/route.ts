@@ -4,9 +4,9 @@ import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 
 const createSchema = z.object({
-  title: z.string().min(3, "Başlık en az 3 karakter olmalıdır"),
+  title:     z.string().min(3, "Dönem adı en az 3 karakter olmalıdır"),
   startDate: z.string().datetime(),
-  endDate: z.string().datetime(),
+  endDate:   z.string().datetime(),
 }).refine((d) => new Date(d.endDate) > new Date(d.startDate), {
   message: "Bitiş tarihi başlangıçtan sonra olmalıdır",
   path: ["endDate"],
@@ -40,10 +40,10 @@ export async function POST(req: NextRequest) {
 
   const period = await prisma.applicationPeriod.create({
     data: {
-      title: parsed.data.title,
+      title:     parsed.data.title,
       startDate: new Date(parsed.data.startDate),
-      endDate: new Date(parsed.data.endDate),
-      status: "DRAFT",
+      endDate:   new Date(parsed.data.endDate),
+      status:    "DRAFT",
     },
   })
 

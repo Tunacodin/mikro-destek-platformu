@@ -8,6 +8,27 @@ const schema = z.object({
   note: z.string().min(1, "Not boş olamaz."),
 })
 
+async function resolveApplicationId(fileId: string): Promise<string | null> {
+  const file = await prisma.file.findUnique({
+    where: { id: fileId },
+    select: {
+      applicationId: true,
+      project: { select: { applicationId: true } },
+    },
+  })
+  if (!file) return null
+  return file.applicationId ?? file.project?.applicationId ?? null
+}
+
+async function checkJuryAccess(juryId: string, fileId: string): Promise<boolean> {
+  const applicationId = await resolveApplicationId(fileId)
+  if (!applicationId) return false
+  const assignment = await prisma.juryAssignment.findUnique({
+    where: { juryId_applicationId: { juryId, applicationId } },
+  })
+  return !!assignment
+}
+
 export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session || session.user.role !== "JURY") {
@@ -23,19 +44,8 @@ export async function POST(req: NextRequest) {
   const { fileId, note } = parsed.data
   const juryId = session.user.id
 
-  // Dosyanın ait olduğu başvuruya jüri atanmış olmalı
-  const file = await prisma.file.findUnique({
-    where: { id: fileId },
-    select: { applicationId: true },
-  })
-  if (!file?.applicationId) {
-    return NextResponse.json({ error: "Dosya bulunamadı." }, { status: 404 })
-  }
-
-  const assignment = await prisma.juryAssignment.findUnique({
-    where: { juryId_applicationId: { juryId, applicationId: file.applicationId } },
-  })
-  if (!assignment) {
+  const hasAccess = await checkJuryAccess(juryId, fileId)
+  if (!hasAccess) {
     return NextResponse.json({ error: "Bu dosyaya erişim yetkiniz yok." }, { status: 403 })
   }
 
@@ -61,19 +71,8 @@ export async function GET(req: NextRequest) {
 
   const juryId = session.user.id
 
-  // Erişim kontrolü
-  const file = await prisma.file.findUnique({
-    where: { id: fileId },
-    select: { applicationId: true },
-  })
-  if (!file?.applicationId) {
-    return NextResponse.json({ error: "Dosya bulunamadı." }, { status: 404 })
-  }
-
-  const assignment = await prisma.juryAssignment.findUnique({
-    where: { juryId_applicationId: { juryId, applicationId: file.applicationId } },
-  })
-  if (!assignment) {
+  const hasAccess = await checkJuryAccess(juryId, fileId)
+  if (!hasAccess) {
     return NextResponse.json({ error: "Bu dosyaya erişim yetkiniz yok." }, { status: 403 })
   }
 

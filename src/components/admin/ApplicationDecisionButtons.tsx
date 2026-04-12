@@ -47,7 +47,6 @@ export function ApplicationDecisionButtons({
   const [selectedScope, setSelectedScope] = useState<string>("")
   const [notes, setNotes] = useState("")
   const [presentationDate, setPresentationDate] = useState("")
-  const [supportEndDate, setSupportEndDate] = useState("")
   const [showRevizeConfirm, setShowRevizeConfirm] = useState(false)
   const [showRejectConfirm, setShowRejectConfirm] = useState(false)
 
@@ -101,7 +100,7 @@ export function ApplicationDecisionButtons({
                 : undefined,
             })}
             disabled={!!loading}
-            className="w-full flex items-center justify-between px-4 py-3 bg-[#212121] text-white text-[13px] font-semibold rounded-xl hover:bg-[#2d2d2d] disabled:opacity-50 transition-colors cursor-pointer"
+            className="w-full flex items-center justify-between px-4 py-3 bg-[#212121] text-white text-[13px] font-semibold rounded-xl shadow-sm hover:bg-[#383838] hover:shadow disabled:opacity-50 transition-colors cursor-pointer"
           >
             <span>İncelemeye Al</span>
             {loading === "IN_REVIEW"
@@ -118,14 +117,14 @@ export function ApplicationDecisionButtons({
             <button
               onClick={() => setShowRevizeConfirm(true)}
               disabled={!!loading}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 border border-amber-300 text-amber-700 text-[12px] font-medium rounded-xl hover:bg-amber-50 disabled:opacity-50 transition-colors cursor-pointer"
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 border border-amber-400 text-amber-700 text-[12px] font-medium rounded-xl hover:bg-amber-100 disabled:opacity-50 transition-colors cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" /> Revizeye Gönder
             </button>
             <button
               onClick={() => setShowRejectConfirm(true)}
               disabled={!!loading}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 border border-red-200 text-red-600 text-[12px] font-medium rounded-xl hover:bg-red-50 disabled:opacity-50 transition-colors cursor-pointer"
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 border border-red-300 text-red-600 text-[12px] font-medium rounded-xl hover:bg-red-100 disabled:opacity-50 transition-colors cursor-pointer"
             >
               <XCircle className="w-3.5 h-3.5" /> Reddet
             </button>
@@ -160,7 +159,7 @@ export function ApplicationDecisionButtons({
         )}
 
         {showRejectConfirm && (
-          <div className="space-y-2.5 p-3.5 bg-red-50 rounded-xl border border-red-200">
+          <div className="space-y-2.5 p-3.5 bg-red-50 rounded-xl border border-red-300">
             <p className="text-[11px] font-semibold text-red-700 flex items-center gap-1.5">
               <AlertTriangle className="w-3 h-3" /> Başvuruyu Reddet
             </p>
@@ -172,7 +171,7 @@ export function ApplicationDecisionButtons({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Red gerekçesi (isteğe bağlı)"
               rows={2}
-              className="w-full px-3 py-2 bg-white border border-red-200 rounded-lg text-[12px] text-[#1c1c1c] placeholder:text-[#c7c7cc] resize-none focus:outline-none focus:ring-1 focus:ring-red-300"
+              className="w-full px-3 py-2 bg-white border border-red-300 rounded-lg text-[12px] text-[#1c1c1c] placeholder:text-[#c7c7cc] resize-none focus:outline-none focus:ring-1 focus:ring-red-300"
             />
             <div className="flex gap-2">
               <button onClick={() => { setShowRejectConfirm(false); setNotes("") }}
@@ -224,19 +223,6 @@ export function ApplicationDecisionButtons({
           </div>
         </div>
 
-        {/* Destek Süresi Bitişi */}
-        <div>
-          <label className="block text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-            <Calendar className="w-3 h-3" /> Destek Süresi Bitişi
-            <span className="font-normal">(isteğe bağlı)</span>
-          </label>
-          <input type="datetime-local" value={supportEndDate}
-            onChange={(e) => setSupportEndDate(e.target.value)} className={inputCls} />
-          <p className="text-[11px] text-[#aeaeb2] mt-1">
-            Bitişten 48 saat önce proje arşivi otomatik kilitlenir.
-          </p>
-        </div>
-
         {/* Karar Notu */}
         <div>
           <label className="block text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-wider mb-1.5">
@@ -253,10 +239,9 @@ export function ApplicationDecisionButtons({
             onClick={() => changeStatus("SUPPORTED", {
               scope: selectedScope,
               notes: notes || undefined,
-              supportEndDate: supportEndDate ? new Date(supportEndDate).toISOString() : undefined,
             })}
             disabled={!canSupport || !!loading}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-emerald-600 text-white text-[13px] font-semibold rounded-xl hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-emerald-600 text-white text-[13px] font-semibold rounded-xl shadow-sm hover:bg-emerald-700 hover:shadow disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             <CheckCircle className="w-3.5 h-3.5" />
             {loading === "SUPPORTED" ? "…" : "Destekle"}

@@ -30,6 +30,12 @@ enum PeriodStatus {
   CLOSED
 }
 
+enum ProgramStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+}
+
 // ── NextAuth v5 Adapter Modelleri ────────────────────────
 // JWT strategy ile Account kullanılmaz, ancak adapter contract için gerekli.
 // VerificationToken gelecekteki email provider kullanımı için tutulur.
@@ -74,6 +80,22 @@ model User {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
+  // Profil alanları (başvuru formundan kaydedilir)
+  phone               String?
+  educationStatus     String?
+  department          String?
+  address             String?
+  communityProfileUrl String?
+  linkedinUrl         String?
+  twitterUrl          String?
+
+  // Jüri künyesi alanları
+  juryTitle           String?   // Ünvan / Rol
+  juryOrganization    String?   // Kurum / Organizasyon
+  juryExpertise       String[]  // Uzmanlık alanları
+  juryBio             String?   // Profesyonel profil açıklaması
+  juryActive          Boolean   @default(true) // Aktif / Pasif
+
   accounts        Account[]
   applications    Application[]
   juryAssignments JuryAssignment[]
@@ -98,12 +120,25 @@ model ApplicationPeriod {
   applications Application[]
 }
 
+// ── Program ──────────────────────────────────────────────
+
+model Program {
+  id        String        @id @default(cuid())
+  title     String
+  startDate DateTime
+  endDate   DateTime
+  status    ProgramStatus @default(DRAFT)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  applications Application[]
+}
+
 // ── Başvuru ──────────────────────────────────────────────
 
 model Application {
   id               String            @id @default(cuid())
   title            String
-  description      String            @db.Text
   status           ApplicationStatus @default(DRAFT)
   submittedAt      DateTime?
   presentationDate DateTime?         // Admin tarafından Aşama 3'te set edilir (jüri sunum tarihi)
@@ -111,14 +146,47 @@ model Application {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 
-  userId   String
-  user     User              @relation(fields: [userId], references: [id])
-  periodId String
-  period   ApplicationPeriod @relation(fields: [periodId], references: [id])
+  evaluationsLocked Boolean @default(false) // Admin tarafından jüri düzenleme yetkisi kapatılabilir
+
+  // Proje kimliği
+  teamName       String?           // Ekip / Proje adı
+  teamInfo       String?  @db.Text
+  summary        String?  @db.Text  // 30 saniyelik pitch (max 1500 karakter)
+  targetAudience String?  @db.Text
+  categories     String[]            // max 2: Teknoloji/Girişimcilik | Sanat/Kültürel/İçerik | Araştırma/Akademik
+  technologyStage String?
+  artStage        String?
+  researchStage   String?
+
+  // Proje detayı
+  problemStatement       String?  @db.Text
+  solution               String?  @db.Text
+  innovation             String?  @db.Text
+
+  // Plan & hedefler
+  outputs         String?  @db.Text
+  timeline        String?  @db.Text
+  successCriteria String?  @db.Text
+
+  // Ekosistem & topluluk
+  ecosystemCollaboration String?  @db.Text
+  communityContribution  String?  @db.Text
+  divisionContribution   String?  @db.Text
+
+  // İstenen destek türleri
+  supportTypes String[]
+  supportNotes Json?      // { "Destek Türü": "Neden istiyorum..." } şeklinde
+
+  userId    String
+  user      User               @relation(fields: [userId],    references: [id])
+  periodId  String?
+  period    ApplicationPeriod? @relation(fields: [periodId],  references: [id])
+  programId String?
+  program   Program?           @relation(fields: [programId], references: [id])
 
   files           File[]
   juryAssignments JuryAssignment[]
-  evaluation      Evaluation?
+  evaluations     Evaluation[]
   decision        SupportDecision?
   project         Project?
 }
@@ -133,6 +201,7 @@ model File {
   mimeType  String
   bucket    String
   key       String
+  type      String   @default("FILE") // "FILE" veya "LINK"
   createdAt DateTime @default(now())
 
   applicationId String?
@@ -167,10 +236,12 @@ model Evaluation {
 
   juryId        String
   jury          User        @relation(fields: [juryId], references: [id])
-  applicationId String      @unique
+  applicationId String
   application   Application @relation(fields: [applicationId], references: [id])
 
   scores EvaluationScore[]
+
+  @@unique([juryId, applicationId])
 }
 
 model EvaluationScore {
@@ -205,6 +276,13 @@ model SupportDecision {
   notes     String?  @db.Text
   decidedAt DateTime @default(now())
 
+  // Bildiri formu alanları (admin tarafından doldurulur)
+  strategicReason      String?  @db.Text // Stratejik Uyum Gerekçesi
+  expectedOutputs      String?  @db.Text // Beklenen Somut Çıktılar
+  supportDuration      String?           // Destek Süresi (örn. "6 ay")
+  additionalConditions String?  @db.Text // Ek Açıklamalar ve Şartlar
+  riskFramework        String?  @db.Text // Risk ve Sorumluluk Çerçevesi
+
   applicationId String      @unique
   application   Application @relation(fields: [applicationId], references: [id])
   decidedById   String
@@ -235,6 +313,7 @@ model ProjectReport {
   id        String   @id @default(cuid())
   content   String   @db.Text
   createdAt DateTime @default(now())
+  juryId    String?  // null = başvuru sahibi notu; dolu = jüri notu (sadece admin görür)
 
   projectId String
   project   Project @relation(fields: [projectId], references: [id])
@@ -249,6 +328,7 @@ model MagicLinkToken {
   token     String    @unique @default(cuid())
   email     String
   name      String?
+  metadata  Json?     // Jüri künyesi vb. ek bilgiler
   expiresAt DateTime
   usedAt    DateTime? // İlk kullanımda doldurulur — tek kullanımlık
   createdAt DateTime  @default(now())

@@ -16,6 +16,11 @@ export default async function AdminJuryPage() {
       id: true,
       email: true,
       name: true,
+      juryTitle: true,
+      juryOrganization: true,
+      juryExpertise: true,
+      juryBio: true,
+      juryActive: true,
       onboardingCompleted: true,
       createdAt: true,
       _count: { select: { juryAssignments: true } },
@@ -24,34 +29,38 @@ export default async function AdminJuryPage() {
   })
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Başlık */}
-      <div className="pb-5 border-b border-black/[0.06]">
-        <h1 className="text-[22px] sm:text-[26px] font-semibold tracking-tight text-[#1c1c1c] leading-none">
-          Jüri Yönetimi
-        </h1>
-        <p className="text-[13px] text-[#6e6e73] mt-2">
-          Jüri üyelerini e-posta ile davet edin. Üyeler ayrı hesap oluşturmadan sisteme giriş yapar.
+      <div className="pb-6 border-b border-[#e8e8e8] flex items-end justify-between gap-4">
+        <div>
+          <h1 className="text-[26px] font-bold text-[#1c1c1c] tracking-tight">Jüri Yönetimi</h1>
+          <p className="text-[14px] text-[#b0b0b0] mt-1">Disiplinel kurul üyelerini yönetin ve davet edin</p>
+        </div>
+        <p className="text-[14px] text-[#6e6e73] shrink-0 tabular-nums">
+          Toplam <span className="font-semibold text-[#1c1c1c]">{juryMembers.length}</span> jüri üyesi
         </p>
       </div>
 
-      {/* Davet Formu */}
-      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] p-5 sm:p-6">
-        <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em] mb-4">
-          Yeni Jüri Üyesi Davet Et
-        </p>
-        <JuryInviteForm />
-      </div>
+      {/* %50 — %50 grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
-      {/* Jüri Listesi */}
-      <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] p-5 sm:p-6">
-        <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em] mb-4">
-          Jüri Üyeleri
-          {juryMembers.length > 0 && (
-            <span className="ml-2 font-normal">{juryMembers.length}</span>
-          )}
-        </p>
-        <JuryList members={juryMembers} />
+        {/* Sol: Yeni Jüri Davet */}
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] p-5 sm:p-6">
+          <p className="text-[13px] font-semibold text-[#1c1c1c] mb-4">Yeni Jüri Üyesi Davet Et</p>
+          <JuryInviteForm />
+        </div>
+
+        {/* Sağ: Jüri Listesi */}
+        <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] p-5 sm:p-6">
+          <p className="text-[13px] font-semibold text-[#1c1c1c] mb-4">
+            Jüri Üyeleri
+            {juryMembers.length > 0 && (
+              <span className="ml-2 font-normal text-[#aeaeb2]">{juryMembers.length}</span>
+            )}
+          </p>
+          <JuryList members={juryMembers} />
+        </div>
+
       </div>
     </div>
   )

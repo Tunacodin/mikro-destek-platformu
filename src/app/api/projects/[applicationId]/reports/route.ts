@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 
 const reportSchema = z.object({
-  content: z.string().min(50, "Rapor içeriği en az 50 karakter olmalıdır."),
+  content: z.string().min(10, "Not içeriği en az 10 karakter olmalıdır."),
 })
 
 export async function GET(
@@ -21,7 +21,12 @@ export async function GET(
   const project = await prisma.project.findUnique({
     where: { applicationId },
     include: {
-      application: { select: { userId: true } },
+      application: {
+        select: {
+          userId: true,
+          juryAssignments: { select: { juryId: true } },
+        },
+      },
       reports: { orderBy: { createdAt: "desc" } },
     },
   })
@@ -30,13 +35,27 @@ export async function GET(
     return NextResponse.json({ error: "Proje bulunamadı." }, { status: 404 })
   }
 
-  if (
-    session.user.role === "APPLICANT" &&
-    project.application.userId !== session.user.id
-  ) {
+  const role = session.user.role
+
+  if (role === "APPLICANT" && project.application.userId !== session.user.id) {
     return NextResponse.json({ error: "Erişim reddedildi." }, { status: 403 })
   }
 
+  if (role === "JURY") {
+    const isAssigned = project.application.juryAssignments.some(
+      (a) => a.juryId === session.user.id
+    )
+    if (!isAssigned) {
+      return NextResponse.json({ error: "Erişim reddedildi." }, { status: 403 })
+    }
+    // Jüri: sadece başvuru sahibi notları + kendi notları
+    const visible = project.reports.filter(
+      (r) => r.juryId === null || r.juryId === session.user.id
+    )
+    return NextResponse.json(visible)
+  }
+
+  // ADMIN: tümünü görür
   return NextResponse.json(project.reports)
 }
 
@@ -45,7 +64,7 @@ export async function POST(
   { params }: { params: Promise<{ applicationId: string }> }
 ) {
   const session = await auth()
-  if (!session || session.user.role !== "APPLICANT") {
+  if (!session || (session.user.role !== "APPLICANT" && session.user.role !== "JURY")) {
     return NextResponse.json({ error: "Yetkisiz." }, { status: 403 })
   }
 
@@ -58,27 +77,44 @@ export async function POST(
 
   const project = await prisma.project.findUnique({
     where: { applicationId },
-    include: { application: { select: { userId: true } } },
+    include: {
+      application: {
+        select: {
+          userId: true,
+          juryAssignments: { select: { juryId: true } },
+        },
+      },
+    },
   })
 
   if (!project) {
     return NextResponse.json({ error: "Proje bulunamadı." }, { status: 404 })
   }
 
-  if (project.application.userId !== session.user.id) {
-    return NextResponse.json({ error: "Erişim reddedildi." }, { status: 403 })
-  }
-
   if (project.status !== "ACTIVE") {
     return NextResponse.json({ error: "Proje aktif değil." }, { status: 400 })
   }
 
-  const report = await prisma.projectReport.create({
-    data: {
-      projectId: project.id,
-      content: parsed.data.content,
-    },
-  })
+  if (session.user.role === "APPLICANT") {
+    if (project.application.userId !== session.user.id) {
+      return NextResponse.json({ error: "Erişim reddedildi." }, { status: 403 })
+    }
+    const report = await prisma.projectReport.create({
+      data: { projectId: project.id, content: parsed.data.content, juryId: null },
+    })
+    return NextResponse.json(report, { status: 201 })
+  }
 
+  // JURY
+  const isAssigned = project.application.juryAssignments.some(
+    (a) => a.juryId === session.user.id
+  )
+  if (!isAssigned) {
+    return NextResponse.json({ error: "Erişim reddedildi." }, { status: 403 })
+  }
+
+  const report = await prisma.projectReport.create({
+    data: { projectId: project.id, content: parsed.data.content, juryId: session.user.id },
+  })
   return NextResponse.json(report, { status: 201 })
 }

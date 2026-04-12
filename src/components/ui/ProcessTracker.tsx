@@ -29,7 +29,7 @@ const STAGES: Stage[] = [
   },
   {
     id: "5a",
-    label: "Final Değerlendirme",
+    label: "Jüri Değerlendirmesi",
     shortLabel: "Değerlendirme",
     description: "Jüri puanlama ve yorum",
   },

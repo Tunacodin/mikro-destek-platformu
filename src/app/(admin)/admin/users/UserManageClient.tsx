@@ -150,7 +150,7 @@ export function UserManageClient({
         </div>
         <button
           onClick={() => { setShowAdd(true); setForm(f => ({ ...f, role: activeTab })) }}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#212121] text-white text-[13px] font-semibold rounded-xl hover:bg-[#2d2d2d] transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#212121] text-white text-[13px] font-semibold rounded-xl shadow-sm hover:bg-[#383838] hover:shadow transition-colors cursor-pointer"
         >
           <UserPlus className="w-3.5 h-3.5" />
           Ekle
@@ -226,7 +226,7 @@ export function UserManageClient({
             <button
               onClick={handleAdd}
               disabled={loading}
-              className="flex items-center gap-1.5 px-4 py-2 bg-[#212121] text-white text-[13px] font-semibold rounded-xl hover:bg-[#2d2d2d] disabled:opacity-50 transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-2 bg-[#212121] text-white text-[13px] font-semibold rounded-xl shadow-sm hover:bg-[#383838] hover:shadow disabled:opacity-50 transition-colors cursor-pointer"
             >
               {loading ? "Ekleniyor…" : <><ChevronRight className="w-3.5 h-3.5" /> Kullanıcı Ekle</>}
             </button>
@@ -243,7 +243,7 @@ export function UserManageClient({
         ) : (
           <ul className="divide-y divide-black/[0.04]">
             {filtered.map(u => (
-              <li key={u.id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-[#fafafa] transition-colors">
+              <li key={u.id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-[#f4f4f4] transition-colors">
                 {/* Avatar */}
                 <div className="w-8 h-8 rounded-full bg-[#f5f5f5] border border-black/[0.06] flex items-center justify-center shrink-0">
                   <span className="text-[12px] font-semibold text-[#6e6e73]">
@@ -293,7 +293,7 @@ export function UserManageClient({
                     <button
                       onClick={() => setDeleteId(u.id)}
                       title="Kullanıcıyı Sil"
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-[#aeaeb2] hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-[#aeaeb2] hover:text-red-500 hover:bg-red-100 transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -326,7 +326,7 @@ export function UserManageClient({
               <button
                 onClick={() => handleDelete(deleteId)}
                 disabled={loading}
-                className="px-4 py-2 bg-red-500 text-white text-[13px] font-semibold rounded-xl hover:bg-red-600 disabled:opacity-50 transition-colors cursor-pointer"
+                className="px-4 py-2 bg-red-500 text-white text-[13px] font-semibold rounded-xl shadow-sm hover:bg-red-600 hover:shadow disabled:opacity-50 transition-colors cursor-pointer"
               >
                 {loading ? "Siliniyor…" : "Sil"}
               </button>

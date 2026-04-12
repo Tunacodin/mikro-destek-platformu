@@ -43,9 +43,10 @@ export default async function AdminProjectDetailPage({
     include: {
       application: {
         include: {
-          user:   { select: { id: true, name: true, email: true } },
-          period: { select: { title: true } },
-          files:  { select: { id: true, name: true, size: true }, orderBy: { createdAt: "asc" } },
+          user:    { select: { id: true, name: true, email: true } },
+          period:  { select: { title: true } },
+          program: { select: { title: true } },
+          files:   { select: { id: true, name: true, size: true }, orderBy: { createdAt: "asc" } },
         },
       },
       decision: { select: { scope: true, notes: true, decidedAt: true, decidedBy: { select: { name: true, email: true } } } },
@@ -55,6 +56,9 @@ export default async function AdminProjectDetailPage({
   })
 
   if (!project) notFound()
+
+  const applicantReports = project.reports.filter((r) => r.juryId === null)
+  const juryNotes = project.reports.filter((r) => r.juryId !== null)
 
   const scope  = project.decision.scope
   const colors = SCOPE_COLORS[scope] ?? { badge: "bg-slate-50 text-slate-600 border-slate-200", bar: "bg-slate-400" }
@@ -78,7 +82,7 @@ export default async function AdminProjectDetailPage({
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-[0.12em] mb-1">
-              {project.application.period.title}
+              {project.application.period?.title ?? project.application.program?.title ?? "—"}
             </p>
             <h1 className="text-[17px] font-semibold text-[#1c1c1c] leading-snug">
               {project.application.title}
@@ -121,22 +125,22 @@ export default async function AdminProjectDetailPage({
                 <Send className="w-3.5 h-3.5 text-[#aeaeb2]" />
                 <p className="text-[12px] font-semibold text-[#1c1c1c]">İlerleme Raporları</p>
               </div>
-              <span className="text-[11px] text-[#aeaeb2]">{project.reports.length} rapor</span>
+              <span className="text-[11px] text-[#aeaeb2]">{applicantReports.length} rapor</span>
             </div>
 
-            {project.reports.length === 0 ? (
+            {applicantReports.length === 0 ? (
               <div className="px-5 py-10 text-center">
                 <Send className="w-5 h-5 text-[#d1d1d6] mx-auto mb-2" />
                 <p className="text-[13px] text-[#aeaeb2]">Henüz rapor gönderilmedi.</p>
               </div>
             ) : (
               <ul className="divide-y divide-black/[0.04]">
-                {project.reports.map((r, i) => (
+                {applicantReports.map((r, i) => (
                   <li key={r.id} className="px-5 sm:px-6 py-4 space-y-2">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                       <p className="text-[11px] font-semibold text-[#aeaeb2] uppercase tracking-wider">
-                        Rapor #{project.reports.length - i}
+                        Rapor #{applicantReports.length - i}
                       </p>
                       <span className="text-[#d1d1d6]">·</span>
                       <p className="text-[11px] text-[#aeaeb2]">{fmt(r.createdAt)}</p>
@@ -147,6 +151,31 @@ export default async function AdminProjectDetailPage({
                   </li>
                 ))}
               </ul>
+            )}
+
+            {juryNotes.length > 0 && (
+              <>
+                <div className="px-5 sm:px-6 py-2.5 bg-purple-50/60 border-t border-black/[0.04] flex items-center gap-2">
+                  <p className="text-[10px] font-semibold text-purple-500 uppercase tracking-wider">Jüri Notları</p>
+                  <span className="text-[10px] text-purple-400">({juryNotes.length})</span>
+                </div>
+                <ul className="divide-y divide-black/[0.04]">
+                  {juryNotes.map((r, i) => (
+                    <li key={r.id} className="px-5 sm:px-6 py-4 space-y-2 bg-purple-50/30">
+                      <div className="flex items-center gap-2">
+                        <p className="text-[11px] font-semibold text-purple-500 uppercase tracking-wider">
+                          Jüri Notu #{juryNotes.length - i}
+                        </p>
+                        <span className="text-[#d1d1d6]">·</span>
+                        <p className="text-[11px] text-[#aeaeb2]">{fmt(r.createdAt)}</p>
+                      </div>
+                      <p className="text-[13px] text-[#1c1c1c] leading-relaxed whitespace-pre-wrap pl-5">
+                        {r.content}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </>
             )}
           </div>
 
@@ -171,7 +200,7 @@ export default async function AdminProjectDetailPage({
             ) : (
               <ul className="divide-y divide-black/[0.04]">
                 {project.files.map((f) => (
-                  <li key={f.id} className="flex items-center gap-3 px-5 sm:px-6 py-3.5 hover:bg-[#fafafa] transition-colors">
+                  <li key={f.id} className="flex items-center gap-3 px-5 sm:px-6 py-3.5 hover:bg-[#f4f4f4] transition-colors">
                     <div className="w-8 h-8 rounded-lg bg-[#f5f5f5] border border-black/[0.05] flex items-center justify-center shrink-0">
                       <FileText className="w-3.5 h-3.5 text-[#aeaeb2]" />
                     </div>
@@ -194,7 +223,7 @@ export default async function AdminProjectDetailPage({
           {/* Başvuru Dosyaları */}
           {project.application.files.length > 0 && (
             <details className="group bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] overflow-hidden">
-              <summary className="flex items-center justify-between px-5 sm:px-6 py-4 cursor-pointer select-none hover:bg-[#fafafa] transition-colors">
+              <summary className="flex items-center justify-between px-5 sm:px-6 py-4 cursor-pointer select-none hover:bg-[#f4f4f4] transition-colors">
                 <div className="flex items-center gap-2">
                   <FileText className="w-3.5 h-3.5 text-[#aeaeb2]" />
                   <span className="text-[12px] font-semibold text-[#1c1c1c]">Başvuru Belgeleri</span>
@@ -205,7 +234,7 @@ export default async function AdminProjectDetailPage({
               </summary>
               <ul className="divide-y divide-black/[0.04] border-t border-black/[0.04]">
                 {project.application.files.map((f) => (
-                  <li key={f.id} className="flex items-center justify-between px-5 sm:px-6 py-3 hover:bg-[#fafafa] transition-colors">
+                  <li key={f.id} className="flex items-center justify-between px-5 sm:px-6 py-3 hover:bg-[#f4f4f4] transition-colors">
                     <div className="flex items-center gap-2 min-w-0">
                       <FileText className="w-3.5 h-3.5 text-[#aeaeb2] shrink-0" />
                       <span className="text-[13px] text-[#1c1c1c] truncate">{f.name}</span>
@@ -260,7 +289,7 @@ export default async function AdminProjectDetailPage({
               )}
               <div className="flex justify-between">
                 <span className="text-[#6e6e73]">Gönderilen rapor</span>
-                <span className="font-medium text-[#1c1c1c]">{project.reports.length}</span>
+                <span className="font-medium text-[#1c1c1c]">{applicantReports.length}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#6e6e73]">Proje dosyası</span>

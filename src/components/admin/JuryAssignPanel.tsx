@@ -102,7 +102,7 @@ export function JuryAssignPanel({
                 <button
                   onClick={() => unassign(j.id)}
                   disabled={loading === j.id}
-                  className="w-6 h-6 rounded-lg flex items-center justify-center text-[#aeaeb2] hover:bg-red-50 hover:text-red-500 disabled:opacity-40 transition-colors cursor-pointer shrink-0"
+                  className="w-6 h-6 rounded-lg flex items-center justify-center text-[#aeaeb2] hover:bg-red-100 hover:text-red-500 disabled:opacity-40 transition-colors cursor-pointer shrink-0"
                 >
                   {loading === j.id ? <span className="text-[11px]">…</span> : <X className="w-3.5 h-3.5" />}
                 </button>
@@ -130,7 +130,7 @@ export function JuryAssignPanel({
             <button
               onClick={assign}
               disabled={!selectedJuryId || loading === "assign"}
-              className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#212121] text-white text-[12px] font-semibold rounded-xl hover:bg-[#2d2d2d] disabled:opacity-40 transition-colors cursor-pointer shrink-0"
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#212121] text-white text-[12px] font-semibold rounded-xl shadow-sm hover:bg-[#383838] hover:shadow disabled:opacity-40 transition-colors cursor-pointer shrink-0"
             >
               <UserPlus className="w-3.5 h-3.5" />
               {loading === "assign" ? "…" : "Ata"}

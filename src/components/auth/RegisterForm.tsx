@@ -194,14 +194,14 @@ export function RegisterForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-2.5 bg-[#212121] text-white text-[14px] font-semibold rounded-xl hover:bg-[#2d2d2d] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+        className="w-full py-2.5 bg-[#212121] text-white text-[14px] font-semibold rounded-xl shadow-sm hover:bg-[#383838] hover:shadow disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
       >
         {loading ? "Kayıt yapılıyor…" : "Kayıt Ol"}
       </button>
 
       <p className="text-center text-[13px] text-[#6e6e73]">
         Zaten hesabınız var mı?{" "}
-        <Link href="/login" className="font-semibold text-[#1c1c1c] hover:opacity-60 transition-opacity">
+        <Link href="/login" className="font-semibold text-[#1c1c1c] hover:opacity-80 underline-offset-2 hover:underline transition-all">
           Giriş yapın
         </Link>
       </p>

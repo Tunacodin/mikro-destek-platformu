@@ -27,7 +27,7 @@ export function SubmitApplicationButton({ applicationId }: { applicationId: stri
       <button
         onClick={handleSubmit}
         disabled={loading}
-        className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#212121] text-white text-[13px] font-semibold rounded-xl hover:bg-[#2d2d2d] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+        className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#212121] text-white text-[13px] font-semibold rounded-xl shadow-sm hover:bg-[#383838] hover:shadow disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
       >
         <Send className="w-3.5 h-3.5" />
         {loading ? "Gönderiliyor…" : "Başvuruyu Gönder"}

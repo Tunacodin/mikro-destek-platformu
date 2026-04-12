@@ -15,7 +15,7 @@ export function ProjectReportForm({ applicationId }: { applicationId: string }) 
   async function handleSubmit() {
     setError("")
     if (content.trim().length < 50) {
-      setError("Rapor içeriği en az 50 karakter olmalıdır.")
+      setError("Not içeriği en az 50 karakter olmalıdır.")
       return
     }
     if (pendingRef.current) return
@@ -45,12 +45,12 @@ export function ProjectReportForm({ applicationId }: { applicationId: string }) 
       <div className="flex items-center gap-2.5 px-4 py-3.5 bg-emerald-50 rounded-xl border border-emerald-100">
         <span className="text-emerald-500 text-lg">✓</span>
         <div>
-          <p className="text-[13px] font-semibold text-emerald-700">Rapor gönderildi!</p>
+          <p className="text-[13px] font-semibold text-emerald-700">Not gönderildi!</p>
           <button
             onClick={() => setSuccess(false)}
             className="text-[11px] text-emerald-600 hover:underline cursor-pointer"
           >
-            Yeni rapor gönder
+            Yeni not gönder
           </button>
         </div>
       </div>
@@ -61,7 +61,7 @@ export function ProjectReportForm({ applicationId }: { applicationId: string }) 
     <div className="space-y-3">
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <label className="text-[12px] font-medium text-[#6e6e73]">Rapor İçeriği</label>
+          <label className="text-[12px] font-medium text-[#6e6e73]">Not İçeriği</label>
           <span className={`text-[11px] font-semibold tabular-nums transition-colors ${content.length >= 50 ? "text-emerald-500" : "text-[#aeaeb2]"}`}>
             {content.length} / 50+
           </span>
@@ -84,10 +84,10 @@ export function ProjectReportForm({ applicationId }: { applicationId: string }) 
       <button
         onClick={handleSubmit}
         disabled={loading || content.trim().length < 50}
-        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#212121] text-white text-[13px] font-semibold rounded-xl hover:bg-[#2d2d2d] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#212121] text-white text-[13px] font-semibold rounded-xl shadow-sm hover:bg-[#383838] hover:shadow disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
       >
         <Send className="w-3.5 h-3.5" />
-        {loading ? "Gönderiliyor…" : "Raporu Gönder"}
+        {loading ? "Gönderiliyor…" : "Notu Gönder"}
       </button>
     </div>
   )

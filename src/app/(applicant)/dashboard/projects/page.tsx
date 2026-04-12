@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { FolderOpen, ArrowRight, FileText } from "lucide-react"
 
-export const metadata = { title: "Projelerim — Mikro Destek Fonu" }
+export const metadata = { title: "Desteklerim — Mikro Destek Fonu" }
 
 const SCOPE_LABELS: Record<string, string> = {
   LIMITED:  "Sınırlı Destek",
@@ -32,7 +32,7 @@ export default async function ProjectsListPage() {
     where: { application: { userId: session.user.id } },
     include: {
       application: {
-        select: { id: true, title: true, period: { select: { title: true } } },
+        select: { id: true, title: true, period: { select: { title: true } }, program: { select: { title: true } } },
       },
       decision: { select: { scope: true, decidedAt: true } },
       reports: { select: { id: true } },
@@ -51,7 +51,7 @@ export default async function ProjectsListPage() {
           Komünite Üyesi
         </p>
         <h1 className="text-[22px] sm:text-[26px] font-semibold tracking-tight text-[#1c1c1c] leading-none">
-          Projelerim
+          Desteklerim
         </h1>
         <p className="text-[13px] text-[#6e6e73] mt-2">
           {projects.length === 0
@@ -66,13 +66,13 @@ export default async function ProjectsListPage() {
           <div className="w-12 h-12 rounded-2xl bg-[#f5f5f5] flex items-center justify-center mx-auto mb-4">
             <FolderOpen className="w-6 h-6 text-[#aeaeb2]" />
           </div>
-          <p className="text-[15px] font-semibold text-[#1c1c1c]">Henüz desteklenen projeniz yok</p>
+          <p className="text-[15px] font-semibold text-[#1c1c1c]">Henüz desteklenen başvurunuz yok</p>
           <p className="text-[13px] text-[#6e6e73] mt-1.5 mb-5">
             Başvurunuz desteklendiğinde proje takip alanı burada görünür.
           </p>
           <Link
             href="/dashboard/applications"
-            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#1c1c1c] hover:opacity-60 transition-opacity cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#1c1c1c] hover:opacity-80 underline-offset-2 hover:underline transition-all cursor-pointer"
           >
             Başvurularıma git <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -106,7 +106,7 @@ export default async function ProjectsListPage() {
                       </span>
                     </div>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <p className="text-[11px] text-[#aeaeb2]">{p.application.period.title}</p>
+                      <p className="text-[11px] text-[#aeaeb2]">{p.application.period?.title ?? p.application.program?.title ?? "—"}</p>
                       <span className="w-1 h-1 rounded-full bg-[#d1d1d6]" />
                       <p className="text-[11px] text-[#aeaeb2]">
                         {fmt(p.decision.decidedAt)} kararlandı

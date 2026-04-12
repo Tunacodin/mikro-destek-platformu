@@ -122,6 +122,33 @@
   }
 }
 
+/* ── Baskı (Print) — Admin Shell sıfırlama ──────────────────────────────
+   AdminShell'deki h-screen + overflow-auto kombinasyonu baskıda yalnızca
+   görünen scroll alanını yazdırır. Aşağıdaki kurallar bunu düzeltir.
+   ──────────────────────────────────────────────────────────────────── */
+@media print {
+  /* Dış sarmalayıcı: sabit yüksekliği ve flex'i kaldır */
+  .admin-shell-outer {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Sidebar + hamburger: baskıda gizle */
+  .admin-shell-sidebar {
+    display: none !important;
+  }
+
+  /* Ana içerik alanı: overflow ve padding sıfırla */
+  .admin-shell-main {
+    overflow: visible !important;
+    padding: 0 !important;
+    flex: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
 @keyframes floatToLogo {
   0% {
     opacity: 0;
