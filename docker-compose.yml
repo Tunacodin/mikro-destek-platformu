@@ -66,6 +66,8 @@ services:
       dockerfile: Dockerfile
     container_name: mdf-app
     restart: unless-stopped
+    ports:
+      - "3001:3000"
     env_file:
       - .env
     networks:
@@ -78,23 +80,6 @@ services:
       minio-init:
         condition: service_completed_successfully
 
-  # ── Caddy — Reverse Proxy + SSL ────────────────────────
-  caddy:
-    image: caddy:2-alpine
-    container_name: mdf-caddy
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
-    networks:
-      - app-network
-    depends_on:
-      - next-app
-
 networks:
   app-network:
     driver: bridge
@@ -102,5 +87,3 @@ networks:
 volumes:
   pgdata:
   miniodata:
-  caddy_data:
-  caddy_config:
