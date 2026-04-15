@@ -118,7 +118,7 @@ export default async function ProjectDetailPage({
                 </span>
               )}
               <span className="inline-flex items-center gap-1">
-                <Send className="w-3 h-3 text-[#aeaeb2]" /> {project.reports.length} rapor
+                <Send className="w-3 h-3 text-[#aeaeb2]" /> {project.reports.length} güncelleme notu
               </span>
               <span className="inline-flex items-center gap-1">
                 <FileText className="w-3 h-3 text-[#aeaeb2]" /> {project.files.length} dosya

@@ -52,6 +52,7 @@ export default async function JuryEvaluatePage({
         id: application.id,
         title: application.title,
         summary: application.summary,
+        teamName: application.teamName,
         teamInfo: application.teamInfo,
         targetAudience: application.targetAudience,
         categories: application.categories,
@@ -68,6 +69,7 @@ export default async function JuryEvaluatePage({
         communityContribution: application.communityContribution,
         divisionContribution: application.divisionContribution,
         supportTypes: application.supportTypes,
+        supportNotes: application.supportNotes as Record<string, string> | null,
       }}
       applicant={{
         name: application.user.name,

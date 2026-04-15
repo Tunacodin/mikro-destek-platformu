@@ -113,7 +113,7 @@ export default async function ProjectsListPage() {
                       </p>
                       <span className="w-1 h-1 rounded-full bg-[#d1d1d6]" />
                       <span className="inline-flex items-center gap-1 text-[11px] text-[#aeaeb2]">
-                        <FileText className="w-3 h-3" /> {p.reports.length} rapor
+                        <FileText className="w-3 h-3" /> {p.reports.length} güncelleme notu
                       </span>
                     </div>
                   </div>

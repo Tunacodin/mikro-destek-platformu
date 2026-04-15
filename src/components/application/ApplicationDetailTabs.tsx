@@ -96,12 +96,14 @@ export function ApplicationDetailTabs({
   files,
   showFileNotes = false,
   canEvaluate = false,
+  showAuthor = false,
 }: {
   application: ApplicationData
   userProfile?: UserProfile | null
   files: FileItem[]
   showFileNotes?: boolean
   canEvaluate?: boolean
+  showAuthor?: boolean
 }) {
   const tabs = userProfile
     ? ALL_TABS
@@ -245,7 +247,7 @@ export function ApplicationDetailTabs({
                               Aç ↗
                             </a>
                           </div>
-                          <FileNotePanel fileId={f.id} canEvaluate={canEvaluate} />
+                          <FileNotePanel fileId={f.id} canEvaluate={canEvaluate} showAuthor={showAuthor} />
                         </>
                       ) : (
                         <>

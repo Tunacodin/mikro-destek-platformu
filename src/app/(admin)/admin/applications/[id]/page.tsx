@@ -7,8 +7,10 @@ import { ChevronLeft, Calendar, FileText, Users, ClipboardList, Printer } from "
 import { JuryAssignPanel } from "@/components/admin/JuryAssignPanel"
 import { ApplicationDecisionButtons } from "@/components/admin/ApplicationDecisionButtons"
 import { LockEvaluationsButton } from "@/components/admin/LockEvaluationsButton"
+import { EditGrantButton } from "@/components/admin/EditGrantButton"
 import { ProcessTracker } from "@/components/ui/ProcessTracker"
 import { ApplicationDetailTabs } from "@/components/application/ApplicationDetailTabs"
+import { JuryEvaluationTabs } from "@/components/admin/JuryEvaluationTabs"
 import type { ApplicationStatus } from "@prisma/client"
 
 export const metadata = { title: "Başvuru Detayı — Mikro Destek Fonu" }
@@ -208,136 +210,18 @@ export default async function AdminApplicationDetailPage({
             application={{ ...application, supportNotes: application.supportNotes as Record<string, string> | null }}
             userProfile={application.user}
             files={application.files}
+            showFileNotes
+            showAuthor
           />
 
           {/* Değerlendirme bölümü */}
           {application.evaluations.length > 0 && (
-            <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] overflow-hidden">
-              {/* Section header */}
-              <div className="px-5 py-4 border-b border-black/[0.04] flex items-center justify-between">
-                <p className="text-[13px] font-semibold text-[#1c1c1c]">Jüri Değerlendirmeleri</p>
-                <span className="text-[11px] font-semibold text-[#aeaeb2] bg-[#f5f5f5] px-2.5 py-1 rounded-full">
-                  {application.evaluations.length} jüri
-                </span>
-              </div>
-
-              <div className="p-5 space-y-5">
-                {/* Overall score */}
-                {band && avgTotal !== null && (
-                  <div className={`rounded-xl border ${band.border} ${band.bg} px-4 py-4`}>
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-wider mb-0.5">Ortalama Toplam Puan</p>
-                        <span className={`text-[14px] font-bold ${band.text}`}>{band.label}</span>
-                      </div>
-                      <span className={`text-[28px] font-bold tabular-nums ${band.text}`}>
-                        {avgTotal.toFixed(1)}
-                        <span className="text-[14px] font-normal opacity-60">/40</span>
-                      </span>
-                    </div>
-                    <div className="h-2 bg-black/[0.07] rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${band.bar}`}
-                        style={{ width: `${Math.min(100, (avgTotal / 40) * 100)}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Per-criterion comparison */}
-                <div className="space-y-1">
-                  <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-wider mb-3">Kriter Dağılımı</p>
-                  <div className="space-y-3">
-                    {CRITERIA_ORDER.map((criterion) => {
-                      const avg = criteriaAvg[criterion]
-                      if (avg === null) return null
-                      const juryScores = application.evaluations.map((ev) => ({
-                        jury: ev.jury,
-                        score: ev.scores.find((s) => s.criteria === criterion)?.score ?? null,
-                      }))
-                      return (
-                        <div key={criterion}>
-                          <div className="flex items-center gap-3 mb-1">
-                            <p className="text-[12px] font-medium text-[#1c1c1c] w-36 shrink-0">
-                              {CRITERIA_LABELS[criterion]}
-                            </p>
-                            <div className="flex-1 h-1.5 bg-[#f0f0f0] rounded-full overflow-hidden">
-                              <div
-                                className="h-full rounded-full bg-[#fab758]"
-                                style={{ width: `${(avg / 5) * 100}%` }}
-                              />
-                            </div>
-                            <span className="text-[12px] font-semibold text-[#1c1c1c] tabular-nums w-8 text-right">
-                              {avg.toFixed(1)}
-                            </span>
-                            <div className="flex items-center gap-1 ml-1">
-                              {juryScores.map(({ jury, score }) => (
-                                score !== null && (
-                                  <span
-                                    key={jury.id}
-                                    title={jury.name ?? jury.email}
-                                    className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#f0f0f0] text-[10px] font-bold text-[#6e6e73]"
-                                  >
-                                    {score}
-                                  </span>
-                                )
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                {/* Per-jury comments */}
-                {application.evaluations.some((ev) => ev.comment) && (
-                  <div className="pt-3 border-t border-black/[0.04] space-y-3">
-                    <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-wider">Genel Yorumlar</p>
-                    {application.evaluations.filter((ev) => ev.comment).map((ev) => (
-                      <div key={ev.id} className="space-y-1">
-                        <p className="text-[11px] font-semibold text-[#6e6e73]">
-                          {ev.jury.name ?? ev.jury.email}
-                        </p>
-                        <p className="text-[13px] text-[#1c1c1c] leading-relaxed">{ev.comment}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Per-jury full breakdown (kriter gerekçeleri) */}
-                <div className="pt-3 border-t border-black/[0.04] space-y-4">
-                  <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-wider">Kriter Gerekçeleri</p>
-                  {application.evaluations.map((ev) => {
-                    const evTotal = ev.scores.reduce((s, e) => s + e.score, 0)
-                    const evBand = SCORE_BANDS.find((b) => evTotal < b.max) ?? SCORE_BANDS[3]
-                    return (
-                      <div key={ev.id} className="rounded-xl border border-black/[0.06] overflow-hidden">
-                        <div className="flex items-center justify-between px-4 py-3 bg-[#fafafa] border-b border-black/[0.04]">
-                          <p className="text-[12px] font-semibold text-[#1c1c1c]">
-                            {ev.jury.name ?? ev.jury.email}
-                          </p>
-                          <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${evBand.bg} ${evBand.text}`}>
-                            {evTotal}/40 — {evBand.label}
-                          </span>
-                        </div>
-                        <div className="divide-y divide-black/[0.04]">
-                          {ev.scores.map((s) => (
-                            <div key={s.id} className="px-4 py-3 flex gap-4">
-                              <div className="flex items-center gap-1.5 shrink-0 w-32">
-                                <span className="text-[12px] font-semibold tabular-nums text-[#1c1c1c]">{s.score}/5</span>
-                                <span className="text-[11px] text-[#6e6e73]">{CRITERIA_LABELS[s.criteria] ?? s.criteria}</span>
-                              </div>
-                              <p className="text-[12px] text-[#6e6e73] leading-relaxed">{s.justification}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
+            <JuryEvaluationTabs
+              evaluations={application.evaluations}
+              avgTotal={avgTotal}
+              band={band}
+              criteriaAvg={criteriaAvg}
+            />
           )}
         </div>
 
@@ -400,6 +284,14 @@ export default async function AdminApplicationDetailPage({
               <Printer className="w-4 h-4 text-[#6e6e73]" />
               Bildiriyi Yazdır
             </Link>
+          )}
+
+          {/* Düzenleme yetkisi */}
+          {(application.status === "SUBMITTED" || application.status === "IN_REVIEW" || application.status === "EVALUATED") && (
+            <EditGrantButton
+              applicationId={application.id}
+              editGranted={application.editGranted}
+            />
           )}
 
           {/* Aksiyon butonları */}

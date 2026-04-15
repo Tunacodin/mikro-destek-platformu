@@ -19,11 +19,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Başvuru bulunamadı." }, { status: 404 })
   }
 
-  const updated = await prisma.application.update({
-    where: { id },
-    data: { evaluationsLocked: locked },
-    select: { id: true, evaluationsLocked: true },
-  })
+  await prisma.$executeRaw`UPDATE "Application" SET "evaluationsLocked" = ${locked} WHERE id = ${id}`
 
-  return NextResponse.json(updated)
+  return NextResponse.json({ id, evaluationsLocked: locked })
 }

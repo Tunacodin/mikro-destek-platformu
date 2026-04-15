@@ -3,10 +3,11 @@ import { redirect, notFound } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { ApplicationForm } from "@/components/application/ApplicationForm"
+import { ApplicationEditForm } from "@/components/application/ApplicationEditForm"
 import { ApplicationDetailTabs } from "@/components/application/ApplicationDetailTabs"
 import { InlineCountdown } from "@/components/ui/InlineCountdown"
 import { HorizontalProcess } from "@/components/ui/HorizontalProcess"
-import { ChevronLeft, Lock, RotateCcw, Calendar, FileText, Layers } from "lucide-react"
+import { ChevronLeft, Lock, PencilLine, RotateCcw, Calendar, FileText, Layers } from "lucide-react"
 import type { ApplicationStatus } from "@prisma/client"
 
 export const metadata = { title: "Başvuru Detayı — Mikro Destek Fonu" }
@@ -83,6 +84,9 @@ export default async function ApplicationDetailPage({
     : Infinity
   const isLocked = hoursLeft < 48 || presentationHoursLeft < 48
   const isDraft = application.status === "DRAFT"
+  const canEditByGrant = application.editGranted && !isLocked
+  // Jüri sunum tarihi belirlenmişse ve 48 saatten fazla varsa otomatik düzenleme yetkisi
+  const canEditByPresentation = !!application.presentationDate && presentationHoursLeft >= 48
   const hasJury = application.juryAssignments.length > 0
   const hasEvaluation = application._count.evaluations > 0
   const showPresentationDate = !!application.presentationDate && application.presentationDate.getTime() > now
@@ -145,12 +149,46 @@ export default async function ApplicationDetailPage({
           </div>
         </div>
 
-        {isDraft && isLocked && (
+        {(isDraft && isLocked) && (
           <div className="mt-4 pt-4 border-t border-[#e8e8e8] flex items-start gap-2.5">
             <Lock className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
             <div>
               <p className="text-[13px] font-semibold text-red-600">Düzenleme yetkisi kapalı</p>
-              <p className="text-[12px] text-red-500 mt-0.5">Dönem bitimine 48 saatten az kaldı.</p>
+              <p className="text-[12px] text-red-500 mt-0.5">
+                {presentationHoursLeft < 48
+                  ? "Jüri sunumuna 48 saatten az kaldığı için düzenleme kapatıldı."
+                  : "Dönem bitimine 48 saatten az kaldı."}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {!isDraft && isLocked && (canEditByGrant || canEditByPresentation) && (
+          <div className="mt-4 pt-4 border-t border-[#e8e8e8] flex items-start gap-2.5">
+            <Lock className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[13px] font-semibold text-red-600">Düzenleme süresi doldu</p>
+              <p className="text-[12px] text-red-500 mt-0.5">Jüri sunumuna 48 saatten az kaldığı için düzenleme kapatıldı.</p>
+            </div>
+          </div>
+        )}
+
+        {canEditByPresentation && (
+          <div className="mt-4 pt-4 border-t border-[#e8e8e8] flex items-start gap-2.5">
+            <PencilLine className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[13px] font-semibold text-blue-700">Düzenleme açık</p>
+              <p className="text-[12px] text-blue-600 mt-0.5">Jüri sunumuna 48 saat kalana dek başvurunuzu düzenleyebilirsiniz.</p>
+            </div>
+          </div>
+        )}
+
+        {canEditByGrant && !canEditByPresentation && (
+          <div className="mt-4 pt-4 border-t border-[#e8e8e8] flex items-start gap-2.5">
+            <PencilLine className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[13px] font-semibold text-amber-700">Düzenleme yetkisi aktif</p>
+              <p className="text-[12px] text-amber-600 mt-0.5">Admin tarafından başvurunuzu düzenlemenize izin verildi.</p>
             </div>
           </div>
         )}
@@ -204,6 +242,34 @@ export default async function ApplicationDetailPage({
             supportNotes: application.supportNotes as Record<string, string> | null,
             files: application.files,
           }}
+        />
+      ) : (canEditByGrant || canEditByPresentation) ? (
+        <ApplicationEditForm
+          application={{
+            id: application.id,
+            title: application.title,
+            teamName: application.teamName,
+            teamInfo: application.teamInfo,
+            summary: application.summary,
+            targetAudience: application.targetAudience,
+            categories: application.categories,
+            technologyStage: application.technologyStage,
+            artStage: application.artStage,
+            researchStage: application.researchStage,
+            problemStatement: application.problemStatement,
+            solution: application.solution,
+            innovation: application.innovation,
+            outputs: application.outputs,
+            timeline: application.timeline,
+            successCriteria: application.successCriteria,
+            ecosystemCollaboration: application.ecosystemCollaboration,
+            communityContribution: application.communityContribution,
+            divisionContribution: application.divisionContribution,
+            supportTypes: application.supportTypes,
+            supportNotes: application.supportNotes as Record<string, string> | null,
+          }}
+          userProfile={userProfile!}
+          locked={false}
         />
       ) : isDraft && isLocked ? null : (
         <ApplicationDetailTabs

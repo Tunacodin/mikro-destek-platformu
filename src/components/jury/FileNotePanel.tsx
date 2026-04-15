@@ -3,9 +3,20 @@
 import { useEffect, useState } from "react"
 import { MessageSquare, X } from "lucide-react"
 
-type FileNote = { id: string; note: string; createdAt: string }
+type FileNote = {
+  id: string
+  note: string
+  createdAt: string
+  user?: { name: string | null; email: string } | null
+}
 
-export function FileNotePanel({ fileId, canEvaluate }: { fileId: string; canEvaluate: boolean }) {
+export function FileNotePanel({
+  fileId, canEvaluate, showAuthor = false,
+}: {
+  fileId: string
+  canEvaluate: boolean
+  showAuthor?: boolean
+}) {
   const [open, setOpen] = useState(false)
   const [notes, setNotes] = useState<FileNote[]>([])
   const [noteText, setNoteText] = useState("")
@@ -68,6 +79,11 @@ export function FileNotePanel({ fileId, canEvaluate }: { fileId: string; canEval
             <ul className="space-y-1.5">
               {notes.map((n) => (
                 <li key={n.id} className="bg-white rounded-lg px-3 py-2 space-y-0.5">
+                  {showAuthor && n.user && (
+                    <p className="text-[10px] font-semibold text-purple-500">
+                      {n.user.name ?? n.user.email}
+                    </p>
+                  )}
                   <p className="text-[12px] text-[#1c1c1c] whitespace-pre-wrap">{n.note}</p>
                   <p className="text-[10px] text-[#aeaeb2]">{fmt(n.createdAt)}</p>
                 </li>

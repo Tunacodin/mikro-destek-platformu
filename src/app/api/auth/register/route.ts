@@ -9,13 +9,19 @@ async function verifyCircleMembership(email: string): Promise<boolean> {
   const token = process.env.CIRCLE_API_TOKEN
   const communityId = process.env.CIRCLE_COMMUNITY_ID
 
-  // Geliştirme ortamında Circle doğrulaması atlanabilir
-  if (!token || !communityId) {
-    if (process.env.NODE_ENV === "development") {
-      console.warn("[register] CIRCLE_API_TOKEN veya CIRCLE_COMMUNITY_ID eksik — doğrulama atlanıyor")
+  // Token set edilmişse her zaman doğrulama yap (dev/prod fark etmez)
+  // Token hiç set edilmemişse geliştirme modunda geç (production'da engelle)
+  if (!token) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("[register] CIRCLE_API_TOKEN eksik — geliştirme modunda doğrulama atlanıyor")
       return true
     }
-    console.error("[register] CIRCLE_API_TOKEN veya CIRCLE_COMMUNITY_ID tanımlı değil")
+    console.error("[register] CIRCLE_API_TOKEN tanımlı değil")
+    return false
+  }
+
+  if (!communityId) {
+    console.error("[register] CIRCLE_COMMUNITY_ID tanımlı değil")
     return false
   }
 
