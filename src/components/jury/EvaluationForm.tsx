@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { ChevronDown, ChevronUp, Info } from "lucide-react"
 
@@ -221,6 +221,19 @@ export function EvaluationForm({
   existingEvaluation: ExistingEvaluation
 }) {
   const router = useRouter()
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setScrolled(!entry.isIntersecting),
+      { threshold: 0 }
+    )
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [])
 
   const initScores = (): Record<string, ScoreEntry> => {
     const base: Record<string, ScoreEntry> = {}
@@ -234,18 +247,19 @@ export function EvaluationForm({
   const [scores, setScores] = useState<Record<string, ScoreEntry>>(initScores)
   const [comment, setComment] = useState(existingEvaluation?.comment ?? "")
   const [submitting, setSubmitting] = useState(false)
+  const [draftSaving, setDraftSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [draftSuccess, setDraftSuccess] = useState(false)
   const [expandedGuide, setExpandedGuide] = useState<string | null>(null)
-  // Açık/kapalı kriter takibi — tamamlananlar otomatik kapanır, kullanıcı açabilir
+  // Açık/kapalı kriter takibi — sadece aktif kriter açık, tamamlananlar compact
   const [expandedCriteria, setExpandedCriteria] = useState<Set<string>>(() => {
-    // İlk yüklemede dolmamış kriterleri açık başlat
-    const open = new Set<string>()
-    for (const c of CRITERIA) {
+    // İlk yüklemede yalnızca ilk doldurulmamış kriteri açık başlat
+    const firstIncomplete = CRITERIA.find((c) => {
       const ex = existingEvaluation?.scores.find((s) => s.criteria === c.key)
-      if (!ex || !ex.score || ex.justification.trim().length < 10) open.add(c.key)
-    }
-    return open
+      return !ex || !ex.score || ex.justification.trim().length < 10
+    })
+    return firstIncomplete ? new Set([firstIncomplete.key]) : new Set()
   })
 
   // Hesaplamalar
@@ -274,7 +288,10 @@ export function EvaluationForm({
   }
 
   function updateScore(key: string, field: keyof ScoreEntry, value: string | number) {
-    setScores((prev) => ({ ...prev, [key]: { ...prev[key], [field]: value } }))
+    setScores((prev) => {
+      const next = { ...prev, [key]: { ...prev[key], [field]: value } }
+      return next
+    })
     setSuccess(false)
   }
 
@@ -282,6 +299,7 @@ export function EvaluationForm({
     if (!allMainFilled) return
     setSubmitting(true)
     setError(null)
+    setDraftSuccess(false)
 
     const payload = {
       applicationId,
@@ -309,6 +327,44 @@ export function EvaluationForm({
     setSubmitting(false)
   }
 
+  async function saveDraft() {
+    const completedScores = CRITERIA.filter(
+      (c) => scores[c.key].score > 0 && scores[c.key].justification.trim().length >= 10
+    )
+    if (completedScores.length === 0) {
+      setError("Taslak kaydedebilmek için en az bir kriteri puanlayın ve gerekçe yazın.")
+      return
+    }
+    setDraftSaving(true)
+    setError(null)
+    setSuccess(false)
+
+    const payload = {
+      applicationId,
+      comment: comment.trim() || undefined,
+      scores: completedScores.map((c) => ({
+        criteria: c.key,
+        score: scores[c.key].score,
+        justification: scores[c.key].justification.trim(),
+      })),
+    }
+
+    const res = await fetch("/api/jury/evaluations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+
+    if (!res.ok) {
+      const data = await res.json()
+      setError(data.error ?? "Bir hata oluştu.")
+    } else {
+      setDraftSuccess(true)
+      router.refresh()
+    }
+    setDraftSaving(false)
+  }
+
   return (
     <div className="space-y-6">
 
@@ -325,29 +381,52 @@ export function EvaluationForm({
         )}
       </div>
 
-      {/* Anlık Toplam */}
+      {/* Sentinel — sticky'nin ne zaman sıkışacağını takip eder */}
+      <div ref={sentinelRef} className="h-px -mt-2" aria-hidden />
+
+      {/* Anlık Toplam — scroll'a göre compact'a geçer */}
       {band && (
         <div className="sticky top-0 z-10 -mx-1 px-1 pb-1 bg-white">
-        <div className={`${band.bg} rounded-xl px-4 py-3.5`}>
-          <div className="flex items-center justify-between mb-2">
-            <span className={`text-[13px] font-semibold ${band.text}`}>{band.label}</span>
-            <div className="text-right">
-              <span className="text-[18px] font-bold text-[#1c1c1c] tabular-nums">{mainTotal}</span>
-              <span className="text-[12px] text-[#6e6e73]">/35</span>
-              {bonusTotal > 0 && (
-                <span className="text-[12px] text-[#aeaeb2] ml-2">(+{bonusTotal} bonus)</span>
-              )}
+          <div
+            className={`${band.bg} rounded-xl overflow-hidden transition-all duration-300 ease-in-out ${
+              scrolled ? "px-4 py-2" : "px-4 py-3.5"
+            }`}
+          >
+            {/* Her zaman görünen satır */}
+            <div className="flex items-center justify-between">
+              <span className={`font-semibold transition-all duration-300 ${scrolled ? "text-[12px]" : "text-[13px]"} ${band.text}`}>
+                {band.label}
+              </span>
+              <div className="flex items-center gap-1.5">
+                {scrolled && bonusTotal > 0 && (
+                  <span className="text-[11px] text-[#aeaeb2]">+{bonusTotal}</span>
+                )}
+                <span className={`font-bold text-[#1c1c1c] tabular-nums transition-all duration-300 ${scrolled ? "text-[15px]" : "text-[18px]"}`}>
+                  {mainTotal}
+                </span>
+                <span className={`text-[#6e6e73] transition-all duration-300 ${scrolled ? "text-[11px]" : "text-[12px]"}`}>/35</span>
+                {!scrolled && bonusTotal > 0 && (
+                  <span className="text-[12px] text-[#aeaeb2] ml-1">(+{bonusTotal} bonus)</span>
+                )}
+              </div>
+            </div>
+
+            {/* Progress bar — sadece geniş halde */}
+            <div
+              className={`overflow-hidden transition-all duration-300 ${scrolled ? "max-h-0 mt-0" : "max-h-10 mt-2"}`}
+            >
+              <div className="h-2 bg-black/[0.07] rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-300 ${band.bar}`}
+                  style={{ width: `${Math.min(100, (mainTotal / 35) * 100)}%` }}
+                />
+              </div>
+              <div className="flex justify-between mt-1.5 text-[10px] text-[#aeaeb2]">
+                <span>{mainFilled}/7 kriter puanlandı</span>
+                <span>Toplam: {grandTotal}/40</span>
+              </div>
             </div>
           </div>
-          <div className="h-2 bg-black/[0.07] rounded-full overflow-hidden">
-            <div className={`h-full rounded-full transition-all duration-300 ${band.bar}`}
-              style={{ width: `${Math.min(100, (mainTotal / 35) * 100)}%` }} />
-          </div>
-          <div className="flex justify-between mt-1.5 text-[10px] text-[#aeaeb2]">
-            <span>{mainFilled}/7 kriter puanlandı</span>
-            <span>Toplam: {grandTotal}/40</span>
-          </div>
-        </div>
         </div>
       )}
 
@@ -414,8 +493,13 @@ export function EvaluationForm({
           <p className="text-[13px] text-emerald-700">Değerlendirme kaydedildi.</p>
         </div>
       )}
+      {draftSuccess && (
+        <div className="bg-amber-50 rounded-xl px-4 py-2.5">
+          <p className="text-[13px] text-amber-700">Taslak kaydedildi.</p>
+        </div>
+      )}
 
-      {/* Gönder */}
+      {/* Gönder + Taslak */}
       {canEvaluate && (
         <div className="space-y-2">
           {!allMainFilled && (
@@ -429,6 +513,13 @@ export function EvaluationForm({
             className="w-full py-3 bg-[#1c1c1c] text-white text-[13px] font-semibold rounded-xl shadow-sm hover:bg-[#383838] hover:shadow disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             {submitting ? "Kaydediliyor…" : existingEvaluation ? "Değerlendirmeyi Güncelle" : "Değerlendirmeyi Gönder"}
+          </button>
+          <button
+            onClick={saveDraft}
+            disabled={draftSaving || submitting}
+            className="w-full py-2.5 bg-white border border-black/[0.1] text-[#6e6e73] text-[13px] font-medium rounded-xl hover:bg-[#f9f9f9] hover:border-black/[0.15] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          >
+            {draftSaving ? "Kaydediliyor…" : "Taslak Olarak Kaydet"}
           </button>
         </div>
       )}
@@ -465,31 +556,33 @@ function CriterionBlock({
   const justTooShort = !hasJustification && entry.justification.length > 0
   const scoreLabel = hasScore ? criterion.scoreLabels[entry.score] : null
 
-  // ── Kapalı (compact) görünüm ──────────────────────────────────────────────
-  if (!isExpanded && isComplete) {
+  // ── Kapalı (compact) görünüm — tüm kapalı kriterler ──────────────────────
+  if (!isExpanded) {
     return (
       <div
         onClick={onToggle}
-        className="rounded-xl border border-emerald-200 bg-emerald-50/30 px-4 py-2.5 flex items-center gap-3 cursor-pointer hover:bg-emerald-50/50 transition-all group"
+        className={`rounded-xl border px-3 py-2 flex items-center gap-2 cursor-pointer transition-all group ${
+          isComplete
+            ? "border-emerald-200 bg-emerald-50/30 hover:bg-emerald-50/60"
+            : "border-black/[0.06] bg-white hover:bg-[#f9f9f9]"
+        }`}
       >
-        {index && (
-          <span className="text-[11px] font-bold text-emerald-600 bg-emerald-100 w-6 h-6 rounded-lg flex items-center justify-center shrink-0">
+        {index !== undefined && (
+          <span className={`text-[10px] font-bold w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
+            isComplete ? "text-emerald-600 bg-emerald-100" : "text-[#aeaeb2] bg-[#f0f0f0]"
+          }`}>
             {index}
           </span>
         )}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-[13px] font-semibold text-[#1c1c1c]">{criterion.label}</p>
-            <span className="text-[11px] font-semibold bg-[#1c1c1c] text-white px-2 py-0.5 rounded-md tabular-nums">
-              {entry.score}/5
-            </span>
-            <span className="text-[11px] text-[#6e6e73]">{scoreLabel}</span>
-          </div>
-          <p className="text-[11px] text-[#6e6e73] mt-0.5 truncate">
-            {entry.justification.trim().slice(0, 80)}{entry.justification.trim().length > 80 ? "…" : ""}
-          </p>
-        </div>
-        <ChevronDown className="w-3.5 h-3.5 text-[#aeaeb2] shrink-0 group-hover:text-[#6e6e73] transition-colors" />
+        <p className="text-[12px] font-medium text-[#1c1c1c] flex-1 truncate min-w-0">{criterion.label}</p>
+        {hasScore ? (
+          <span className="text-[11px] font-semibold bg-[#1c1c1c] text-white px-2 py-0.5 rounded-md tabular-nums shrink-0">
+            {entry.score}/5
+          </span>
+        ) : (
+          <span className="text-[11px] text-[#d1d1d6] shrink-0">—</span>
+        )}
+        <ChevronDown className="w-3 h-3 text-[#aeaeb2] shrink-0 group-hover:text-[#6e6e73] transition-colors" />
       </div>
     )
   }
