@@ -26,37 +26,47 @@ async function verifyCircleMembership(email: string): Promise<boolean> {
   }
 
   try {
-    // Circle API v1 — community_members endpoint
-    const url = new URL("https://app.circle.so/api/v1/community_members")
-    url.searchParams.set("community_id", communityId)
-    url.searchParams.set("email", email)
+    // Circle API v1 — tüm sayfalarda email ara (max 100/sayfa)
+    const PER_PAGE = 100
+    let page = 1
 
-    const res = await fetch(url.toString(), {
-      headers: {
-        Authorization: `Token ${token}`,
-        "Content-Type": "application/json",
-      },
-      // 5 saniye timeout
-      signal: AbortSignal.timeout(5000),
-    })
+    while (true) {
+      const url = new URL("https://app.circle.so/api/v1/community_members")
+      url.searchParams.set("community_id", communityId)
+      url.searchParams.set("per_page", String(PER_PAGE))
+      url.searchParams.set("page", String(page))
 
-    if (!res.ok) {
-      console.error(`[register] Circle API ${res.status}: ${await res.text()}`)
-      return false
+      const res = await fetch(url.toString(), {
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+        signal: AbortSignal.timeout(8000),
+      })
+
+      if (!res.ok) {
+        console.error(`[register] Circle API ${res.status}: ${await res.text()}`)
+        return false
+      }
+
+      const data = await res.json()
+
+      if (!Array.isArray(data) || data.length === 0) break
+
+      // Bu sayfada email var mı?
+      const found = data.some((member: { email?: string }) =>
+        member.email?.toLowerCase() === email.toLowerCase()
+      )
+      if (found) return true
+
+      // Sonraki sayfaya gerek yok mu?
+      if (data.length < PER_PAGE) break
+      page++
     }
 
-    const data = await res.json()
-
-    // Circle API yanıtı: aktif üyeler dizisi
-    if (!Array.isArray(data)) return false
-
-    // Üye var mı ve aktif mi kontrolü
-    return data.some((member: { email?: string; public_uid?: string }) =>
-      member.email?.toLowerCase() === email.toLowerCase()
-    )
+    return false
   } catch (err) {
     console.error("[register] Circle API erişim hatası:", err)
-    // Timeout veya ağ hatasında üretimde false döndür
     return false
   }
 }
