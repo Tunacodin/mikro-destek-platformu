@@ -123,7 +123,7 @@ export function ProjectStatusPanel({
         ) : (
           <div className="space-y-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
             <p className="text-[11px] text-[#6e6e73]">
-              Proje kapatılacak. Üye yeni rapor/dosya gönderemez.
+              Proje kapatılacak. Üye yeni güncelleme notu/dosya gönderemez.
             </p>
             <div className="flex gap-2">
               <button

@@ -147,6 +147,7 @@ model Application {
   updatedAt        DateTime          @updatedAt
 
   evaluationsLocked Boolean @default(false) // Admin tarafından jüri düzenleme yetkisi kapatılabilir
+  editGranted       Boolean @default(false) // Admin tarafından başvuru sahibine düzenleme yetkisi verilir
 
   // Proje kimliği
   teamName       String?           // Ekip / Proje adı

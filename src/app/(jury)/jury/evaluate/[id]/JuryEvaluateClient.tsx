@@ -16,6 +16,7 @@ type AppData = {
   id: string
   title: string
   summary: string | null
+  teamName: string | null
   teamInfo: string | null
   targetAudience: string | null
   categories: string[]
@@ -32,6 +33,7 @@ type AppData = {
   communityContribution: string | null
   divisionContribution: string | null
   supportTypes: string[]
+  supportNotes: Record<string, string> | null
 }
 
 type FileItem = { id: string; name: string; size: number; mimeType: string }

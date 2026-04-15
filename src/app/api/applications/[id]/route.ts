@@ -49,18 +49,36 @@ export async function PATCH(
   if (application.userId !== session.user.id) {
     return NextResponse.json({ error: "Erişim reddedildi." }, { status: 403 })
   }
-  if (application.status !== "DRAFT") {
-    return NextResponse.json({ error: "Yalnızca taslak başvurular düzenlenebilir." }, { status: 400 })
+
+  const presentationHoursLeft = application.presentationDate
+    ? (application.presentationDate.getTime() - Date.now()) / 3_600_000
+    : Infinity
+
+  // Jüri sunumuna 48 saatten az kaldıysa her durumda kilit
+  if (application.presentationDate && presentationHoursLeft < 48) {
+    return NextResponse.json(
+      { error: "Jüri sunumuna 48 saatten az kaldığı için düzenleme yetkisi kapalıdır." },
+      { status: 400 }
+    )
   }
 
-  // 48 saat kuralı yalnızca dönem için geçerli
-  if (application.period) {
-    const hoursLeft = (application.period.endDate.getTime() - Date.now()) / 3_600_000
-    if (hoursLeft < 48) {
-      return NextResponse.json(
-        { error: "Dönem bitimine 48 saatten az kaldığı için düzenleme yetkisi kapalıdır." },
-        { status: 400 }
-      )
+  const canEditByPresentation = !!application.presentationDate && presentationHoursLeft >= 48
+
+  if (application.status === "DRAFT") {
+    // DRAFT: dönem bitimine 48 saat kuralı
+    if (application.period) {
+      const hoursLeft = (application.period.endDate.getTime() - Date.now()) / 3_600_000
+      if (hoursLeft < 48) {
+        return NextResponse.json(
+          { error: "Dönem bitimine 48 saatten az kaldığı için düzenleme yetkisi kapalıdır." },
+          { status: 400 }
+        )
+      }
+    }
+  } else {
+    // DRAFT dışı: ya admin editGranted vermiş ya da sunum tarihi > 48 saat uzakta
+    if (!application.editGranted && !canEditByPresentation) {
+      return NextResponse.json({ error: "Düzenleme yetkiniz bulunmuyor." }, { status: 403 })
     }
   }
 

@@ -252,7 +252,7 @@ export default async function JuryProjectDetailPage({
           <div className="border-t border-black/[0.04]">
             <div className="px-5 py-3 bg-[#fafafa] flex items-center justify-between">
               <p className="text-[11px] font-semibold text-[#aeaeb2] uppercase tracking-wider flex items-center gap-1.5">
-                Yöneticiye Notlarım
+                Geri Bildirim Görüş ve Öneriler
                 <span className="font-normal normal-case text-[10px] bg-[#ebebeb] text-[#aeaeb2] px-2 py-0.5 rounded-full">
                   Sadece Yönetici Görecek
                 </span>
@@ -266,7 +266,7 @@ export default async function JuryProjectDetailPage({
                   <li key={r.id} className="px-5 py-4 space-y-1.5">
                     <div className="flex items-center justify-between">
                       <p className="text-[12px] font-semibold text-[#1c1c1c]">
-                        Notum #{myNotes.length - i}
+                        Geri Bildirim #{myNotes.length - i}
                       </p>
                       <p className="text-[11px] text-[#aeaeb2]">{fmtShort(r.createdAt)}</p>
                     </div>
@@ -280,7 +280,7 @@ export default async function JuryProjectDetailPage({
 
             {isActive && (
               <div className="px-5 py-4 bg-[#fafafa] border-t border-black/[0.04]">
-                <p className="text-[12px] font-semibold text-[#1c1c1c] mb-2">Yöneticiye Not Gönder</p>
+                <p className="text-[12px] font-semibold text-[#1c1c1c] mb-2">Geri Bildirim Görüş ve Öneri Gönder</p>
                 <JuryProjectNoteForm applicationId={applicationId} />
               </div>
             )}

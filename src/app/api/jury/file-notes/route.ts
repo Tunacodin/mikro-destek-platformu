@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   const session = await auth()
-  if (!session || session.user.role !== "JURY") {
+  if (!session || (session.user.role !== "JURY" && session.user.role !== "ADMIN")) {
     return NextResponse.json({ error: "Yetkisiz." }, { status: 403 })
   }
 
@@ -69,8 +69,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "fileId gerekli." }, { status: 400 })
   }
 
-  const juryId = session.user.id
+  // Admin: tüm notları yazar bilgisiyle döndür
+  if (session.user.role === "ADMIN") {
+    const notes = await prisma.fileNote.findMany({
+      where: { fileId },
+      orderBy: { createdAt: "asc" },
+      include: { user: { select: { name: true, email: true } } },
+    })
+    return NextResponse.json(notes)
+  }
 
+  // Jüri: yalnızca kendi notları, erişim kontrolü ile
+  const juryId = session.user.id
   const hasAccess = await checkJuryAccess(juryId, fileId)
   if (!hasAccess) {
     return NextResponse.json({ error: "Bu dosyaya erişim yetkiniz yok." }, { status: 403 })

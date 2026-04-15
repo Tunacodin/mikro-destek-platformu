@@ -123,15 +123,15 @@ export default async function AdminProjectDetailPage({
             <div className="px-5 sm:px-6 py-4 border-b border-black/[0.05] flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Send className="w-3.5 h-3.5 text-[#aeaeb2]" />
-                <p className="text-[12px] font-semibold text-[#1c1c1c]">İlerleme Raporları</p>
+                <p className="text-[12px] font-semibold text-[#1c1c1c]">Güncelleme Notları</p>
               </div>
-              <span className="text-[11px] text-[#aeaeb2]">{applicantReports.length} rapor</span>
+              <span className="text-[11px] text-[#aeaeb2]">{applicantReports.length} güncelleme notu</span>
             </div>
 
             {applicantReports.length === 0 ? (
               <div className="px-5 py-10 text-center">
                 <Send className="w-5 h-5 text-[#d1d1d6] mx-auto mb-2" />
-                <p className="text-[13px] text-[#aeaeb2]">Henüz rapor gönderilmedi.</p>
+                <p className="text-[13px] text-[#aeaeb2]">Henüz güncelleme notu gönderilmedi.</p>
               </div>
             ) : (
               <ul className="divide-y divide-black/[0.04]">
@@ -140,7 +140,7 @@ export default async function AdminProjectDetailPage({
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                       <p className="text-[11px] font-semibold text-[#aeaeb2] uppercase tracking-wider">
-                        Rapor #{applicantReports.length - i}
+                        Not #{applicantReports.length - i}
                       </p>
                       <span className="text-[#d1d1d6]">·</span>
                       <p className="text-[11px] text-[#aeaeb2]">{fmt(r.createdAt)}</p>
@@ -156,7 +156,7 @@ export default async function AdminProjectDetailPage({
             {juryNotes.length > 0 && (
               <>
                 <div className="px-5 sm:px-6 py-2.5 bg-purple-50/60 border-t border-black/[0.04] flex items-center gap-2">
-                  <p className="text-[10px] font-semibold text-purple-500 uppercase tracking-wider">Jüri Notları</p>
+                  <p className="text-[10px] font-semibold text-purple-500 uppercase tracking-wider">Geri Bildirim Görüş ve Öneriler</p>
                   <span className="text-[10px] text-purple-400">({juryNotes.length})</span>
                 </div>
                 <ul className="divide-y divide-black/[0.04]">
@@ -164,7 +164,7 @@ export default async function AdminProjectDetailPage({
                     <li key={r.id} className="px-5 sm:px-6 py-4 space-y-2 bg-purple-50/30">
                       <div className="flex items-center gap-2">
                         <p className="text-[11px] font-semibold text-purple-500 uppercase tracking-wider">
-                          Jüri Notu #{juryNotes.length - i}
+                          Geri Bildirim #{juryNotes.length - i}
                         </p>
                         <span className="text-[#d1d1d6]">·</span>
                         <p className="text-[11px] text-[#aeaeb2]">{fmt(r.createdAt)}</p>
@@ -184,7 +184,7 @@ export default async function AdminProjectDetailPage({
             <div className="px-5 sm:px-6 py-4 border-b border-black/[0.05] flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FolderOpen className="w-3.5 h-3.5 text-[#aeaeb2]" />
-                <p className="text-[12px] font-semibold text-[#1c1c1c]">Proje Dosyaları</p>
+                <p className="text-[12px] font-semibold text-[#1c1c1c]">Proje Materyalleri ve Raporlar</p>
                 <span className="text-[#aeaeb2] text-[12px] font-normal">
                   (üye tarafından yüklendi)
                 </span>
@@ -288,11 +288,11 @@ export default async function AdminProjectDetailPage({
                 </div>
               )}
               <div className="flex justify-between">
-                <span className="text-[#6e6e73]">Gönderilen rapor</span>
+                <span className="text-[#6e6e73]">Güncelleme notu</span>
                 <span className="font-medium text-[#1c1c1c]">{applicantReports.length}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#6e6e73]">Proje dosyası</span>
+                <span className="text-[#6e6e73]">Proje materyali</span>
                 <span className="font-medium text-[#1c1c1c]">{project.files.length}</span>
               </div>
             </div>

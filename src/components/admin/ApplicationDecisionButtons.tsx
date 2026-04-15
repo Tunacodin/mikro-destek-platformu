@@ -190,6 +190,11 @@ export function ApplicationDecisionButtons({
     )
   }
 
+  // ── IN_REVIEW → Jüri Değerlendirmesini Kapat (Aşama 5a → 5b) ────────────
+  if (status === "IN_REVIEW") {
+    return <CloseEvaluationPanel applicationId={applicationId} />
+  }
+
   // ── EVALUATED → Destek Kararı (Aşama 5b) ────────────────────────────────
   if (status === "EVALUATED") {
     const canSupport = !!selectedScope
@@ -263,4 +268,189 @@ export function ApplicationDecisionButtons({
   }
 
   return null
+}
+
+// ── Jüri Değerlendirmesini Kapat → Sonuç Seç ────────────────────────────────
+
+function CloseEvaluationPanel({ applicationId }: { applicationId: string }) {
+  const router = useRouter()
+  const pendingRef = useRef(false)
+  const [step, setStep] = useState<"button" | "choice">("button")
+  const [selectedScope, setSelectedScope] = useState("")
+  const [notes, setNotes] = useState("")
+  const [showRejectConfirm, setShowRejectConfirm] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  async function callStatus(status: string, extra?: Record<string, string | undefined>) {
+    const res = await fetch(`/api/admin/applications/${applicationId}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status, ...extra }),
+    })
+    if (!res.ok) throw new Error(await res.text())
+  }
+
+  async function handleDecide(scope: string) {
+    if (pendingRef.current) return
+    pendingRef.current = true
+    setLoading(true)
+    try {
+      await callStatus("EVALUATED")
+      await callStatus("SUPPORTED", { scope, notes: notes || undefined })
+      router.refresh()
+    } finally {
+      pendingRef.current = false
+      setLoading(false)
+    }
+  }
+
+  async function handleReject() {
+    if (pendingRef.current) return
+    pendingRef.current = true
+    setLoading(true)
+    try {
+      await callStatus("EVALUATED")
+      await callStatus("REJECTED", { notes: notes || undefined })
+      router.refresh()
+    } finally {
+      pendingRef.current = false
+      setLoading(false)
+    }
+  }
+
+  // ── Adım 1: Kapat butonu ──────────────────────────────────────────────────
+  if (step === "button") {
+    return (
+      <div className="bg-white rounded-2xl border border-purple-100 p-5 space-y-3">
+        <div>
+          <div className="flex items-center gap-1.5 mb-1">
+            <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Aşama 5a</span>
+          </div>
+          <p className="text-[13px] font-semibold text-[#1c1c1c]">Jüri Değerlendirmesi</p>
+          <p className="text-[12px] text-[#6e6e73] mt-0.5">
+            Jüri değerlendirmeleri tamamlandığında kapatın ve sonucu belirleyin.
+          </p>
+        </div>
+        <button
+          onClick={() => setStep("choice")}
+          className="w-full flex items-center justify-between px-4 py-3 bg-purple-600 text-white text-[13px] font-semibold rounded-xl shadow-sm hover:bg-purple-700 hover:shadow transition-colors cursor-pointer"
+        >
+          <span>Jüri Değerlendirmesini Kapat</span>
+          <ChevronRight className="w-4 h-4 opacity-70" />
+        </button>
+      </div>
+    )
+  }
+
+  // ── Adım 2: Sonuç seç ────────────────────────────────────────────────────
+  return (
+    <div className="bg-white rounded-2xl border border-purple-100 p-5 space-y-4">
+      <div>
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Aşama 5b</span>
+        </div>
+        <p className="text-[13px] font-semibold text-[#1c1c1c]">Sonuç Kararı</p>
+        <p className="text-[12px] text-[#6e6e73] mt-0.5">Destek kapsamını seçin ve onaylayın.</p>
+      </div>
+
+      {/* 3 kapsam seçeneği */}
+      {!showRejectConfirm && (
+        <div className="space-y-2">
+          <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-wider">Destek Kapsamı</p>
+          <div className="space-y-2">
+            {SCOPE_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setSelectedScope(opt.value)}
+                className={`w-full text-left px-3.5 py-3 border rounded-xl transition-all cursor-pointer ${
+                  selectedScope === opt.value ? opt.activeColor : opt.color
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[13px] font-semibold text-[#1c1c1c]">{opt.label}</span>
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${opt.badge}`}>{opt.value}</span>
+                </div>
+                <p className="text-[11px] text-[#6e6e73] mt-0.5">{opt.description}</p>
+              </button>
+            ))}
+          </div>
+
+          {/* Karar notu */}
+          <div className="pt-1">
+            <label className="block text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-wider mb-1.5">
+              Karar Notu <span className="font-normal">(isteğe bağlı)</span>
+            </label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Destek kapsamı hakkında notlar…"
+              rows={2}
+              className="w-full px-3 py-2 bg-[#f9f9f9] border border-black/[0.08] rounded-xl text-[12px] text-[#1c1c1c] placeholder:text-[#c7c7cc] resize-none focus:outline-none focus:ring-1 focus:ring-[#fab758]/40"
+            />
+          </div>
+
+          {/* Aksiyonlar */}
+          <div className="flex gap-2 pt-1">
+            <button
+              onClick={() => setStep("button")}
+              disabled={loading}
+              className="px-3 py-2.5 text-[12px] text-[#6e6e73] rounded-xl hover:bg-[#f5f5f5] disabled:opacity-40 transition-colors cursor-pointer"
+            >
+              Geri
+            </button>
+            <button
+              onClick={() => handleDecide(selectedScope)}
+              disabled={!selectedScope || loading}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-emerald-600 text-white text-[13px] font-semibold rounded-xl shadow-sm hover:bg-emerald-700 hover:shadow disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            >
+              <CheckCircle className="w-3.5 h-3.5" />
+              {loading ? "İşleniyor…" : "Onayla ve Destekle"}
+            </button>
+            <button
+              onClick={() => { setShowRejectConfirm(true); setNotes("") }}
+              disabled={loading}
+              className="px-3 py-2.5 border border-red-300 text-red-600 text-[12px] font-medium rounded-xl hover:bg-red-50 disabled:opacity-40 transition-colors cursor-pointer"
+            >
+              <XCircle className="w-4 h-4" />
+            </button>
+          </div>
+          {!selectedScope && (
+            <p className="text-[11px] text-[#aeaeb2] text-center">Desteklemek için önce destek kapsamı seçin.</p>
+          )}
+        </div>
+      )}
+
+      {/* Red onay */}
+      {showRejectConfirm && (
+        <div className="space-y-2.5 p-3.5 bg-red-50 rounded-xl border border-red-300">
+          <p className="text-[11px] font-semibold text-red-700 flex items-center gap-1.5">
+            <AlertTriangle className="w-3 h-3" /> Başvuruyu Reddet
+          </p>
+          <p className="text-[11px] text-red-600">Bu işlem geri alınamaz. Başvuru sahibi bilgilendirilecek.</p>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Red gerekçesi (isteğe bağlı)"
+            rows={2}
+            className="w-full px-3 py-2 bg-white border border-red-300 rounded-lg text-[12px] text-[#1c1c1c] placeholder:text-[#c7c7cc] resize-none focus:outline-none focus:ring-1 focus:ring-red-300"
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={() => { setShowRejectConfirm(false); setNotes("") }}
+              className="flex-1 py-2 text-[12px] text-[#6e6e73] rounded-lg hover:bg-red-100 transition-colors cursor-pointer"
+            >
+              İptal
+            </button>
+            <button
+              onClick={handleReject}
+              disabled={loading}
+              className="flex-1 py-2 bg-red-600 text-white text-[12px] font-semibold rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors cursor-pointer"
+            >
+              {loading ? "İşleniyor…" : "Reddet"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }
