@@ -105,6 +105,7 @@ export async function POST(req: NextRequest) {
           userId: admin.id,
           title: "Başvuru değerlendirildi",
           message: `Bir başvuru jüri tarafından değerlendirildi ve "Değerlendirildi" durumuna geçti. Destek kararı verebilirsiniz.`,
+          link: `/admin/applications/${applicationId}`,
         })
       )
     )

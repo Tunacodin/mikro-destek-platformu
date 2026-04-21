@@ -12,6 +12,7 @@ export async function GET() {
     where: { userId: session.user.id },
     orderBy: { createdAt: "desc" },
     take: 25,
+    select: { id: true, title: true, message: true, link: true, read: true, createdAt: true },
   })
 
   return NextResponse.json(notifications)

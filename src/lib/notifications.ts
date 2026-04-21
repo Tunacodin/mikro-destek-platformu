@@ -4,13 +4,15 @@ export async function createNotification({
   userId,
   title,
   message,
+  link,
 }: {
   userId: string
   title: string
   message: string
+  link?: string
 }) {
   return prisma.notification.create({
-    data: { userId, title, message },
+    data: { userId, title, message, link },
   })
 }
 

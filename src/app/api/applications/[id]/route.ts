@@ -9,6 +9,7 @@ const updateSchema = z.object({
   teamInfo:       z.string().optional(),
   summary:        z.string().max(1500).optional(),
   targetAudience: z.string().optional(),
+  projectFields:  z.array(z.string()).max(2).optional(),
   categories:     z.array(z.string()).max(2).optional(),
   technologyStage:z.string().optional(),
   artStage:       z.string().optional(),

@@ -69,6 +69,7 @@ export default async function ProjectDetailPage({
 
   const now = Date.now()
   const isActive = project.status === "ACTIVE"
+  const applicantReports = project.reports.filter((r) => r.juryId === null)
   const showSupportEnd = !!project.supportEndDate && project.supportEndDate.getTime() > now
   const endingSoon = isActive && project.supportEndDate && (project.supportEndDate.getTime() - now) < 7 * 24 * 3_600_000
 
@@ -118,7 +119,7 @@ export default async function ProjectDetailPage({
                 </span>
               )}
               <span className="inline-flex items-center gap-1">
-                <Send className="w-3 h-3 text-[#aeaeb2]" /> {project.reports.length} güncelleme notu
+                <Send className="w-3 h-3 text-[#aeaeb2]" /> {applicantReports.length} güncelleme notu
               </span>
               <span className="inline-flex items-center gap-1">
                 <FileText className="w-3 h-3 text-[#aeaeb2]" /> {project.files.length} dosya
@@ -224,10 +225,10 @@ export default async function ProjectDetailPage({
             <p className="text-[13px] font-semibold text-[#1c1c1c] flex items-center gap-2">
               <Send className="w-4 h-4 text-[#aeaeb2]" /> Güncelleme Notları
             </p>
-            <span className="text-[11px] text-[#aeaeb2]">{project.reports.length} not</span>
+            <span className="text-[11px] text-[#aeaeb2]">{applicantReports.length} not</span>
           </div>
 
-          {project.reports.length === 0 ? (
+          {applicantReports.length === 0 ? (
             <div className="px-5 py-8 text-center">
               <Send className="w-5 h-5 text-[#d1d1d6] mx-auto mb-2" />
               <p className="text-[13px] text-[#aeaeb2]">Henüz güncelleme notu gönderilmedi.</p>
@@ -235,11 +236,11 @@ export default async function ProjectDetailPage({
             </div>
           ) : (
             <ul className="divide-y divide-black/[0.04]">
-              {project.reports.map((r, i) => (
+              {applicantReports.map((r, i) => (
                 <li key={r.id} className="px-5 py-4 space-y-1.5">
                   <div className="flex items-center justify-between">
                     <p className="text-[12px] font-semibold text-[#1c1c1c]">
-                      Not #{project.reports.length - i}
+                      Not #{applicantReports.length - i}
                     </p>
                     <p className="text-[11px] text-[#aeaeb2]">{fmtShort(r.createdAt)}</p>
                   </div>

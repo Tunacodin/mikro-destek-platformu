@@ -11,6 +11,7 @@ const createSchema = z.object({
   teamInfo:      z.string().optional().default(""),
   summary:       z.string().max(1500).optional().default(""),
   targetAudience:z.string().optional().default(""),
+  projectFields: z.array(z.string()).max(2).optional().default([]),
   categories:    z.array(z.string()).max(2).optional().default([]),
   technologyStage: z.string().optional().default(""),
   artStage:        z.string().optional().default(""),

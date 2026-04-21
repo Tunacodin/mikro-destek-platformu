@@ -7,9 +7,11 @@ import { ApplicantNav } from "./ApplicantNav"
 export function ApplicantShell({
   children,
   userName,
+  userEmail,
 }: {
   children: React.ReactNode
   userName: string
+  userEmail: string
 }) {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -30,6 +32,7 @@ export function ApplicantShell({
           collapsed={collapsed}
           onCollapse={() => setCollapsed((c) => !c)}
           userName={userName}
+          userEmail={userEmail}
         />
       </div>
 
@@ -42,6 +45,7 @@ export function ApplicantShell({
         <ApplicantNav
           collapsed={false}
           userName={userName}
+          userEmail={userEmail}
           onClose={() => setMobileOpen(false)}
         />
       </div>

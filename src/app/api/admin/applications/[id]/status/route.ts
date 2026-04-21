@@ -105,7 +105,10 @@ export async function PATCH(
   // Başvuru sahibine bildirim
   const notif = STATUS_NOTIFICATION[newStatus]
   if (notif) {
-    await createNotification({ userId: application.userId, title: notif.title, message: notif.message })
+    const applicantLink = newStatus === "SUPPORTED"
+      ? `/dashboard/projects/${id}`
+      : `/dashboard/applications/${id}`
+    await createNotification({ userId: application.userId, title: notif.title, message: notif.message, link: applicantLink })
   }
 
   // EVALUATED → admin bildirimi
@@ -117,6 +120,7 @@ export async function PATCH(
           userId: admin.id,
           title: "Başvuru değerlendirmesi tamamlandı",
           message: `"${application.title}" başvurusu jüri tarafından değerlendirildi. Destek kararı verebilirsiniz.`,
+          link: `/admin/applications/${id}`,
         })
       )
     )

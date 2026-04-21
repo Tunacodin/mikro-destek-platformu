@@ -18,6 +18,7 @@ import {
 } from "lucide-react"
 import { signOut } from "next-auth/react"
 import { NotificationBell } from "@/components/ui/NotificationBell"
+import { UserProfileModal } from "@/components/ui/UserProfileModal"
 
 const links = [
   { href: "/admin/dashboard",    label: "Genel Bakış",   icon: LayoutDashboard },
@@ -25,7 +26,7 @@ const links = [
   { href: "/admin/programs",     label: "Programlar",    icon: BookOpen },
   { href: "/admin/applications", label: "Başvurular",    icon: FileText },
   { href: "/admin/jury",         label: "Jüri Yönetimi", icon: Users },
-  { href: "/admin/projects",     label: "Projeler",      icon: FolderKanban },
+  { href: "/admin/projects",     label: "Desteklenen Projeler", icon: FolderKanban },
   { href: "/admin/users",        label: "Kullanıcılar",  icon: UserCog },
 ]
 
@@ -37,15 +38,18 @@ export function AdminSidebar({
   collapsed = false,
   onClose,
   userName,
+  userEmail,
 }: {
   collapsed?: boolean
   onClose?: () => void
   userName: string
+  userEmail: string
 }) {
   const pathname = usePathname()
   const initials = getInitials(userName || "A")
   const firstName = userName.split(" ")[0] ?? userName
   const [menuOpen, setMenuOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -57,6 +61,7 @@ export function AdminSidebar({
   }, [])
 
   return (
+    <>
     <aside
       className={cn(
         "h-full bg-white border-r border-[#e8e8e8] flex flex-col shrink-0 transition-all duration-300",
@@ -148,6 +153,14 @@ export function AdminSidebar({
 
               {menuOpen && (
                 <div className="absolute bottom-[calc(100%+4px)] left-0 w-full bg-white border border-[#e8e8e8] rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.12)] overflow-hidden z-50">
+                  <button
+                    onClick={() => { setMenuOpen(false); setProfileOpen(true) }}
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-left text-[13px] text-[#1c1c1c] hover:bg-[#f5f5f5] transition-colors cursor-pointer"
+                  >
+                    <UserCog className="w-4 h-4 text-[#aeaeb2]" />
+                    Hesap Ayarları
+                  </button>
+                  <div className="h-px bg-[#e8e8e8]" />
                   <Link
                     href="/admin/users"
                     onClick={() => setMenuOpen(false)}
@@ -172,5 +185,13 @@ export function AdminSidebar({
         )}
       </div>
     </aside>
+
+    <UserProfileModal
+      isOpen={profileOpen}
+      onClose={() => setProfileOpen(false)}
+      userName={userName}
+      userEmail={userEmail}
+    />
+    </>
   )
 }

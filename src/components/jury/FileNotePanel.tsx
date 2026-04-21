@@ -23,15 +23,28 @@ export function FileNotePanel({
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [prefetched, setPrefetched] = useState(false)
+
+  // Read-only modda (canEvaluate=false) mount'ta notları getir;
+  // not yoksa toggle butonunu hiç gösterme.
+  useEffect(() => {
+    if (canEvaluate || prefetched) return
+    fetch(`/api/jury/file-notes?fileId=${fileId}`)
+      .then((r) => r.json())
+      .then((data) => { if (Array.isArray(data)) setNotes(data) })
+      .finally(() => setPrefetched(true))
+  }, [canEvaluate, prefetched, fileId])
 
   useEffect(() => {
-    if (!open) return
+    if (!open || prefetched) return
     setLoading(true)
     fetch(`/api/jury/file-notes?fileId=${fileId}`)
       .then((r) => r.json())
       .then((data) => { if (Array.isArray(data)) setNotes(data) })
-      .finally(() => setLoading(false))
-  }, [open, fileId])
+      .finally(() => { setLoading(false); setPrefetched(true) })
+  }, [open, prefetched, fileId])
+
+  if (!canEvaluate && prefetched && notes.length === 0) return null
 
   async function handleSave() {
     if (!noteText.trim()) return
@@ -57,7 +70,11 @@ export function FileNotePanel({
         className="inline-flex items-center gap-1 text-[11px] font-medium text-[#aeaeb2] hover:text-[#6e6e73] transition-colors"
       >
         <MessageSquare className="w-3 h-3" />
-        {open ? "Notları Kapat" : `Not${notes.length > 0 ? ` (${notes.length})` : " Ekle"}`}
+        {open
+          ? "Notları Kapat"
+          : canEvaluate
+            ? `Not${notes.length > 0 ? ` (${notes.length})` : " Ekle"}`
+            : `Değerlendirici Notları (${notes.length})`}
       </button>
 
       {open && (

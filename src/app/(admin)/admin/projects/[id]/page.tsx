@@ -7,6 +7,7 @@ import {
   Download, Calendar, User, ExternalLink,
 } from "lucide-react"
 import { ProjectStatusPanel } from "./ProjectStatusPanel"
+import { FileNotePanel } from "@/components/jury/FileNotePanel"
 
 export const metadata = { title: "Proje Yönetimi — Mikro Destek Fonu" }
 
@@ -74,7 +75,7 @@ export default async function AdminProjectDetailPage({
         href="/admin/projects"
         className="inline-flex items-center gap-1 text-[13px] text-[#6e6e73] hover:text-[#1c1c1c] transition-colors cursor-pointer"
       >
-        <ChevronLeft className="w-3.5 h-3.5" /> Projeler
+        <ChevronLeft className="w-3.5 h-3.5" /> Desteklenen Projeler
       </Link>
 
       {/* Başlık */}
@@ -222,7 +223,7 @@ export default async function AdminProjectDetailPage({
 
           {/* Başvuru Dosyaları */}
           {project.application.files.length > 0 && (
-            <details className="group bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] overflow-hidden">
+            <details open className="group bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] overflow-hidden">
               <summary className="flex items-center justify-between px-5 sm:px-6 py-4 cursor-pointer select-none hover:bg-[#f4f4f4] transition-colors">
                 <div className="flex items-center gap-2">
                   <FileText className="w-3.5 h-3.5 text-[#aeaeb2]" />
@@ -234,16 +235,19 @@ export default async function AdminProjectDetailPage({
               </summary>
               <ul className="divide-y divide-black/[0.04] border-t border-black/[0.04]">
                 {project.application.files.map((f) => (
-                  <li key={f.id} className="flex items-center justify-between px-5 sm:px-6 py-3 hover:bg-[#f4f4f4] transition-colors">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <FileText className="w-3.5 h-3.5 text-[#aeaeb2] shrink-0" />
-                      <span className="text-[13px] text-[#1c1c1c] truncate">{f.name}</span>
-                      <span className="text-[11px] text-[#aeaeb2] shrink-0">{formatSize(f.size)}</span>
+                  <li key={f.id} className="px-5 sm:px-6 py-3 space-y-2 hover:bg-[#f4f4f4] transition-colors">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <FileText className="w-3.5 h-3.5 text-[#aeaeb2] shrink-0" />
+                        <span className="text-[13px] text-[#1c1c1c] truncate">{f.name}</span>
+                        <span className="text-[11px] text-[#aeaeb2] shrink-0">{formatSize(f.size)}</span>
+                      </div>
+                      <a href={`/api/files/${f.id}`} target="_blank" rel="noreferrer"
+                        className="ml-3 shrink-0 text-[12px] font-medium text-[#6e6e73] hover:text-[#1c1c1c] transition-colors cursor-pointer">
+                        İndir
+                      </a>
                     </div>
-                    <a href={`/api/files/${f.id}`} target="_blank" rel="noreferrer"
-                      className="ml-3 shrink-0 text-[12px] font-medium text-[#6e6e73] hover:text-[#1c1c1c] transition-colors cursor-pointer">
-                      İndir
-                    </a>
+                    <FileNotePanel fileId={f.id} canEvaluate={false} showAuthor />
                   </li>
                 ))}
               </ul>

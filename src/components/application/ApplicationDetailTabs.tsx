@@ -29,6 +29,7 @@ type ApplicationData = {
   teamName?: string | null
   teamInfo?: string | null
   targetAudience?: string | null
+  projectFields?: string[]
   categories: string[]
   technologyStage?: string | null
   artStage?: string | null
@@ -156,6 +157,16 @@ export function ApplicationDetailTabs({
             <Field label="30 Saniyelik Özet" value={application.summary} />
             <Field label="Ekip Bilgileri" value={application.teamInfo} />
             <Field label="Hedef Kitle" value={application.targetAudience} />
+            {(application.projectFields ?? []).length > 0 && (
+              <div className="space-y-1.5">
+                <p className="text-[11px] font-semibold text-[#aeaeb2] uppercase tracking-wider">Proje Faaliyet Alanı</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {(application.projectFields ?? []).map((f) => (
+                    <span key={f} className="text-[11px] font-medium bg-[#f0f0f0] text-[#6e6e73] px-2.5 py-1 rounded-full">{f}</span>
+                  ))}
+                </div>
+              </div>
+            )}
             {application.categories.length > 0 && (
               <div className="space-y-1.5">
                 <p className="text-[11px] font-semibold text-[#aeaeb2] uppercase tracking-wider">Proje Alanı</p>

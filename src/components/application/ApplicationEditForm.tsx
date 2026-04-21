@@ -23,6 +23,18 @@ const EDUCATION_OPTIONS = [
   "Doktora Öğrencisi / Mezunu",
 ]
 
+const PROJECT_FIELDS = [
+  "Yazılım ve Teknoloji Geliştirme (uygulama, web platformu, oyun, yapay zekâ vb.)",
+  "Dijital Sanatlar ve Tasarım (grafik tasarım, animasyon, illüstrasyon, görsel prodüksiyon vb.)",
+  "İçerik Üretimi ve Yayıncılık (podcast, video, blog, sosyal medya içerikleri vb.)",
+  "Kültürel ve Sanatsal Projeler (sergi, performans, dijital enstalasyon vb.)",
+  "Araştırma ve Akademik Katkı (kaynak, rapor, analiz, metodoloji geliştirme vb.)",
+  "Girişimcilik ve İş Modeli Geliştirme (ürünleştirme, pazar validasyonu, iş modeli inovasyonu vb.)",
+  "Topluluk ve Sosyal Katkı (peer-learning, sosyal etki, kolektif fayda odaklı projeler)",
+  "Glokal İşbirliği ve Dış Temsil (uluslararası bağlantılar, bölgesel işbirlikleri, vitrin projeler vb.)",
+  "Diğer",
+]
+
 const CATEGORIES = [
   "Teknoloji/Girişimcilik",
   "Sanat/Kültürel/İçerik",
@@ -55,6 +67,7 @@ type Application = {
   teamInfo:              string | null
   summary:               string | null
   targetAudience:        string | null
+  projectFields:         string[]
   categories:            string[]
   technologyStage:       string | null
   artStage:              string | null
@@ -229,6 +242,7 @@ export function ApplicationEditForm({
   const [teamInfo,               setTeamInfo]               = useState(application.teamInfo               ?? "")
   const [summary,                setSummary]                = useState(application.summary                ?? "")
   const [targetAudience,         setTargetAudience]         = useState(application.targetAudience         ?? "")
+  const [projectFields,          setProjectFields]          = useState<string[]>(application.projectFields ?? [])
   const [categories,             setCategories]             = useState<string[]>(application.categories   ?? [])
   const [technologyStage,        setTechnologyStage]        = useState(application.technologyStage        ?? "")
   const [artStage,               setArtStage]               = useState(application.artStage               ?? "")
@@ -244,6 +258,12 @@ export function ApplicationEditForm({
   const [divisionContribution,   setDivisionContribution]   = useState(application.divisionContribution   ?? "")
   const [supportTypes,           setSupportTypes]           = useState<string[]>(application.supportTypes ?? [])
   const [supportNotes,           setSupportNotes]           = useState<Record<string, string>>(application.supportNotes ?? {})
+
+  function toggleProjectField(field: string) {
+    setProjectFields((prev) =>
+      prev.includes(field) ? prev.filter((f) => f !== field) : prev.length < 2 ? [...prev, field] : prev
+    )
+  }
 
   function toggleCategory(cat: string) {
     setCategories((prev) =>
@@ -281,9 +301,10 @@ export function ApplicationEditForm({
 
   function handleStep1() {
     setError("")
-    if (!title.trim())           return setError("Proje adı zorunludur.")
-    if (!summary.trim())         return setError("30 saniyelik özet zorunludur.")
-    if (!targetAudience.trim())  return setError("Hedef kitle zorunludur.")
+    if (!title.trim())               return setError("Proje adı zorunludur.")
+    if (!summary.trim())             return setError("30 saniyelik özet zorunludur.")
+    if (!targetAudience.trim())      return setError("Hedef kitle zorunludur.")
+    if (projectFields.length === 0)  return setError("En az bir faaliyet alanı seçiniz.")
     if (categories.length === 0) return setError("En az bir proje alanı seçiniz.")
     if (categories.includes("Teknoloji/Girişimcilik") && !technologyStage) return setError("Teknoloji/Girişimcilik için proje aşamasını seçiniz.")
     if (categories.includes("Sanat/Kültürel/İçerik")  && !artStage)        return setError("Sanat/Kültürel/İçerik için proje aşamasını seçiniz.")
@@ -336,7 +357,7 @@ export function ApplicationEditForm({
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: title.trim(), teamName, teamInfo, summary, targetAudience, categories,
+          title: title.trim(), teamName, teamInfo, summary, targetAudience, projectFields, categories,
           technologyStage, artStage, researchStage,
           problemStatement, solution, innovation,
           outputs, timeline, successCriteria,
@@ -508,6 +529,31 @@ export function ApplicationEditForm({
                 <span className={`absolute bottom-2.5 right-3.5 text-[11px] tabular-nums ${targetAudience.length >= 1400 ? "text-amber-500" : "text-[#aeaeb2]"}`}>
                   {targetAudience.length}/1500
                 </span>
+              </div>
+            </div>
+
+            <div>
+              <FieldLabel hint="Projenizin ilgili faaliyet alanlarını en fazla 2 adet olmak üzere işaretleyiniz.">
+                Proje Faaliyet Alanı
+              </FieldLabel>
+              <div className="flex flex-col gap-2">
+                {PROJECT_FIELDS.map((field) => (
+                  <label key={field} className="flex items-center gap-3 cursor-pointer group">
+                    <div
+                      onClick={() => toggleProjectField(field)}
+                      className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all cursor-pointer ${
+                        projectFields.includes(field)
+                          ? "bg-[#212121] border-[#212121]"
+                          : projectFields.length >= 2
+                          ? "border-[#e0e0e0] opacity-40 cursor-not-allowed"
+                          : "border-[#d1d1d6] group-hover:border-[#aeaeb2]"
+                      }`}
+                    >
+                      {projectFields.includes(field) && <Check className="w-3 h-3 text-white" />}
+                    </div>
+                    <span className="text-[13px] text-[#1c1c1c]">{field}</span>
+                  </label>
+                ))}
               </div>
             </div>
 

@@ -1,12 +1,14 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useRouter } from "next/navigation"
 import { Bell } from "lucide-react"
 
 type Notif = {
   id: string
   title: string
   message: string
+  link: string | null
   read: boolean
   createdAt: string
 }
@@ -15,6 +17,7 @@ export function NotificationBell({ dropUp = false, dark = false, openRight = fal
   const [notifications, setNotifications] = useState<Notif[]>([])
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const router = useRouter()
 
   useEffect(() => {
     fetch("/api/notifications")
@@ -23,7 +26,6 @@ export function NotificationBell({ dropUp = false, dark = false, openRight = fal
       .catch(() => {})
   }, [])
 
-  // Dışarı tıklandığında kapat
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -39,6 +41,17 @@ export function NotificationBell({ dropUp = false, dark = false, openRight = fal
   async function markAllRead() {
     await fetch("/api/notifications/read-all", { method: "PATCH" })
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
+  }
+
+  async function handleNotifClick(n: Notif) {
+    if (!n.read) {
+      await fetch(`/api/notifications/${n.id}`, { method: "PATCH" })
+      setNotifications((prev) => prev.map((p) => p.id === n.id ? { ...p, read: true } : p))
+    }
+    if (n.link) {
+      setOpen(false)
+      router.push(n.link)
+    }
   }
 
   function fmt(dateStr: string) {
@@ -84,7 +97,7 @@ export function NotificationBell({ dropUp = false, dark = false, openRight = fal
             {unread > 0 && (
               <button
                 onClick={markAllRead}
-                className="text-[11px] font-medium text-[#fab758] hover:text-amber-600 transition-colors"
+                className="text-[11px] font-medium text-[#fab758] hover:text-amber-600 transition-colors cursor-pointer"
               >
                 Tümünü okundu işaretle
               </button>
@@ -102,8 +115,9 @@ export function NotificationBell({ dropUp = false, dark = false, openRight = fal
               notifications.map((n) => (
                 <li
                   key={n.id}
-                  className={`px-4 py-3 transition-colors ${
-                    n.read ? "bg-white" : "bg-amber-50/60"
+                  onClick={() => handleNotifClick(n)}
+                  className={`px-4 py-3 transition-colors ${n.link ? "cursor-pointer" : ""} ${
+                    n.read ? "bg-white hover:bg-[#fafafa]" : "bg-amber-50/60 hover:bg-amber-50"
                   }`}
                 >
                   <div className="flex items-start gap-2.5">
@@ -117,7 +131,12 @@ export function NotificationBell({ dropUp = false, dark = false, openRight = fal
                       <p className="text-[11px] text-[#6e6e73] mt-0.5 leading-relaxed">
                         {n.message}
                       </p>
-                      <p className="text-[10px] text-[#aeaeb2] mt-1">{fmt(n.createdAt)}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-[10px] text-[#aeaeb2]">{fmt(n.createdAt)}</p>
+                        {n.link && (
+                          <span className="text-[10px] font-medium text-[#fab758]">Görüntüle →</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </li>
