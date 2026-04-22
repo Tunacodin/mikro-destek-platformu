@@ -24,6 +24,14 @@ export async function PATCH(
     return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 })
   }
 
+  const adminUser = await prisma.user.findUnique({
+    where: { email: session.user.email! },
+    select: { id: true },
+  })
+  if (!adminUser) {
+    return NextResponse.json({ error: "Admin kullanıcı bulunamadı." }, { status: 403 })
+  }
+
   const project = await prisma.project.findUnique({ where: { id } })
   if (!project) {
     return NextResponse.json({ error: "Proje bulunamadı." }, { status: 404 })
@@ -43,7 +51,7 @@ export async function PATCH(
     data: {
       action: "PROJECT_UPDATED",
       metadata: { projectId: id, ...parsed.data },
-      userId: session.user.id,
+      userId: adminUser.id,
     },
   })
 

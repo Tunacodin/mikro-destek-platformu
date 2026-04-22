@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
-import { createNotification } from "@/lib/notifications"
+import { createNotification, notifyAdmins } from "@/lib/notifications"
 
 const scoreSchema = z.object({
   criteria: z.string().min(1),
@@ -93,22 +93,31 @@ export async function POST(req: NextRequest) {
     return newEval
   })
 
-  // Yeni değerlendirmede (ilk kez) tüm adminlere bildirim gönder
-  if (!existing) {
-    const admins = await prisma.user.findMany({
-      where: { role: "ADMIN" },
-      select: { id: true },
+  // Her yeni değerlendirmede admin'e bildir
+  const juryName = await prisma.user.findUnique({
+    where: { id: juryId },
+    select: { name: true, email: true },
+  }).then((u) => u?.name ?? u?.email ?? "Jüri üyesi")
+
+  const [assignmentCount, evaluationCount] = await Promise.all([
+    prisma.juryAssignment.count({ where: { applicationId } }),
+    prisma.evaluation.count({ where: { applicationId } }),
+  ])
+
+  if (evaluationCount >= assignmentCount) {
+    // Tüm jüri tamamladı
+    await notifyAdmins({
+      title: "Tüm jüri değerlendirmeleri tamamlandı",
+      message: `"${application.title}" başvurusu tüm jüri üyeleri tarafından değerlendirildi. Destek kararı verebilirsiniz.`,
+      link: `/admin/applications/${applicationId}`,
     })
-    await Promise.all(
-      admins.map((admin) =>
-        createNotification({
-          userId: admin.id,
-          title: "Başvuru değerlendirildi",
-          message: `Bir başvuru jüri tarafından değerlendirildi ve "Değerlendirildi" durumuna geçti. Destek kararı verebilirsiniz.`,
-          link: `/admin/applications/${applicationId}`,
-        })
-      )
-    )
+  } else {
+    // Kısmi değerlendirme
+    await notifyAdmins({
+      title: "Jüri değerlendirmesi yapıldı",
+      message: `${juryName}, "${application.title}" başvurusunu değerlendirdi. (${evaluationCount}/${assignmentCount} tamamlandı)`,
+      link: `/admin/applications/${applicationId}`,
+    })
   }
 
   return NextResponse.json(evaluation, { status: existing ? 200 : 201 })

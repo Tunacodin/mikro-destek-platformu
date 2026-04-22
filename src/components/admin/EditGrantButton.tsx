@@ -39,8 +39,8 @@ export function EditGrantButton({
       {loading
         ? "Kaydediliyor…"
         : editGranted
-        ? "Düzenleme Yetkisini Geri Al"
-        : "Düzenleme Yetkisi Ver"}
+        ? "Başvuru Düzenleme Yetkisini Geri Al"
+        : "Kullanıcıya Başvuru Düzenleme Yetkisi Ver"}
     </button>
   )
 }

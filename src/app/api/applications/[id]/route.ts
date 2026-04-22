@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
+import { notifyAdmins } from "@/lib/notifications"
 
 const updateSchema = z.object({
   title:          z.string().min(3).optional(),
@@ -93,6 +94,15 @@ export async function PATCH(
     where: { id },
     data: parsed.data,
   })
+
+  // Revize tamamlandı bildirimi — sadece admin tarafından edit yetkisi verilmişse
+  if (application.editGranted) {
+    await notifyAdmins({
+      title: "Başvuru güncellendi",
+      message: `"${application.title}" başvurusu revize edilerek güncellendi.`,
+      link: `/admin/applications/${id}`,
+    })
+  }
 
   return NextResponse.json(updated)
 }

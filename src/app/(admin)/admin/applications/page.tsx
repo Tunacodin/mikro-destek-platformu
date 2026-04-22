@@ -2,6 +2,7 @@ import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { AdminApplicationList } from "@/components/admin/AdminApplicationList"
+import { ExcelImportButton } from "@/components/admin/ExcelImportButton"
 import type { ApplicationStatus } from "@prisma/client"
 
 export const metadata = { title: "Başvurular — Mikro Destek Fonu" }
@@ -53,10 +54,13 @@ export default async function AdminApplicationsPage({
           <h1 className="text-[26px] font-bold text-[#1c1c1c] tracking-tight">Başvurular</h1>
           <p className="text-[14px] text-[#b0b0b0] mt-1">Mikro Destek Platformu başvuruları ve değerlendirme yönetimi</p>
         </div>
-        <p className="text-[14px] text-[#6e6e73] shrink-0 tabular-nums">
-          Toplam <span className="font-semibold text-[#1c1c1c]">{total}</span> başvuru
-          {(status || period) && <span className="text-[#b0b0b0]"> · {applications.length} sonuç</span>}
-        </p>
+        <div className="flex items-center gap-3 shrink-0">
+          <p className="text-[14px] text-[#6e6e73] tabular-nums">
+            Toplam <span className="font-semibold text-[#1c1c1c]">{total}</span> başvuru
+            {(status || period) && <span className="text-[#b0b0b0]"> · {applications.length} sonuç</span>}
+          </p>
+          <ExcelImportButton periods={periods} />
+        </div>
       </div>
 
       <AdminApplicationList

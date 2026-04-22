@@ -43,6 +43,14 @@ export async function PATCH(
     return NextResponse.json({ error: "Destek kapsamı (scope) zorunludur." }, { status: 400 })
   }
 
+  const adminUser = await prisma.user.findUnique({
+    where: { email: session.user.email! },
+    select: { id: true },
+  })
+  if (!adminUser) {
+    return NextResponse.json({ error: "Admin kullanıcı bulunamadı." }, { status: 403 })
+  }
+
   const application = await prisma.application.findUnique({
     where: { id },
     select: { id: true, status: true, userId: true, title: true },
@@ -78,7 +86,7 @@ export async function PATCH(
           applicationId: id,
           scope,
           notes: notes ?? null,
-          decidedById: session.user.id,
+          decidedById: adminUser.id,
         },
       })
       await tx.project.create({
@@ -95,7 +103,7 @@ export async function PATCH(
       data: {
         action: `STATUS_CHANGED_TO_${newStatus}`,
         metadata: { applicationId: id, title: application.title, scope, notes, presentationDate, supportEndDate },
-        userId: session.user.id,
+        userId: adminUser.id,
       },
     })
 

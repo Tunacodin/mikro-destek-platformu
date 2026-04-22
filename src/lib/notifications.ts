@@ -16,6 +16,24 @@ export async function createNotification({
   })
 }
 
+export async function notifyAdmins({
+  title,
+  message,
+  link,
+}: {
+  title: string
+  message: string
+  link?: string
+}) {
+  const admins = await prisma.user.findMany({
+    where: { role: "ADMIN" },
+    select: { id: true },
+  })
+  await Promise.all(
+    admins.map((a) => createNotification({ userId: a.id, title, message, link }))
+  )
+}
+
 // Durum değişikliğine göre standart bildirim mesajları
 export const STATUS_NOTIFICATION: Record<
   string,

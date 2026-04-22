@@ -18,6 +18,14 @@ export async function PATCH(
     return NextResponse.json({ error: "Yetkisiz." }, { status: 403 })
   }
 
+  const adminUser = await prisma.user.findUnique({
+    where: { email: session.user.email! },
+    select: { id: true },
+  })
+  if (!adminUser) {
+    return NextResponse.json({ error: "Admin kullanıcı bulunamadı." }, { status: 403 })
+  }
+
   const { id } = await params
   const body = await req.json()
   const parsed = patchSchema.safeParse(body)
@@ -44,7 +52,7 @@ export async function PATCH(
     data: {
       action: "USER_UPDATED",
       metadata: { targetUserId: id, ...parsed.data },
-      userId: session.user.id,
+      userId: adminUser.id,
     },
   })
 
@@ -60,9 +68,17 @@ export async function DELETE(
     return NextResponse.json({ error: "Yetkisiz." }, { status: 403 })
   }
 
+  const adminUser = await prisma.user.findUnique({
+    where: { email: session.user.email! },
+    select: { id: true },
+  })
+  if (!adminUser) {
+    return NextResponse.json({ error: "Admin kullanıcı bulunamadı." }, { status: 403 })
+  }
+
   const { id } = await params
 
-  if (id === session.user.id) {
+  if (id === adminUser.id) {
     return NextResponse.json({ error: "Kendi hesabınızı silemezsiniz." }, { status: 400 })
   }
 
@@ -106,12 +122,11 @@ export async function DELETE(
     await tx.user.delete({ where: { id } })
   })
 
-  // Silme işlemini yeni audit log olarak kaydet (session admin'i ile)
   await prisma.auditLog.create({
     data: {
       action: "USER_DELETED",
       metadata: { deletedUserId: id, email: user.email, role: user.role },
-      userId: session.user.id,
+      userId: adminUser.id,
     },
   })
 
