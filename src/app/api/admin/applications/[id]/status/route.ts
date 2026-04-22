@@ -43,6 +43,14 @@ export async function PATCH(
     return NextResponse.json({ error: "Destek kapsamı (scope) zorunludur." }, { status: 400 })
   }
 
+  const adminUser = await prisma.user.findUnique({
+    where: { email: session.user.email! },
+    select: { id: true },
+  })
+  if (!adminUser) {
+    return NextResponse.json({ error: "Admin kullanıcı bulunamadı." }, { status: 403 })
+  }
+
   const application = await prisma.application.findUnique({
     where: { id },
     select: { id: true, status: true, userId: true, title: true },
@@ -78,7 +86,7 @@ export async function PATCH(
           applicationId: id,
           scope,
           notes: notes ?? null,
-          decidedById: session.user.id,
+          decidedById: adminUser.id,
         },
       })
       await tx.project.create({
@@ -95,7 +103,7 @@ export async function PATCH(
       data: {
         action: `STATUS_CHANGED_TO_${newStatus}`,
         metadata: { applicationId: id, title: application.title, scope, notes, presentationDate, supportEndDate },
-        userId: session.user.id,
+        userId: adminUser.id,
       },
     })
 
@@ -105,7 +113,10 @@ export async function PATCH(
   // Başvuru sahibine bildirim
   const notif = STATUS_NOTIFICATION[newStatus]
   if (notif) {
-    await createNotification({ userId: application.userId, title: notif.title, message: notif.message })
+    const applicantLink = newStatus === "SUPPORTED"
+      ? `/dashboard/projects/${id}`
+      : `/dashboard/applications/${id}`
+    await createNotification({ userId: application.userId, title: notif.title, message: notif.message, link: applicantLink })
   }
 
   // EVALUATED → admin bildirimi
@@ -117,6 +128,7 @@ export async function PATCH(
           userId: admin.id,
           title: "Başvuru değerlendirmesi tamamlandı",
           message: `"${application.title}" başvurusu jüri tarafından değerlendirildi. Destek kararı verebilirsiniz.`,
+          link: `/admin/applications/${id}`,
         })
       )
     )

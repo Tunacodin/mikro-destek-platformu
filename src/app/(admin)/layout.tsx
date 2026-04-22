@@ -7,7 +7,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!session || session.user.role !== "ADMIN") redirect("/login")
 
   return (
-    <AdminShell userName={session.user.name ?? session.user.email ?? ""}>
+    <AdminShell userName={session.user.name ?? session.user.email ?? ""} userEmail={session.user.email ?? ""}>
       {children}
     </AdminShell>
   )

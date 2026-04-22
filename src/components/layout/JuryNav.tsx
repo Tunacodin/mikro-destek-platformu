@@ -9,6 +9,7 @@ import { LayoutDashboard, ClipboardList, LogOut, X, PanelLeftClose, PanelLeftOpe
 import { signOut } from "next-auth/react"
 import { NotificationBell } from "@/components/ui/NotificationBell"
 import { JuryProfileModal } from "@/components/jury/JuryProfileModal"
+import { UserProfileModal } from "@/components/ui/UserProfileModal"
 
 const links = [
   { href: "/jury/dashboard",   label: "Panelim",              icon: LayoutDashboard },
@@ -19,17 +20,20 @@ const links = [
 export function JuryNav({
   collapsed = false,
   userName,
+  userEmail,
   onCollapse,
   onClose,
 }: {
   collapsed?: boolean
   userName: string
+  userEmail: string
   onCollapse?: () => void
   onClose?: () => void
 }) {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [accountOpen, setAccountOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   const initials = userName
@@ -136,6 +140,14 @@ export function JuryNav({
                     </button>
                     <div className="h-px bg-[#e8e8e8]" />
                     <button
+                      onClick={() => { setMenuOpen(false); setAccountOpen(true) }}
+                      className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-left text-[13px] text-[#1c1c1c] hover:bg-[#f5f5f5] transition-colors cursor-pointer"
+                    >
+                      <UserCog className="w-4 h-4 text-[#aeaeb2]" />
+                      Hesap Ayarları
+                    </button>
+                    <div className="h-px bg-[#e8e8e8]" />
+                    <button
                       onClick={() => signOut({ callbackUrl: "/login" })}
                       className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-left text-[13px] text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                     >
@@ -153,6 +165,14 @@ export function JuryNav({
 
       {/* Profil düzenleme modal */}
       <JuryProfileModal isOpen={profileOpen} onClose={() => setProfileOpen(false)} />
+
+      {/* Hesap ayarları (ad soyad + şifre) */}
+      <UserProfileModal
+        isOpen={accountOpen}
+        onClose={() => setAccountOpen(false)}
+        userName={userName}
+        userEmail={userEmail}
+      />
     </>
   )
 }

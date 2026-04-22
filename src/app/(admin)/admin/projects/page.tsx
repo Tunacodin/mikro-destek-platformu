@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { AdminProjectList } from "@/components/admin/AdminProjectList"
 
-export const metadata = { title: "Projeler — Mikro Destek Fonu" }
+export const metadata = { title: "Desteklenen Projeler — Mikro Destek Fonu" }
 
 export default async function AdminProjectsPage({
   searchParams,
@@ -44,7 +44,7 @@ export default async function AdminProjectsPage({
     <div className="space-y-6">
       <div className="pb-6 border-b border-[#e8e8e8] flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-[26px] font-bold text-[#1c1c1c] tracking-tight">Projeler</h1>
+          <h1 className="text-[26px] font-bold text-[#1c1c1c] tracking-tight">Desteklenen Projeler</h1>
           <p className="text-[14px] text-[#b0b0b0] mt-1">Desteklenen projelerin takibi ve yönetimi</p>
         </div>
         <div className="flex items-center gap-4 shrink-0 text-[14px] text-[#6e6e73] tabular-nums">

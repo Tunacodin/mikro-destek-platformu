@@ -4,14 +4,34 @@ export async function createNotification({
   userId,
   title,
   message,
+  link,
 }: {
   userId: string
   title: string
   message: string
+  link?: string
 }) {
   return prisma.notification.create({
-    data: { userId, title, message },
+    data: { userId, title, message, link },
   })
+}
+
+export async function notifyAdmins({
+  title,
+  message,
+  link,
+}: {
+  title: string
+  message: string
+  link?: string
+}) {
+  const admins = await prisma.user.findMany({
+    where: { role: "ADMIN" },
+    select: { id: true },
+  })
+  await Promise.all(
+    admins.map((a) => createNotification({ userId: a.id, title, message, link }))
+  )
 }
 
 // Durum değişikliğine göre standart bildirim mesajları

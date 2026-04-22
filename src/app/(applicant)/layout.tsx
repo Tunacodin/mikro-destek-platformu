@@ -7,7 +7,7 @@ export default async function ApplicantLayout({ children }: { children: React.Re
   if (!session || session.user.role !== "APPLICANT") redirect("/login")
 
   return (
-    <ApplicantShell userName={session.user.name ?? session.user.email ?? ""}>
+    <ApplicantShell userName={session.user.name ?? session.user.email ?? ""} userEmail={session.user.email ?? ""}>
       {children}
     </ApplicantShell>
   )

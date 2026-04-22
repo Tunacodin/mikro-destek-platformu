@@ -121,7 +121,37 @@ async function main() {
   console.log("[seed] Dönemler oluşturuldu")
 
   // ══════════════════════════════════════════════════════════════
-  // 3. BAŞVURULAR (5 farklı türde, gerçekçi içerikle)
+  // 3. PROGRAMLAR
+  // ══════════════════════════════════════════════════════════════
+
+  const activeProgram = await prisma.program.upsert({
+    where: { id: "seed-program-active" },
+    update: {},
+    create: {
+      id: "seed-program-active",
+      title: "2025 Teknoloji & Girişimcilik Programı",
+      startDate: new Date(now.getTime() - 30 * DAY),
+      endDate: new Date(now.getTime() + 60 * DAY),
+      status: "ACTIVE",
+    },
+  })
+
+  const closedProgram = await prisma.program.upsert({
+    where: { id: "seed-program-closed" },
+    update: {},
+    create: {
+      id: "seed-program-closed",
+      title: "2024 Sosyal Etki Programı",
+      startDate: new Date(now.getTime() - 150 * DAY),
+      endDate: new Date(now.getTime() - 30 * DAY),
+      status: "CLOSED",
+    },
+  })
+
+  console.log("[seed] Programlar oluşturuldu")
+
+  // ══════════════════════════════════════════════════════════════
+  // 4. BAŞVURULAR (5 farklı türde, gerçekçi içerikle)
   // ══════════════════════════════════════════════════════════════
 
   // ── APP 1: DRAFT — Teknoloji projesi, taslak aşamasında ──
@@ -134,8 +164,10 @@ async function main() {
       status: "DRAFT",
       userId: applicant.id,
       periodId: activePeriod.id,
+      programId: activeProgram.id,
       categories: ["Teknoloji/Girişimcilik"],
       technologyStage: "MVP",
+      teamName: "EcoTrack Ekibi",
       summary: "Bireylerin günlük aktivitelerindeki karbon ayak izini ölçen, alternatif sürdürülebilir seçenekler öneren ve topluluk bazlı ödül sistemiyle davranış değişikliği teşvik eden mobil uygulama.",
       teamInfo: "Elif Kaya — Full-stack Developer & Proje Lideri — elif.kaya@email.com\nAli Yıldız — UI/UX Tasarımcı — ali.yildiz@email.com",
       targetAudience: "18-35 yaş arası çevre bilincine sahip kentli bireyler, üniversite öğrencileri ve kurumsal sürdürülebilirlik hedefleri olan şirket çalışanları.",
@@ -157,6 +189,7 @@ async function main() {
       submittedAt: new Date(now.getTime() - 4 * DAY),
       userId: applicant.id,
       periodId: activePeriod.id,
+      teamName: "Sesli Hafıza Ekibi",
       categories: ["Sanat/Kültürel/İçerik", "Araştırma/Akademik"],
       artStage: "Üretimde",
       researchStage: "Veri Toplama",
@@ -188,6 +221,8 @@ async function main() {
       presentationDate: new Date(now.getTime() + 5 * DAY),
       userId: applicant.id,
       periodId: activePeriod.id,
+      programId: activeProgram.id,
+      teamName: "VeriHarita Ekibi",
       categories: ["Araştırma/Akademik", "Teknoloji/Girişimcilik"],
       researchStage: "Analiz",
       technologyStage: "Doğrulama",
@@ -218,6 +253,8 @@ async function main() {
       submittedAt: new Date(now.getTime() - 30 * DAY),
       userId: applicant.id,
       periodId: closedPeriod.id,
+      programId: closedProgram.id,
+      teamName: "Komşu Mutfağı Ekibi",
       categories: ["Teknoloji/Girişimcilik"],
       technologyStage: "Büyüme",
       summary: "Mahalle sakinlerinin evlerinde artan yemekleri ve son kullanma tarihi yaklaşan gıda ürünlerini komşularıyla paylaşmalarını sağlayan, gamification destekli lokasyon bazlı mobil platform.",
@@ -247,6 +284,8 @@ async function main() {
       submittedAt: new Date(now.getTime() - 80 * DAY),
       userId: applicant.id,
       periodId: closedPeriod.id,
+      programId: closedProgram.id,
+      teamName: "Köprü Ekibi",
       categories: ["Teknoloji/Girişimcilik", "Sanat/Kültürel/İçerik"],
       technologyStage: "MVP",
       artStage: "Üretimde",
@@ -269,7 +308,7 @@ async function main() {
   console.log("[seed] Başvurular oluşturuldu")
 
   // ══════════════════════════════════════════════════════════════
-  // 4. DOSYALAR
+  // 5. DOSYALAR
   // ══════════════════════════════════════════════════════════════
 
   const filesToCreate = [
@@ -307,7 +346,7 @@ async function main() {
   console.log("[seed] Dosyalar oluşturuldu")
 
   // ══════════════════════════════════════════════════════════════
-  // 5. JÜRİ ATAMALARI
+  // 6. JÜRİ ATAMALARI
   // ══════════════════════════════════════════════════════════════
 
   const juryAssignments = [
@@ -328,7 +367,7 @@ async function main() {
   console.log("[seed] Jüri atamaları oluşturuldu")
 
   // ══════════════════════════════════════════════════════════════
-  // 6. DEĞERLENDİRMELER (yeni 7+1 kriter sistemi)
+  // 7. DEĞERLENDİRMELER (7+1 kriter sistemi)
   // ══════════════════════════════════════════════════════════════
 
   // App4 (EVALUATED) — 2 jüri değerlendirmiş
@@ -393,7 +432,7 @@ async function main() {
   console.log("[seed] Değerlendirmeler oluşturuldu")
 
   // ══════════════════════════════════════════════════════════════
-  // 7. DESTEK KARARI + PROJE
+  // 8. DESTEK KARARI + PROJE
   // ══════════════════════════════════════════════════════════════
 
   const decision5 = await prisma.supportDecision.findUnique({ where: { applicationId: app5.id } })
@@ -404,6 +443,11 @@ async function main() {
         decidedById: admin.id,
         scope: "PRIORITY",
         notes: "Erişilebilirlik alanında Türkiye'de öncü bir proje. Toplam 38/40 puanla öncelikli destek kapsamında değerlendirildi. Tam destek paketi ve ekosistem entegrasyonu sağlanacaktır.",
+        strategicReason: "Köprü projesi, Divizyon'un kapsayıcı teknoloji ve sosyal etki alanındaki stratejik vizyonuyla tam uyum içindedir. Türkiye'de engelli erişilebilirliği alanında öncü bir dijital altyapı oluşturması, uluslararası görünürlük ve kurumsal itibar açısından yüksek değer taşımaktadır.",
+        expectedOutputs: "• 5.000+ mekan erişilebilirlik verisi (İstanbul pilot)\n• iOS ve Android uygulaması yayını\n• En az 3 belediye ile resmi işbirliği protokolü\n• 2.000+ aktif kullanıcı\n• 1 uluslararası erişilebilirlik konferansında sunum\n• App Store erişilebilirlik kategorisinde öne çıkarılma",
+        supportDuration: "6 ay",
+        additionalConditions: "Proje ekibinin aylık ilerleme raporu sunması zorunludur. Açık kaynak yayınlanma taahhüdü proje bitimiyle yerine getirilmelidir. Belediye işbirlikleri için imzalanan protokoller Divizyon'a iletilmelidir.",
+        riskFramework: "Veri kalitesi ve crowdsource katkı yoğunluğu konusunda risk mevcuttur. Ekip, gönüllü ağını büyütmekle yükümlüdür. Yasal sorumluluk: kullanıcı tarafından eklenen erişilebilirlik bilgilerinin doğruluğu konusunda sorumluluk reddi beyanı uygulama içinde yer almalıdır.",
       },
     })
     await prisma.project.create({
@@ -411,14 +455,13 @@ async function main() {
         applicationId: app5.id,
         decisionId: dec.id,
         status: "ACTIVE",
-        supportEndDate: new Date(now.getTime() + 90 * DAY),
       },
     })
     console.log("[seed] Destek kararı ve proje oluşturuldu (Köprü)")
   }
 
   // ══════════════════════════════════════════════════════════════
-  // 8. PROJE İLERLEME RAPORLARI
+  // 9. PROJE İLERLEME RAPORLARI
   // ══════════════════════════════════════════════════════════════
 
   const project5 = await prisma.project.findUnique({ where: { applicationId: app5.id } })
@@ -444,7 +487,7 @@ async function main() {
   }
 
   // ══════════════════════════════════════════════════════════════
-  // 9. BİLDİRİMLER
+  // 10. BİLDİRİMLER
   // ══════════════════════════════════════════════════════════════
 
   const notifCount = await prisma.notification.count()

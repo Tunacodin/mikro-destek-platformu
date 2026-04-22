@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
+import { notifyAdmins } from "@/lib/notifications"
 
 const reportSchema = z.object({
   content: z.string().min(10, "Not içeriği en az 10 karakter olmalıdır."),
@@ -101,6 +102,11 @@ export async function POST(
     }
     const report = await prisma.projectReport.create({
       data: { projectId: project.id, content: parsed.data.content, juryId: null },
+    })
+    await notifyAdmins({
+      title: "Proje ilerleme raporu gönderildi",
+      message: `Başvuru sahibi yeni bir ilerleme raporu paylaştı.`,
+      link: `/admin/applications/${applicationId}`,
     })
     return NextResponse.json(report, { status: 201 })
   }

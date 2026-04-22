@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
+import { notifyAdmins } from "@/lib/notifications"
 
 // DRAFT → SUBMITTED
 export async function POST(
@@ -61,7 +62,6 @@ export async function POST(
     data: { status: "SUBMITTED", submittedAt: new Date() },
   })
 
-  // Protokol onayını audit log'a kaydet (İş Kuralı #2)
   await prisma.auditLog.create({
     data: {
       action: "PROTOCOL_ACCEPTED",
@@ -73,6 +73,12 @@ export async function POST(
       },
       userId: session.user.id,
     },
+  })
+
+  await notifyAdmins({
+    title: "Yeni başvuru gönderildi",
+    message: `"${application.title}" başvurusu incelemenizi bekliyor.`,
+    link: `/admin/applications/${id}`,
   })
 
   return NextResponse.json(updated)

@@ -154,6 +154,7 @@ model Application {
   teamInfo       String?  @db.Text
   summary        String?  @db.Text  // 30 saniyelik pitch (max 1500 karakter)
   targetAudience String?  @db.Text
+  projectFields  String[]            // max 2: detaylı faaliyet alanları (9 seçenek)
   categories     String[]            // max 2: Teknoloji/Girişimcilik | Sanat/Kültürel/İçerik | Araştırma/Akademik
   technologyStage String?
   artStage        String?
@@ -341,6 +342,7 @@ model Notification {
   id        String   @id @default(cuid())
   title     String
   message   String
+  link      String?
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 

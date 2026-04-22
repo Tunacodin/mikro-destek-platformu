@@ -78,6 +78,7 @@ export function AdminApplicationList({
   const [movingId, setMovingId] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<App | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
   const pendingRef = useRef(false)
 
   function setFilter(key: string, value: string | undefined) {
@@ -92,10 +93,18 @@ export function AdminApplicationList({
     if (!deleteTarget || pendingRef.current) return
     pendingRef.current = true
     setDeletingId(deleteTarget.id)
+    setDeleteError(null)
     try {
-      await fetch(`/api/admin/applications/${deleteTarget.id}`, { method: "DELETE" })
+      const res = await fetch(`/api/admin/applications/${deleteTarget.id}`, { method: "DELETE" })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setDeleteError(data.error ?? `Silme başarısız (${res.status})`)
+        return
+      }
       setDeleteTarget(null)
       router.refresh()
+    } catch {
+      setDeleteError("Ağ hatası, lütfen tekrar deneyin.")
     } finally {
       pendingRef.current = false
       setDeletingId(null)
@@ -155,6 +164,11 @@ export function AdminApplicationList({
             <p className="text-[12px] text-[#6e6e73] leading-relaxed">
               Bu başvuru ve ilişkili tüm veriler (değerlendirmeler, jüri atamaları, dosyalar, proje) kalıcı olarak silinecektir.
             </p>
+            {deleteError && (
+              <div className="px-3 py-2 bg-red-50 border border-red-100 rounded-xl">
+                <p className="text-[12px] text-red-600">{deleteError}</p>
+              </div>
+            )}
             <div className="flex items-center gap-2 pt-1">
               <button
                 onClick={() => setDeleteTarget(null)}
@@ -316,7 +330,7 @@ export function AdminApplicationList({
                         </button>
                       )}
                       <button
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDeleteTarget(app) }}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDeleteTarget(app); setDeleteError(null) }}
                         className="px-3 py-1.5 text-[11px] font-semibold text-red-500 border border-red-200 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                       >
                         Sil
@@ -356,7 +370,7 @@ export function AdminApplicationList({
                 {/* Sil — desktop */}
                 <div className="hidden sm:flex items-center justify-center">
                   <button
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDeleteTarget(app) }}
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDeleteTarget(app); setDeleteError(null) }}
                     className="w-7 h-7 rounded-lg flex items-center justify-center text-[#d1d1d6] hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
                     title="Sil"
                   >

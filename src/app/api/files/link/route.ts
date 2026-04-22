@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
+import { notifyAdmins } from "@/lib/notifications"
 
 export async function POST(req: NextRequest) {
   const session = await auth()
@@ -97,6 +98,34 @@ export async function POST(req: NextRequest) {
       ...(projectId ? { projectId } : {}),
     },
   })
+
+  if (session.user.role === "APPLICANT") {
+    if (applicationId) {
+      const app = await prisma.application.findUnique({
+        where: { id: applicationId },
+        select: { title: true },
+      })
+      if (app) {
+        await notifyAdmins({
+          title: "Başvuruya link eklendi",
+          message: `"${app.title}" başvurusuna yeni bir link eklendi: ${name}`,
+          link: `/admin/applications/${applicationId}`,
+        })
+      }
+    } else if (projectId) {
+      const project = await prisma.project.findUnique({
+        where: { id: projectId },
+        select: { application: { select: { id: true, title: true } } },
+      })
+      if (project) {
+        await notifyAdmins({
+          title: "Projeye link eklendi",
+          message: `"${project.application.title}" projesine yeni bir link eklendi: ${name}`,
+          link: `/admin/applications/${project.application.id}`,
+        })
+      }
+    }
+  }
 
   return NextResponse.json({
     id: dbFile.id,

@@ -7,9 +7,11 @@ import { AdminSidebar } from "./AdminSidebar"
 export function AdminShell({
   children,
   userName,
+  userEmail,
 }: {
   children: React.ReactNode
   userName: string
+  userEmail: string
 }) {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -29,6 +31,7 @@ export function AdminShell({
         <AdminSidebar
           collapsed={collapsed}
           userName={userName}
+          userEmail={userEmail}
         />
       </div>
 
@@ -41,6 +44,7 @@ export function AdminShell({
         <AdminSidebar
           collapsed={false}
           userName={userName}
+          userEmail={userEmail}
           onClose={() => setMobileOpen(false)}
         />
       </div>

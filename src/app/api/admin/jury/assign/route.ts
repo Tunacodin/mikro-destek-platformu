@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
+import { createNotification } from "@/lib/notifications"
 
 const schema = z.object({
   applicationId: z.string().min(1),
@@ -51,6 +52,13 @@ export async function POST(req: NextRequest) {
   const assignment = await prisma.juryAssignment.create({
     data: { juryId, applicationId },
     include: { jury: { select: { name: true, email: true } } },
+  })
+
+  await createNotification({
+    userId: juryId,
+    title: "Yeni başvuru değerlendirmeniz bekleniyor",
+    message: `"${application.title}" başvurusu değerlendirmenize atandı.`,
+    link: `/jury/applications/${applicationId}`,
   })
 
   return NextResponse.json(assignment, { status: 201 })

@@ -25,6 +25,14 @@ export async function POST(req: NextRequest) {
 
   const { name, email, password, role } = parsed.data
 
+  const adminUser = await prisma.user.findUnique({
+    where: { email: session.user.email! },
+    select: { id: true },
+  })
+  if (!adminUser) {
+    return NextResponse.json({ error: "Admin kullanıcı bulunamadı." }, { status: 403 })
+  }
+
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) {
     return NextResponse.json({ error: "Bu e-posta adresi zaten kullanımda." }, { status: 409 })
@@ -47,7 +55,7 @@ export async function POST(req: NextRequest) {
     data: {
       action: "USER_CREATED",
       metadata: { userId: user.id, email, role },
-      userId: session.user.id,
+      userId: adminUser.id,
     },
   })
 

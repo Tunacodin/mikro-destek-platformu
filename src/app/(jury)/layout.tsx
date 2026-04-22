@@ -7,7 +7,7 @@ export default async function JuryLayout({ children }: { children: React.ReactNo
   if (!session || session.user.role !== "JURY") redirect("/login")
 
   return (
-    <JuryShell userName={session.user.name ?? session.user.email ?? ""}>
+    <JuryShell userName={session.user.name ?? session.user.email ?? ""} userEmail={session.user.email ?? ""}>
       {children}
     </JuryShell>
   )
