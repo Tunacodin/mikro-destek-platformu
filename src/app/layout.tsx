@@ -13,8 +13,9 @@ export const metadata: Metadata = {
   title: "Mikro Destek Fonu",
   description: "Divizyon mikro destek programı yönetim platformu",
   icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.png",
+    icon: "/divizyon-logo.png",
+    shortcut: "/divizyon-logo.png",
+    apple: "/divizyon-logo.png",
   },
 }
 
