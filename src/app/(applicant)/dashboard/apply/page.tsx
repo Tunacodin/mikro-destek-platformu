@@ -9,13 +9,14 @@ export default async function ApplyPage() {
   const session = await auth()
   if (!session || session.user.role !== "APPLICANT") redirect("/login")
 
+  const now = new Date()
   const [activePeriods, activePrograms, user] = await Promise.all([
     prisma.applicationPeriod.findMany({
-      where: { status: "ACTIVE" },
+      where: { status: "ACTIVE", endDate: { gte: now } },
       orderBy: { endDate: "asc" },
     }),
     prisma.program.findMany({
-      where: { status: "ACTIVE" },
+      where: { status: "ACTIVE", endDate: { gte: now } },
       orderBy: { endDate: "asc" },
     }),
     prisma.user.findUnique({

@@ -31,12 +31,23 @@ export async function POST(
     return NextResponse.json({ error: "Başvuru zaten gönderilmiş." }, { status: 400 })
   }
 
-  // Dönem veya program aktif olmalı
-  if (application.period && application.period.status !== "ACTIVE") {
-    return NextResponse.json({ error: "Dönem aktif değil." }, { status: 400 })
+  // Dönem veya program aktif olmalı ve süresi dolmamış olmalı
+  const now = new Date()
+  if (application.period) {
+    if (application.period.status !== "ACTIVE") {
+      return NextResponse.json({ error: "Dönem aktif değil." }, { status: 400 })
+    }
+    if (application.period.endDate < now) {
+      return NextResponse.json({ error: "Dönemin başvuru süresi dolmuş." }, { status: 400 })
+    }
   }
-  if (application.program && application.program.status !== "ACTIVE") {
-    return NextResponse.json({ error: "Program aktif değil." }, { status: 400 })
+  if (application.program) {
+    if (application.program.status !== "ACTIVE") {
+      return NextResponse.json({ error: "Program aktif değil." }, { status: 400 })
+    }
+    if (application.program.endDate < now) {
+      return NextResponse.json({ error: "Programın başvuru süresi dolmuş." }, { status: 400 })
+    }
   }
 
   if (application.files.length === 0) {

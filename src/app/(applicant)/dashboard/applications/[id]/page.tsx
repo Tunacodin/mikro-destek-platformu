@@ -94,9 +94,10 @@ export default async function ApplicationDetailPage({
   let activePeriods:  { id: string; title: string; endDate: Date }[] = []
   let activePrograms: { id: string; title: string; endDate: Date }[] = []
   if (isDraft) {
+    const today = new Date()
     ;[activePeriods, activePrograms] = await Promise.all([
-      prisma.applicationPeriod.findMany({ where: { status: "ACTIVE" }, orderBy: { endDate: "asc" } }),
-      prisma.program.findMany({ where: { status: "ACTIVE" }, orderBy: { endDate: "asc" } }),
+      prisma.applicationPeriod.findMany({ where: { status: "ACTIVE", endDate: { gte: today } }, orderBy: { endDate: "asc" } }),
+      prisma.program.findMany({ where: { status: "ACTIVE", endDate: { gte: today } }, orderBy: { endDate: "asc" } }),
     ])
   }
 

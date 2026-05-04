@@ -64,7 +64,7 @@ export default async function ApplicantDashboardPage() {
       orderBy: { createdAt: "desc" },
     }),
     prisma.applicationPeriod.findFirst({
-      where: { status: "ACTIVE" },
+      where: { status: "ACTIVE", endDate: { gte: new Date() } },
       orderBy: { endDate: "asc" },
     }),
     prisma.project.count({

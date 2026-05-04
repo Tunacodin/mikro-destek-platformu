@@ -25,16 +25,26 @@ export function ProjectFileUpload({ projectId }: { projectId: string }) {
     setUploading(true)
 
     const newFiles: UploadedFile[] = [...staged]
+    const MAX_SIZE = 25 * 1024 * 1024
 
     for (const file of Array.from(selected)) {
+      if (file.size > MAX_SIZE) {
+        setError(`${file.name} 25 MB sınırını aşıyor.`)
+        continue
+      }
+      if (file.size === 0) {
+        setError(`${file.name} boş görünüyor, lütfen kontrol edin.`)
+        continue
+      }
+
       const form = new FormData()
       form.append("file", file)
       form.append("projectId", projectId)
 
       try {
         const res = await fetch("/api/upload", { method: "POST", body: form })
-        const data = await res.json()
-        if (!res.ok) { setError(data.error ?? `${file.name} yüklenemedi.`); continue }
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) { setError(data.error ?? `${file.name} yüklenemedi (${res.status}).`); continue }
         newFiles.push({ id: data.id, name: data.name, size: data.size })
       } catch {
         setError(`${file.name} yüklenirken hata oluştu.`)
@@ -61,10 +71,10 @@ export function ProjectFileUpload({ projectId }: { projectId: string }) {
         <p className="text-[12px] font-semibold text-[#6e6e73] mt-2">
           {uploading ? "Yükleniyor…" : "Tıklayın veya dosya sürükleyin"}
         </p>
-        <p className="text-[11px] text-[#aeaeb2] mt-0.5">PDF, Word, Excel, Görsel · maks. 10 MB</p>
+        <p className="text-[11px] text-[#aeaeb2] mt-0.5">PDF, Word, Excel, Görsel · maks. 25 MB</p>
         <input
           ref={inputRef} type="file" multiple className="hidden"
-          accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+          accept="application/pdf,.pdf,application/msword,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx,application/vnd.ms-excel,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsx,image/png,.png,image/jpeg,.jpg,.jpeg"
           onChange={(e) => handleFiles(e.target.files)}
         />
       </div>

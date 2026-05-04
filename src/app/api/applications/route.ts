@@ -51,11 +51,15 @@ export async function POST(req: NextRequest) {
 
   const { periodId, programId, ...rest } = parsed.data
 
-  // Dönem veya Program aktif mi?
+  // Dönem veya Program aktif mi ve süresi dolmamış mı?
+  const now = new Date()
   if (periodId) {
     const period = await prisma.applicationPeriod.findUnique({ where: { id: periodId } })
     if (!period || period.status !== "ACTIVE") {
       return NextResponse.json({ error: "Dönem aktif değil." }, { status: 400 })
+    }
+    if (period.endDate < now) {
+      return NextResponse.json({ error: "Dönemin başvuru süresi dolmuş." }, { status: 400 })
     }
   }
 
@@ -63,6 +67,9 @@ export async function POST(req: NextRequest) {
     const program = await prisma.program.findUnique({ where: { id: programId } })
     if (!program || program.status !== "ACTIVE") {
       return NextResponse.json({ error: "Program aktif değil." }, { status: 400 })
+    }
+    if (program.endDate < now) {
+      return NextResponse.json({ error: "Programın başvuru süresi dolmuş." }, { status: 400 })
     }
   }
 

@@ -5,19 +5,42 @@ import { uploadFile, BUCKETS } from "@/lib/minio"
 import { randomUUID } from "crypto"
 import { notifyAdmins } from "@/lib/notifications"
 
-const MAX_SIZE_MB = 10
+const MAX_SIZE_MB = 25
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024
 
-const ALLOWED_TYPES = [
+// Bazı tarayıcı/işletim sistemleri PDF için "application/x-pdf", "application/octet-stream"
+// veya boş mimeType döndürebiliyor. MIME katı yerine MIME + uzantı kombinasyonuyla doğruluyoruz.
+const ALLOWED_MIME = new Set([
   "application/pdf",
+  "application/x-pdf",
+  "application/acrobat",
+  "application/vnd.pdf",
+  "text/pdf",
   "image/png",
   "image/jpeg",
   "image/jpg",
+  "image/pjpeg",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "application/msword",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   "application/vnd.ms-excel",
-]
+])
+
+const ALLOWED_EXT = new Set([
+  "pdf", "doc", "docx", "xls", "xlsx", "png", "jpg", "jpeg",
+])
+
+function getExt(name: string): string {
+  const i = name.lastIndexOf(".")
+  return i >= 0 ? name.slice(i + 1).toLowerCase() : ""
+}
+
+function isAllowed(file: File): boolean {
+  const ext = getExt(file.name)
+  if (ALLOWED_EXT.has(ext)) return true
+  const mime = (file.type || "").toLowerCase()
+  return ALLOWED_MIME.has(mime)
+}
 
 export async function POST(req: NextRequest) {
   const session = await auth()
@@ -42,8 +65,8 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Tip kontrolü
-  if (!ALLOWED_TYPES.includes(file.type)) {
+  // Tip kontrolü (MIME ya da uzantı eşleşmesi yeterli)
+  if (!isAllowed(file)) {
     return NextResponse.json(
       { error: "Desteklenmeyen dosya türü. PDF, Word, Excel veya resim yükleyin." },
       { status: 400 }
@@ -84,12 +107,33 @@ export async function POST(req: NextRequest) {
   const bytes = await file.arrayBuffer()
   const buffer = Buffer.from(bytes)
 
-  const ext = file.name.split(".").pop() ?? "bin"
+  const ext = getExt(file.name) || "bin"
   const folder = projectId ? `projects/${projectId}` : (applicationId ?? "general")
   const key = `${folder}/${randomUUID()}.${ext}`
   const bucket = projectId ? BUCKETS.projects : BUCKETS.applications
 
-  await uploadFile({ bucket, key, buffer, mimeType: file.type, size: file.size })
+  // file.type bazı tarayıcılarda boş gelebiliyor — uzantıdan tahmin et
+  const EXT_MIME: Record<string, string> = {
+    pdf:  "application/pdf",
+    doc:  "application/msword",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    xls:  "application/vnd.ms-excel",
+    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    png:  "image/png",
+    jpg:  "image/jpeg",
+    jpeg: "image/jpeg",
+  }
+  const resolvedMime = file.type || EXT_MIME[ext] || "application/octet-stream"
+
+  try {
+    await uploadFile({ bucket, key, buffer, mimeType: resolvedMime, size: file.size })
+  } catch (err) {
+    console.error("MinIO upload failed:", err)
+    return NextResponse.json(
+      { error: "Dosya depolama servisine yüklenemedi. Lütfen tekrar deneyin." },
+      { status: 502 }
+    )
+  }
 
   // DB'ye kaydet
   const dbFile = await prisma.file.create({
@@ -97,7 +141,7 @@ export async function POST(req: NextRequest) {
       name: file.name,
       url: `/${bucket}/${key}`,
       size: file.size,
-      mimeType: file.type,
+      mimeType: resolvedMime,
       bucket,
       key,
       ...(applicationId ? { applicationId } : {}),

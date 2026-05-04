@@ -30,18 +30,28 @@ export function FileUploader({
     setUploading(true)
 
     const newFiles: UploadedFile[] = [...files]
+    const MAX_SIZE = 25 * 1024 * 1024
 
     for (const file of Array.from(selected)) {
+      if (file.size > MAX_SIZE) {
+        setError(`${file.name} 25 MB sınırını aşıyor.`)
+        continue
+      }
+      if (file.size === 0) {
+        setError(`${file.name} boş görünüyor, lütfen kontrol edin.`)
+        continue
+      }
+
       const form = new FormData()
       form.append("file", file)
       form.append("applicationId", applicationId)
 
       try {
         const res = await fetch("/api/upload", { method: "POST", body: form })
-        const data = await res.json()
+        const data = await res.json().catch(() => ({}))
 
         if (!res.ok) {
-          setError(data.error ?? `${file.name} yuklenemedi.`)
+          setError(data.error ?? `${file.name} yüklenemedi (${res.status}).`)
           continue
         }
 
@@ -132,10 +142,10 @@ export function FileUploader({
         <p className="text-[13px] font-semibold text-[#6e6e73] mt-2.5">
           {uploading ? "Yukleniyor..." : "Tiklayın veya surukleyin"}
         </p>
-        <p className="text-[11px] text-[#aeaeb2] mt-0.5">PDF, Word, Excel - maks. 10 MB</p>
+        <p className="text-[11px] text-[#aeaeb2] mt-0.5">PDF, Word, Excel · maks. 25 MB</p>
         <input
           ref={inputRef} type="file" multiple className="hidden"
-          accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+          accept="application/pdf,.pdf,application/msword,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx,application/vnd.ms-excel,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsx,image/png,.png,image/jpeg,.jpg,.jpeg"
           onChange={(e) => handleFiles(e.target.files)}
         />
       </div>
