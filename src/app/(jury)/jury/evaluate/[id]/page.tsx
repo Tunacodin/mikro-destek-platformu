@@ -28,7 +28,7 @@ export default async function JuryEvaluatePage({
       period:  { select: { title: true, endDate: true } },
       program: { select: { title: true, endDate: true } },
       files: {
-        select: { id: true, name: true, size: true, mimeType: true },
+        select: { id: true, name: true, size: true, mimeType: true, type: true, url: true },
         orderBy: { createdAt: "asc" },
       },
       evaluations: { where: { juryId }, include: { scores: true }, take: 1 },

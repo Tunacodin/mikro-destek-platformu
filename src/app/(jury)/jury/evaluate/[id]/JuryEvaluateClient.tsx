@@ -36,7 +36,7 @@ type AppData = {
   supportNotes: Record<string, string> | null
 }
 
-type FileItem = { id: string; name: string; size: number; mimeType: string }
+type FileItem = { id: string; name: string; size: number; mimeType: string; type?: string | null; url?: string | null }
 
 type ExistingEvaluation = {
   id: string

@@ -7,12 +7,14 @@ type UploadedFile = { id: string; name: string; size: number; mimeType: string; 
 
 export function FileUploader({
   applicationId,
+  initialFiles,
   onFilesChange,
 }: {
   applicationId: string
+  initialFiles?: UploadedFile[]
   onFilesChange: (files: UploadedFile[]) => void
 }) {
-  const [files, setFiles] = useState<UploadedFile[]>([])
+  const [files, setFiles] = useState<UploadedFile[]>(initialFiles ?? [])
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
@@ -90,10 +92,20 @@ export function FileUploader({
     setAddingLink(false)
   }
 
-  function removeFile(id: string) {
+  async function removeFile(id: string) {
+    const target = files.find((f) => f.id === id)
     const updated = files.filter((f) => f.id !== id)
     setFiles(updated)
     onFilesChange(updated)
+    // Sunucudan da sil — yoksa "kaybolmuş gibi görünüp" tekrar yüklenmesini engelle
+    try {
+      await fetch(`/api/files/${id}`, { method: "DELETE" })
+    } catch {
+      // Geri al
+      setFiles((prev) => (target ? [...prev, target] : prev))
+      onFilesChange(target ? [...updated, target] : updated)
+      setError("Dosya silinirken bir hata oluştu.")
+    }
   }
 
   function formatSize(bytes: number) {

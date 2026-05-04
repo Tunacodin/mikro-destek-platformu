@@ -55,7 +55,7 @@ export default async function ApplicationDetailPage({
         period:  { select: { id: true, title: true, endDate: true, status: true } },
         program: { select: { id: true, title: true, endDate: true, status: true } },
         files: {
-          select: { id: true, name: true, size: true, mimeType: true },
+          select: { id: true, name: true, size: true, mimeType: true, type: true, url: true },
           orderBy: { createdAt: "asc" },
         },
         juryAssignments: { select: { id: true } },
@@ -78,11 +78,10 @@ export default async function ApplicationDetailPage({
 
   const now = Date.now()
   const periodOrProgram = application.period ?? application.program
-  const hoursLeft = periodOrProgram ? (periodOrProgram.endDate.getTime() - now) / 3_600_000 : Infinity
   const presentationHoursLeft = application.presentationDate
     ? (application.presentationDate.getTime() - now) / 3_600_000
     : Infinity
-  const isLocked = hoursLeft < 48 || presentationHoursLeft < 48
+  const isLocked = presentationHoursLeft < 48
   const isDraft = application.status === "DRAFT"
   const canEditByGrant = application.editGranted && !isLocked
   // Jüri sunum tarihi belirlenmişse ve 48 saatten fazla varsa otomatik düzenleme yetkisi
@@ -155,9 +154,7 @@ export default async function ApplicationDetailPage({
             <div>
               <p className="text-[13px] font-semibold text-red-600">Düzenleme yetkisi kapalı</p>
               <p className="text-[12px] text-red-500 mt-0.5">
-                {presentationHoursLeft < 48
-                  ? "Jüri sunumuna 48 saatten az kaldığı için düzenleme kapatıldı."
-                  : "Dönem bitimine 48 saatten az kaldı."}
+                Jüri sunumuna 48 saatten az kaldığı için düzenleme kapatıldı.
               </p>
             </div>
           </div>

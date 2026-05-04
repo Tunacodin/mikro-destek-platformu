@@ -90,7 +90,7 @@ export default async function AdminApplicationDetailPage({
         },
         period:  { select: { title: true, endDate: true } },
         program: { select: { title: true, endDate: true } },
-        files: { select: { id: true, name: true, size: true, mimeType: true } },
+        files: { select: { id: true, name: true, size: true, mimeType: true, type: true, url: true } },
         juryAssignments: { include: { jury: { select: { id: true, name: true, email: true } } } },
         evaluations: { include: { scores: true, jury: { select: { id: true, name: true, email: true } } } },
         project: { select: { supportEndDate: true, status: true } },

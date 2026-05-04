@@ -47,11 +47,11 @@ export default async function AdminProjectDetailPage({
           user:    { select: { id: true, name: true, email: true } },
           period:  { select: { title: true } },
           program: { select: { title: true } },
-          files:   { select: { id: true, name: true, size: true }, orderBy: { createdAt: "asc" } },
+          files:   { select: { id: true, name: true, size: true, type: true, url: true }, orderBy: { createdAt: "asc" } },
         },
       },
       decision: { select: { scope: true, notes: true, decidedAt: true, decidedBy: { select: { name: true, email: true } } } },
-      files:    { select: { id: true, name: true, size: true, mimeType: true, createdAt: true }, orderBy: { createdAt: "desc" } },
+      files:    { select: { id: true, name: true, size: true, mimeType: true, type: true, url: true, createdAt: true }, orderBy: { createdAt: "desc" } },
       reports:  { orderBy: { createdAt: "desc" } },
     },
   })
@@ -200,23 +200,35 @@ export default async function AdminProjectDetailPage({
               </div>
             ) : (
               <ul className="divide-y divide-black/[0.04]">
-                {project.files.map((f) => (
+                {project.files.map((f) => {
+                  const isLink = f.type === "LINK"
+                  const href = isLink && f.url ? f.url : `/api/files/${f.id}`
+                  return (
                   <li key={f.id} className="flex items-center gap-3 px-5 sm:px-6 py-3.5 hover:bg-[#f4f4f4] transition-colors">
                     <div className="w-8 h-8 rounded-lg bg-[#f5f5f5] border border-black/[0.05] flex items-center justify-center shrink-0">
-                      <FileText className="w-3.5 h-3.5 text-[#aeaeb2]" />
+                      {isLink ? (
+                        <ExternalLink className="w-3.5 h-3.5 text-[#6e6e73]" />
+                      ) : (
+                        <FileText className="w-3.5 h-3.5 text-[#aeaeb2]" />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] font-medium text-[#1c1c1c] truncate">{f.name}</p>
-                      <p className="text-[11px] text-[#aeaeb2]">{formatSize(f.size)} · {fmt(f.createdAt)}</p>
+                      <p className="text-[11px] text-[#aeaeb2]">{isLink ? "Harici link" : formatSize(f.size)} · {fmt(f.createdAt)}</p>
                     </div>
                     <a
-                      href={`/api/files/${f.id}`} target="_blank" rel="noreferrer"
+                      href={href} target="_blank" rel="noreferrer"
                       className="ml-2 shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium text-[#6e6e73] hover:text-[#1c1c1c] hover:bg-[#f0f0f0] rounded-lg transition-colors cursor-pointer"
                     >
-                      <Download className="w-3.5 h-3.5" /> İndir
+                      {isLink ? (
+                        <><ExternalLink className="w-3.5 h-3.5" /> Aç</>
+                      ) : (
+                        <><Download className="w-3.5 h-3.5" /> İndir</>
+                      )}
                     </a>
                   </li>
-                ))}
+                  )
+                })}
               </ul>
             )}
           </div>
@@ -234,22 +246,30 @@ export default async function AdminProjectDetailPage({
                 <span className="text-[11px] text-[#aeaeb2] hidden group-open:block">Gizle</span>
               </summary>
               <ul className="divide-y divide-black/[0.04] border-t border-black/[0.04]">
-                {project.application.files.map((f) => (
+                {project.application.files.map((f) => {
+                  const isLink = f.type === "LINK"
+                  const href = isLink && f.url ? f.url : `/api/files/${f.id}`
+                  return (
                   <li key={f.id} className="px-5 sm:px-6 py-3 space-y-2 hover:bg-[#f4f4f4] transition-colors">
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2 min-w-0">
-                        <FileText className="w-3.5 h-3.5 text-[#aeaeb2] shrink-0" />
+                        {isLink ? (
+                          <ExternalLink className="w-3.5 h-3.5 text-[#6e6e73] shrink-0" />
+                        ) : (
+                          <FileText className="w-3.5 h-3.5 text-[#aeaeb2] shrink-0" />
+                        )}
                         <span className="text-[13px] text-[#1c1c1c] truncate">{f.name}</span>
-                        <span className="text-[11px] text-[#aeaeb2] shrink-0">{formatSize(f.size)}</span>
+                        <span className="text-[11px] text-[#aeaeb2] shrink-0">{isLink ? "Harici link" : formatSize(f.size)}</span>
                       </div>
-                      <a href={`/api/files/${f.id}`} target="_blank" rel="noreferrer"
+                      <a href={href} target="_blank" rel="noreferrer"
                         className="ml-3 shrink-0 text-[12px] font-medium text-[#6e6e73] hover:text-[#1c1c1c] transition-colors cursor-pointer">
-                        İndir
+                        {isLink ? "Aç" : "İndir"}
                       </a>
                     </div>
                     <FileNotePanel fileId={f.id} canEvaluate={false} showAuthor />
                   </li>
-                ))}
+                  )
+                })}
               </ul>
             </details>
           )}

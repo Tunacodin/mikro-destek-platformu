@@ -41,23 +41,21 @@ export async function POST(req: NextRequest) {
   const body = await req.json()
   const parsed = createSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 })
+    const first = parsed.error.errors[0]
+    const fieldPath = first.path.join(".")
+    return NextResponse.json(
+      { error: fieldPath ? `${fieldPath}: ${first.message}` : first.message },
+      { status: 400 }
+    )
   }
 
   const { periodId, programId, ...rest } = parsed.data
 
-  // Dönem veya Program aktif mi? + 48 saat kuralı (yalnızca dönem için)
+  // Dönem veya Program aktif mi?
   if (periodId) {
     const period = await prisma.applicationPeriod.findUnique({ where: { id: periodId } })
     if (!period || period.status !== "ACTIVE") {
       return NextResponse.json({ error: "Dönem aktif değil." }, { status: 400 })
-    }
-    const hoursLeft = (period.endDate.getTime() - Date.now()) / 3_600_000
-    if (hoursLeft < 48) {
-      return NextResponse.json(
-        { error: "Dönem bitimine 48 saatten az kaldığı için yeni başvuru alınamaz." },
-        { status: 400 }
-      )
     }
   }
 

@@ -23,7 +23,7 @@ type UserProfile = {
   twitterUrl:         string | null
 }
 
-type UploadedFile = { id: string; name: string; size: number; mimeType: string }
+type UploadedFile = { id: string; name: string; size: number; mimeType: string; type?: string; url?: string }
 
 const STEPS = [
   { label: "Kişisel Bilgiler",  short: "Kişisel"   },
@@ -244,6 +244,20 @@ export function ApplicationForm({
 
   // ── Yardımcılar ────────────────────────────────────────────────────────────
 
+  async function readErrorMessage(res: Response): Promise<string> {
+    try {
+      const data = await res.json()
+      if (data && typeof data.error === "string" && data.error.trim()) return data.error
+    } catch {
+      // JSON değilse text olarak dene
+      try {
+        const txt = await res.clone().text()
+        if (txt && txt.length < 300) return `Sunucu hatası (${res.status}): ${txt}`
+      } catch { /* ignore */ }
+    }
+    return `İşlem başarısız (HTTP ${res.status}).`
+  }
+
   function toggleProjectField(field: string) {
     setProjectFields((prev) =>
       prev.includes(field) ? prev.filter((f) => f !== field) : prev.length < 2 ? [...prev, field] : prev
@@ -293,7 +307,7 @@ export function ApplicationForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, phone, educationStatus, department, address, communityProfileUrl, linkedinUrl, twitterUrl }),
       })
-      if (!profileRes.ok) { const d = await profileRes.json(); setError(d.error ?? "Profil kaydedilemedi."); return }
+      if (!profileRes.ok) { setError(await readErrorMessage(profileRes)); return }
 
       // 2. Minimum gerekli alanlar (title + periodId) varsa başvuruyu oluştur/güncelle
       if (!title.trim()) {
@@ -318,8 +332,8 @@ export function ApplicationForm({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(appFields),
         })
+        if (!res.ok) { setError(await readErrorMessage(res)); return }
         const data = await res.json()
-        if (!res.ok) { setError(data.error ?? "Hata."); return }
         setApplicationId(data.id)
       } else {
         const res = await fetch(`/api/applications/${applicationId}`, {
@@ -327,11 +341,14 @@ export function ApplicationForm({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(appFields),
         })
-        if (!res.ok) { const d = await res.json(); setError(d.error ?? "Hata."); return }
+        if (!res.ok) { setError(await readErrorMessage(res)); return }
       }
 
       router.push("/dashboard/applications")
-    } catch { setError("Beklenmedik hata.") }
+    } catch (err) {
+      console.error("saveDraft error:", err)
+      setError(err instanceof Error ? `Beklenmedik hata: ${err.message}` : "Beklenmedik hata.")
+    }
     finally { setSavingDraft(false) }
   }
 
@@ -391,11 +408,12 @@ export function ApplicationForm({
       setLoading(true)
       try {
         // Profil kaydet
-        await fetch("/api/profile", {
+        const profileRes = await fetch("/api/profile", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name, phone, educationStatus, department, address, communityProfileUrl, linkedinUrl, twitterUrl }),
         })
+        if (!profileRes.ok) { setError(await readErrorMessage(profileRes)); return }
         // Başvuru oluştur
         const res = await fetch("/api/applications", {
           method: "POST",
@@ -410,10 +428,14 @@ export function ApplicationForm({
             supportTypes,
           }),
         })
+        if (!res.ok) { setError(await readErrorMessage(res)); return }
         const data = await res.json()
-        if (!res.ok) { setError(data.error ?? "Hata."); return }
         setApplicationId(data.id)
-      } catch { setError("Beklenmedik hata."); return }
+      } catch (err) {
+        console.error("handleStep4 error:", err)
+        setError(err instanceof Error ? `Beklenmedik hata: ${err.message}` : "Beklenmedik hata.")
+        return
+      }
       finally { setLoading(false) }
     }
     setStep(5)
@@ -429,11 +451,12 @@ export function ApplicationForm({
     setLoading(true)
     try {
       // Profil kaydet
-      await fetch("/api/profile", {
+      const profileRes = await fetch("/api/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, phone, educationStatus, department, address, communityProfileUrl, linkedinUrl, twitterUrl }),
       })
+      if (!profileRes.ok) { setError(await readErrorMessage(profileRes)); return }
 
       const appFields = {
         ...(applicationType === "period" ? { periodId } : { programId }),
@@ -446,33 +469,34 @@ export function ApplicationForm({
         supportNotes,
       }
 
-      if (!applicationId) {
+      let targetId = applicationId
+      if (!targetId) {
         const res = await fetch("/api/applications", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(appFields),
         })
+        if (!res.ok) { setError(await readErrorMessage(res)); return }
         const data = await res.json()
-        if (!res.ok) { setError(data.error ?? "Hata."); return }
-        setApplicationId(data.id)
-        // Submit
-        const submitRes = await fetch(`/api/applications/${data.id}/submit`, { method: "POST" })
-        const submitData = await submitRes.json()
-        if (!submitRes.ok) { setError(submitData.error ?? "Hata."); return }
+        targetId = data.id
+        setApplicationId(targetId)
       } else {
-        const patchRes = await fetch(`/api/applications/${applicationId}`, {
+        const patchRes = await fetch(`/api/applications/${targetId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(appFields),
         })
-        if (!patchRes.ok) { const d = await patchRes.json(); setError(d.error ?? "Hata."); return }
-        const submitRes = await fetch(`/api/applications/${applicationId}/submit`, { method: "POST" })
-        const data = await submitRes.json()
-        if (!submitRes.ok) { setError(data.error ?? "Hata."); return }
+        if (!patchRes.ok) { setError(await readErrorMessage(patchRes)); return }
       }
 
+      const submitRes = await fetch(`/api/applications/${targetId}/submit`, { method: "POST" })
+      if (!submitRes.ok) { setError(await readErrorMessage(submitRes)); return }
+
       router.push("/dashboard/applications?submitted=1")
-    } catch { setError("Beklenmedik hata.") }
+    } catch (err) {
+      console.error("handleStep5 error:", err)
+      setError(err instanceof Error ? `Beklenmedik hata: ${err.message}` : "Beklenmedik hata.")
+    }
     finally { setLoading(false) }
   }
 
@@ -946,7 +970,7 @@ export function ApplicationForm({
               <SectionTitle>Belgeler</SectionTitle>
               <p className="text-[12px] text-[#6e6e73] mb-4">Proje planı, bütçe taslağı, sunum vb. (en az 1 belge zorunlu)</p>
               {applicationId ? (
-                <FileUploader applicationId={applicationId} onFilesChange={setFiles} />
+                <FileUploader applicationId={applicationId} initialFiles={files} onFilesChange={setFiles} />
               ) : (
                 <p className="text-[13px] text-[#aeaeb2]">Dosya yüklemek için önce taslak olarak kaydedin.</p>
               )}

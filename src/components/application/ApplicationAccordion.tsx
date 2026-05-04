@@ -16,7 +16,7 @@ type UserProfile = {
   twitterUrl?: string | null
 }
 
-type FileItem = { id: string; name: string; size: number; mimeType: string }
+type FileItem = { id: string; name: string; size: number; mimeType: string; type?: string | null; url?: string | null }
 
 type ApplicationData = {
   title: string
@@ -228,16 +228,19 @@ export function ApplicationAccordion({
             <p className="text-[13px] text-[#aeaeb2]">Belge yüklenmemiş.</p>
           ) : (
             <div className="space-y-2">
-              {files.map((f) => (
+              {files.map((f) => {
+                const isLink = f.type === "LINK"
+                const href = isLink && f.url ? f.url : `/api/files/${f.id}`
+                return (
                 <div key={f.id} className={showFileNotes ? "space-y-2" : "flex items-center gap-3"}>
                   {showFileNotes ? (
                     <>
                       <div className="flex items-center justify-between">
                         <div className="min-w-0">
                           <p className="text-[13px] font-medium text-[#1c1c1c] truncate">{f.name}</p>
-                          <p className="text-[11px] text-[#aeaeb2] mt-0.5">{formatSize(f.size)}</p>
+                          <p className="text-[11px] text-[#aeaeb2] mt-0.5">{isLink ? "Harici link" : formatSize(f.size)}</p>
                         </div>
-                        <a href={`/api/files/${f.id}`} target="_blank" rel="noreferrer"
+                        <a href={href} target="_blank" rel="noreferrer"
                           className="ml-3 shrink-0 text-[12px] font-medium text-[#6e6e73] hover:text-[#1c1c1c] transition-colors">
                           Aç ↗
                         </a>
@@ -247,20 +250,29 @@ export function ApplicationAccordion({
                   ) : (
                     <>
                       <div className="w-8 h-8 rounded-lg bg-[#f5f5f5] border border-black/[0.05] flex items-center justify-center shrink-0">
-                        <FileText className="w-3.5 h-3.5 text-[#aeaeb2]" />
+                        {isLink ? (
+                          <ExternalLink className="w-3.5 h-3.5 text-[#6e6e73]" />
+                        ) : (
+                          <FileText className="w-3.5 h-3.5 text-[#aeaeb2]" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[13px] font-medium text-[#1c1c1c] truncate">{f.name}</p>
-                        <p className="text-[11px] text-[#aeaeb2] mt-0.5">{formatSize(f.size)}</p>
+                        <p className="text-[11px] text-[#aeaeb2] mt-0.5">{isLink ? "Harici link" : formatSize(f.size)}</p>
                       </div>
-                      <a href={`/api/files/${f.id}`} target="_blank" rel="noreferrer"
+                      <a href={href} target="_blank" rel="noreferrer"
                         className="ml-2 shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium text-[#6e6e73] hover:text-[#1c1c1c] hover:bg-[#f0f0f0] rounded-lg transition-colors cursor-pointer">
-                        <Download className="w-3.5 h-3.5" /> İndir
+                        {isLink ? (
+                          <><ExternalLink className="w-3.5 h-3.5" /> Aç</>
+                        ) : (
+                          <><Download className="w-3.5 h-3.5" /> İndir</>
+                        )}
                       </a>
                     </>
                   )}
                 </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>

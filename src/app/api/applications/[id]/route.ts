@@ -5,7 +5,7 @@ import { z } from "zod"
 import { notifyAdmins } from "@/lib/notifications"
 
 const updateSchema = z.object({
-  title:          z.string().min(3).optional(),
+  title:          z.string().min(1, "Proje adı zorunludur").optional(),
   teamName:       z.string().optional(),
   teamInfo:       z.string().optional(),
   summary:        z.string().max(1500).optional(),
@@ -66,18 +66,7 @@ export async function PATCH(
 
   const canEditByPresentation = !!application.presentationDate && presentationHoursLeft >= 48
 
-  if (application.status === "DRAFT") {
-    // DRAFT: dönem bitimine 48 saat kuralı
-    if (application.period) {
-      const hoursLeft = (application.period.endDate.getTime() - Date.now()) / 3_600_000
-      if (hoursLeft < 48) {
-        return NextResponse.json(
-          { error: "Dönem bitimine 48 saatten az kaldığı için düzenleme yetkisi kapalıdır." },
-          { status: 400 }
-        )
-      }
-    }
-  } else {
+  if (application.status !== "DRAFT") {
     // DRAFT dışı: ya admin editGranted vermiş ya da sunum tarihi > 48 saat uzakta
     if (!application.editGranted && !canEditByPresentation) {
       return NextResponse.json({ error: "Düzenleme yetkiniz bulunmuyor." }, { status: 403 })
@@ -87,7 +76,12 @@ export async function PATCH(
   const body = await req.json()
   const parsed = updateSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 })
+    const first = parsed.error.errors[0]
+    const fieldPath = first.path.join(".")
+    return NextResponse.json(
+      { error: fieldPath ? `${fieldPath}: ${first.message}` : first.message },
+      { status: 400 }
+    )
   }
 
   const updated = await prisma.application.update({

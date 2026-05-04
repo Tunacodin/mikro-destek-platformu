@@ -46,6 +46,10 @@ const STATUS_HINT: Record<ApplicationStatus, string> = {
   REJECTED:  "Başvurunuz bu dönem kabul edilmedi",
 }
 
+function fmtFull(d: Date) {
+  return new Date(d).toLocaleString("tr-TR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
+}
+
 function fmtDate(d: Date) {
   return new Date(d).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })
 }
@@ -124,11 +128,13 @@ export default async function ApplicationsPage({
           {applications.map((app) => {
             const Icon = STATUS_ICON[app.status]
             const periodOrProgram = app.period ?? app.program
-            const daysLeft = periodOrProgram
-              ? Math.ceil((new Date(periodOrProgram.endDate).getTime() - Date.now()) / 86_400_000)
+            const msLeft = periodOrProgram
+              ? new Date(periodOrProgram.endDate).getTime() - Date.now()
               : 0
+            const daysLeft = Math.floor(msLeft / 86_400_000)
+            const hoursLeft = Math.floor((msLeft % 86_400_000) / 3_600_000)
             const isDraft = app.status === "DRAFT"
-            const urgent = isDraft && daysLeft > 0 && daysLeft <= 3
+            const urgent = isDraft && msLeft > 0 && daysLeft <= 3
 
             return (
               <Link
@@ -187,13 +193,13 @@ export default async function ApplicationsPage({
                     </span>
                     {periodOrProgram && (
                       <span className="inline-flex items-center gap-1 shrink-0">
-                        <Calendar className="w-3 h-3" /> {fmtShort(periodOrProgram.endDate)}
+                        <Calendar className="w-3 h-3" /> {fmtFull(periodOrProgram.endDate)}
                       </span>
                     )}
                   </div>
                   {urgent && (
                     <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full shrink-0">
-                      {daysLeft} gün kaldı
+                      {daysLeft}g {hoursLeft}sa kaldı
                     </span>
                   )}
                 </div>

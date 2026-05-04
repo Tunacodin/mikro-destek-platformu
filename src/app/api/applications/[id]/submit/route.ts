@@ -39,17 +39,6 @@ export async function POST(
     return NextResponse.json({ error: "Program aktif değil." }, { status: 400 })
   }
 
-  // 48 saat kuralı yalnızca dönem için
-  if (application.period) {
-    const hoursLeft = (application.period.endDate.getTime() - Date.now()) / 3_600_000
-    if (hoursLeft < 48) {
-      return NextResponse.json(
-        { error: "Dönem bitimine 48 saatten az kaldığı için başvuru gönderilemez." },
-        { status: 400 }
-      )
-    }
-  }
-
   if (application.files.length === 0) {
     return NextResponse.json(
       { error: "En az bir dosya yüklemeniz gerekiyor." },

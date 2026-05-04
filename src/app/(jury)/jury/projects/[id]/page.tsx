@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import {
   ChevronLeft, FileText, CheckCircle2, Clock,
-  Calendar, FolderOpen, Download, Layers, Zap, Star, Send,
+  Calendar, FolderOpen, Download, Layers, Zap, Star, Send, ExternalLink,
 } from "lucide-react"
 import { JuryProjectNoteForm } from "./JuryProjectNoteForm"
 import { FileNotePanel } from "@/components/jury/FileNotePanel"
@@ -61,11 +61,11 @@ export default async function JuryProjectDetailPage({
         include: {
           period:  { select: { title: true } },
           program: { select: { title: true } },
-          files:   { select: { id: true, name: true, size: true }, orderBy: { createdAt: "asc" } },
+          files:   { select: { id: true, name: true, size: true, type: true, url: true }, orderBy: { createdAt: "asc" } },
         },
       },
       decision: { select: { scope: true, notes: true, decidedAt: true } },
-      files:    { select: { id: true, name: true, size: true, mimeType: true }, orderBy: { createdAt: "asc" } },
+      files:    { select: { id: true, name: true, size: true, mimeType: true, type: true, url: true }, orderBy: { createdAt: "asc" } },
       // Sadece başvuru sahibi raporları (juryId null) + bu jürinin kendi notları
       reports: {
         where: { OR: [{ juryId: null }, { juryId }] },
@@ -150,30 +150,42 @@ export default async function JuryProjectDetailPage({
           {/* Proje dosyaları */}
           {project.files.length > 0 && (
             <ul className="divide-y divide-black/[0.04]">
-              {project.files.map((f) => (
+              {project.files.map((f) => {
+                const isLink = f.type === "LINK"
+                const href = isLink && f.url ? f.url : `/api/files/${f.id}`
+                return (
                 <li key={f.id} className="px-5 py-3 space-y-2">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-[#f5f5f5] border border-black/[0.05] flex items-center justify-center shrink-0">
-                      <FileText className="w-3.5 h-3.5 text-[#aeaeb2]" />
+                      {isLink ? (
+                        <ExternalLink className="w-3.5 h-3.5 text-[#6e6e73]" />
+                      ) : (
+                        <FileText className="w-3.5 h-3.5 text-[#aeaeb2]" />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] font-medium text-[#1c1c1c] truncate">{f.name}</p>
-                      <p className="text-[11px] text-[#aeaeb2]">{formatSize(f.size)}</p>
+                      <p className="text-[11px] text-[#aeaeb2]">{isLink ? "Harici link" : formatSize(f.size)}</p>
                     </div>
                     <a
-                      href={`/api/files/${f.id}`}
+                      href={href}
                       target="_blank"
                       rel="noreferrer"
                       className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium text-[#6e6e73] hover:text-[#1c1c1c] hover:bg-[#f0f0f0] rounded-lg transition-colors cursor-pointer"
                     >
-                      <Download className="w-3 h-3" /> İndir
+                      {isLink ? (
+                        <><ExternalLink className="w-3 h-3" /> Aç</>
+                      ) : (
+                        <><Download className="w-3 h-3" /> İndir</>
+                      )}
                     </a>
                   </div>
                   <div className="pl-11">
                     <FileNotePanel fileId={f.id} canEvaluate={true} />
                   </div>
                 </li>
-              ))}
+                )
+              })}
             </ul>
           )}
 
@@ -184,25 +196,33 @@ export default async function JuryProjectDetailPage({
                 <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-wider">Başvuru Belgeleri</p>
               </div>
               <ul className="divide-y divide-black/[0.04]">
-                {project.application.files.map((f) => (
+                {project.application.files.map((f) => {
+                  const isLink = f.type === "LINK"
+                  const href = isLink && f.url ? f.url : `/api/files/${f.id}`
+                  return (
                   <li key={f.id} className="px-5 py-3 space-y-2">
                     <div className="flex items-center gap-2">
-                      <FileText className="w-3.5 h-3.5 text-[#d1d1d6] shrink-0" />
+                      {isLink ? (
+                        <ExternalLink className="w-3.5 h-3.5 text-[#6e6e73] shrink-0" />
+                      ) : (
+                        <FileText className="w-3.5 h-3.5 text-[#d1d1d6] shrink-0" />
+                      )}
                       <span className="text-[12px] text-[#6e6e73] truncate flex-1">{f.name}</span>
                       <a
-                        href={`/api/files/${f.id}`}
+                        href={href}
                         target="_blank"
                         rel="noreferrer"
                         className="shrink-0 text-[11px] text-[#aeaeb2] hover:text-[#1c1c1c] transition-colors cursor-pointer"
                       >
-                        İndir
+                        {isLink ? "Aç" : "İndir"}
                       </a>
                     </div>
                     <div className="pl-6">
                       <FileNotePanel fileId={f.id} canEvaluate={true} />
                     </div>
                   </li>
-                ))}
+                  )
+                })}
               </ul>
             </>
           )}
