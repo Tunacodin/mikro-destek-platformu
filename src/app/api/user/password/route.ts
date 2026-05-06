@@ -5,7 +5,7 @@ import { z } from "zod"
 import bcrypt from "bcryptjs"
 
 const schema = z.object({
-  currentPassword: z.string().min(1, "Mevcut şifre gerekli."),
+  currentPassword: z.string().optional(),
   password: z.string().min(6, "Yeni şifre en az 6 karakter olmalı."),
 })
 
@@ -24,13 +24,16 @@ export async function PATCH(req: NextRequest) {
     select: { passwordHash: true },
   })
 
-  if (!user?.passwordHash) {
-    return NextResponse.json({ error: "Bu hesap şifre ile giriş desteklemiyor." }, { status: 400 })
-  }
-
-  const valid = await bcrypt.compare(parsed.data.currentPassword, user.passwordHash)
-  if (!valid) {
-    return NextResponse.json({ error: "Mevcut şifre hatalı." }, { status: 400 })
+  // Şifre zaten varsa: mevcut şifreyle doğrulama gerekli (parola değiştirme akışı)
+  // Şifre yoksa (magic link ile gelen jüri / ilk şifre belirleme): currentPassword aranmaz
+  if (user?.passwordHash) {
+    if (!parsed.data.currentPassword) {
+      return NextResponse.json({ error: "Mevcut şifre gerekli." }, { status: 400 })
+    }
+    const valid = await bcrypt.compare(parsed.data.currentPassword, user.passwordHash)
+    if (!valid) {
+      return NextResponse.json({ error: "Mevcut şifre hatalı." }, { status: 400 })
+    }
   }
 
   const passwordHash = await bcrypt.hash(parsed.data.password, 12)
