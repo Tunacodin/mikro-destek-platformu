@@ -8,6 +8,7 @@ import { JuryAssignPanel } from "@/components/admin/JuryAssignPanel"
 import { ApplicationDecisionButtons } from "@/components/admin/ApplicationDecisionButtons"
 import { LockEvaluationsButton } from "@/components/admin/LockEvaluationsButton"
 import { EditGrantButton } from "@/components/admin/EditGrantButton"
+import { PresentationDateCard } from "@/components/admin/PresentationDateCard"
 import { ProcessTracker } from "@/components/ui/ProcessTracker"
 import { ApplicationDetailTabs } from "@/components/application/ApplicationDetailTabs"
 import { JuryEvaluationTabs } from "@/components/admin/JuryEvaluationTabs"
@@ -236,20 +237,12 @@ export default async function AdminApplicationDetailPage({
           />
 
           {/* Jüri Sunum Tarihi */}
-          {application.presentationDate && (
-            <div className="bg-white rounded-2xl border border-black/[0.06] shadow-[0_1px_6px_rgba(0,0,0,0.04)] px-4 py-3.5">
-              <div className="flex items-center gap-2 mb-1">
-                <Calendar className="w-3.5 h-3.5 text-[#fab758]" />
-                <p className="text-[10px] font-semibold text-[#aeaeb2] uppercase tracking-wider">Jüri Sunum Tarihi</p>
-              </div>
-              <p className="text-[13px] font-semibold text-[#1c1c1c]">
-                {new Date(application.presentationDate).toLocaleString("tr-TR", {
-                  day: "numeric", month: "long", year: "numeric",
-                  hour: "2-digit", minute: "2-digit",
-                })}
-              </p>
-            </div>
-          )}
+          <PresentationDateCard
+            applicationId={application.id}
+            status={application.status}
+            presentationDate={application.presentationDate}
+          />
+
 
           {/* Destek Kararı */}
           {application.decision && (
@@ -300,8 +293,11 @@ export default async function AdminApplicationDetailPage({
             status={application.status}
           />
 
-          {/* Jüri Değerlendirme Kilidi */}
-          {application.evaluations.length > 0 && !application.decision && (
+          {/* Jüri Değerlendirme Kilidi — karar verilmediği sürece her zaman düzenlenebilir */}
+          {!application.decision &&
+            (application.status === "SUBMITTED" ||
+              application.status === "IN_REVIEW" ||
+              application.status === "EVALUATED") && (
             <LockEvaluationsButton
               applicationId={application.id}
               locked={application.evaluationsLocked}

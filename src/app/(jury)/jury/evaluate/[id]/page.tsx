@@ -36,15 +36,9 @@ export default async function JuryEvaluatePage({
   })
   if (!application) notFound()
 
-  const now = Date.now()
-  const presentationLocked = application.presentationDate
-    ? (application.presentationDate.getTime() - now) / 3_600_000 < 48
-    : false
-  // Jury can evaluate when IN_REVIEW, or edit existing evaluation —
-  // unless presentation is within 48h or admin has locked evaluations
-  const canEvaluate = !presentationLocked && !application.evaluationsLocked && (
-    application.status === "IN_REVIEW" || !!application.evaluations[0]
-  )
+  // Jüri her zaman değerlendirebilir / düzenleyebilir;
+  // sadece admin `evaluationsLocked` ile bu yetkiyi kapatıp açabilir.
+  const canEvaluate = !application.evaluationsLocked
 
   return (
     <JuryEvaluateClient

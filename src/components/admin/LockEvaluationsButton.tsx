@@ -54,8 +54,14 @@ export function LockEvaluationsButton({
           : "bg-emerald-50 text-emerald-700"
       }`}>
         {isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-        {isLocked ? "Kilitli — Düzenleme Kapalı" : "Açık — Düzenleme Serbest"}
+        {isLocked ? "Kapalı — Jüri düzenleyemez" : "Açık — Jüri düzenleyebilir"}
       </div>
+
+      <p className="text-[11px] text-[#6e6e73] leading-relaxed">
+        {isLocked
+          ? "Jüri üyeleri şu anda değerlendirme yapamaz. Yetkiyi tekrar açabilirsiniz."
+          : "Jüri üyeleri istediği zaman değerlendirebilir veya düzenleyebilir."}
+      </p>
 
       <button
         onClick={toggle}
@@ -69,8 +75,8 @@ export function LockEvaluationsButton({
         {loading
           ? "İşleniyor…"
           : isLocked
-            ? "Düzenlemeyi Aç"
-            : "Düzenlemeyi Kapat"
+            ? "Yetkiyi Aç"
+            : "Yetkiyi Kapat"
         }
       </button>
     </div>

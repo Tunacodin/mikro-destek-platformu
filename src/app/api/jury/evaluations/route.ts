@@ -39,11 +39,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Bu başvuruya atanmış değilsiniz." }, { status: 403 })
   }
 
-  // Başvuru IN_REVIEW durumunda olmalı
+  // Başvuru var olmalı; jüri düzenlemesi sadece admin tarafından kapatılabilir
   const application = await prisma.application.findUnique({ where: { id: applicationId } })
-  if (!application || application.status !== "IN_REVIEW") {
+  if (!application) {
+    return NextResponse.json({ error: "Başvuru bulunamadı." }, { status: 404 })
+  }
+  if (application.evaluationsLocked) {
     return NextResponse.json(
-      { error: "Yalnızca 'İncelemede' durumundaki başvurular değerlendirilebilir." },
+      { error: "Jüri değerlendirme düzenlemesi admin tarafından kapatılmıştır." },
+      { status: 403 }
+    )
+  }
+  if (application.status === "DRAFT" || application.status === "REJECTED") {
+    return NextResponse.json(
+      { error: "Bu başvuru değerlendirilemez." },
       { status: 400 }
     )
   }
@@ -83,7 +92,7 @@ export async function POST(req: NextRequest) {
       tx.evaluation.count({ where: { applicationId } }),
     ])
 
-    if (evaluationCount >= assignmentCount) {
+    if (evaluationCount >= assignmentCount && application.status === "IN_REVIEW") {
       await tx.application.update({
         where: { id: applicationId },
         data: { status: "EVALUATED" },

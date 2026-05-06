@@ -318,24 +318,24 @@ function CloseEvaluationPanel({ applicationId }: { applicationId: string }) {
     }
   }
 
-  // ── Adım 1: Kapat butonu ──────────────────────────────────────────────────
+  // ── Adım 1: Karar Ver butonu ──────────────────────────────────────────────
   if (step === "button") {
     return (
       <div className="bg-white rounded-2xl border border-purple-100 p-5 space-y-3">
         <div>
           <div className="flex items-center gap-1.5 mb-1">
-            <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Aşama 5a</span>
+            <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Aşama 5</span>
           </div>
-          <p className="text-[13px] font-semibold text-[#1c1c1c]">Jüri Değerlendirmesi</p>
+          <p className="text-[13px] font-semibold text-[#1c1c1c]">Destek Kararı</p>
           <p className="text-[12px] text-[#6e6e73] mt-0.5">
-            Jüri değerlendirmeleri tamamlandığında kapatın ve sonucu belirleyin.
+            Süreci sonlandırıp destek kapsamını veya redi belirleyin.
           </p>
         </div>
         <button
           onClick={() => setStep("choice")}
           className="w-full flex items-center justify-between px-4 py-3 bg-purple-600 text-white text-[13px] font-semibold rounded-xl shadow-sm hover:bg-purple-700 hover:shadow transition-colors cursor-pointer"
         >
-          <span>Jüri Değerlendirmesini Kapat</span>
+          <span>Karar Ver</span>
           <ChevronRight className="w-4 h-4 opacity-70" />
         </button>
       </div>
