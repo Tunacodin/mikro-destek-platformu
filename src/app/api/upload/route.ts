@@ -30,6 +30,16 @@ const ALLOWED_EXT = new Set([
   "pdf", "doc", "docx", "xls", "xlsx", "png", "jpg", "jpeg",
 ])
 
+// Jüri sunumu için ek olarak PPTX/PPT kabul edilir
+const JURY_PRESENTATION_MIME = new Set([
+  "application/pdf",
+  "application/x-pdf",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "application/vnd.ms-powerpoint",
+])
+
+const JURY_PRESENTATION_EXT = new Set(["pdf", "pptx", "ppt"])
+
 function getExt(name: string): string {
   const i = name.lastIndexOf(".")
   return i >= 0 ? name.slice(i + 1).toLowerCase() : ""
@@ -42,6 +52,13 @@ function isAllowed(file: File): boolean {
   return ALLOWED_MIME.has(mime)
 }
 
+function isAllowedJuryPresentation(file: File): boolean {
+  const ext = getExt(file.name)
+  if (JURY_PRESENTATION_EXT.has(ext)) return true
+  const mime = (file.type || "").toLowerCase()
+  return JURY_PRESENTATION_MIME.has(mime)
+}
+
 export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) {
@@ -52,6 +69,8 @@ export async function POST(req: NextRequest) {
   const file = formData.get("file") as File | null
   const applicationId = formData.get("applicationId") as string | null
   const projectId = formData.get("projectId") as string | null
+  const kind = (formData.get("kind") as string | null)?.toLowerCase() ?? null
+  const isJuryPresentation = kind === "jury_presentation"
 
   if (!file) {
     return NextResponse.json({ error: "Dosya bulunamadı." }, { status: 400 })
@@ -65,8 +84,15 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Tip kontrolü (MIME ya da uzantı eşleşmesi yeterli)
-  if (!isAllowed(file)) {
+  // Tip kontrolü
+  if (isJuryPresentation) {
+    if (!isAllowedJuryPresentation(file)) {
+      return NextResponse.json(
+        { error: "Sadece PPTX, PPT veya PDF formatında sunum yükleyebilirsiniz." },
+        { status: 400 }
+      )
+    }
+  } else if (!isAllowed(file)) {
     return NextResponse.json(
       { error: "Desteklenmeyen dosya türü. PDF, Word, Excel veya resim yükleyin." },
       { status: 400 }
@@ -82,7 +108,33 @@ export async function POST(req: NextRequest) {
     if (session.user.role === "APPLICANT" && application.userId !== session.user.id) {
       return NextResponse.json({ error: "Bu başvuruya erişim yetkiniz yok." }, { status: 403 })
     }
-    if (!["DRAFT", "SUBMITTED"].includes(application.status)) {
+
+    if (isJuryPresentation) {
+      // Jüri sunumu yalnızca başvuru sahibi veya admin yükleyebilir
+      if (session.user.role !== "APPLICANT" && session.user.role !== "ADMIN") {
+        return NextResponse.json(
+          { error: "Sunum yükleme yetkiniz yok." },
+          { status: 403 }
+        )
+      }
+      // Jüri sunumu: yalnızca IN_REVIEW veya EVALUATED aşamasında
+      if (!["IN_REVIEW", "EVALUATED"].includes(application.status)) {
+        return NextResponse.json(
+          { error: "Sunum yalnızca incelemeye alınmış başvurularda yüklenebilir." },
+          { status: 400 }
+        )
+      }
+      // Tek kopyaya izin ver — varsa eski sunumu sil
+      const existing = await prisma.file.findFirst({
+        where: { applicationId, type: "JURY_PRESENTATION" },
+      })
+      if (existing) {
+        return NextResponse.json(
+          { error: "Önce mevcut sunumu silin, sonra yeni sunum yükleyin." },
+          { status: 400 }
+        )
+      }
+    } else if (!["DRAFT", "SUBMITTED"].includes(application.status)) {
       return NextResponse.json({ error: "Bu başvuruya artık dosya yüklenemez." }, { status: 400 })
     }
   }
@@ -108,7 +160,10 @@ export async function POST(req: NextRequest) {
   const buffer = Buffer.from(bytes)
 
   const ext = getExt(file.name) || "bin"
-  const folder = projectId ? `projects/${projectId}` : (applicationId ?? "general")
+  const subfolder = isJuryPresentation ? "presentations/" : ""
+  const folder = projectId
+    ? `projects/${projectId}`
+    : (applicationId ? `${applicationId}/${subfolder}`.replace(/\/$/, "") : "general")
   const key = `${folder}/${randomUUID()}.${ext}`
   const bucket = projectId ? BUCKETS.projects : BUCKETS.applications
 
@@ -122,6 +177,8 @@ export async function POST(req: NextRequest) {
     png:  "image/png",
     jpg:  "image/jpeg",
     jpeg: "image/jpeg",
+    pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    ppt:  "application/vnd.ms-powerpoint",
   }
   const resolvedMime = file.type || EXT_MIME[ext] || "application/octet-stream"
 
@@ -144,6 +201,7 @@ export async function POST(req: NextRequest) {
       mimeType: resolvedMime,
       bucket,
       key,
+      type: isJuryPresentation ? "JURY_PRESENTATION" : "FILE",
       ...(applicationId ? { applicationId } : {}),
       ...(projectId ? { projectId } : {}),
     },
@@ -157,8 +215,10 @@ export async function POST(req: NextRequest) {
       })
       if (app) {
         await notifyAdmins({
-          title: "Başvuruya dosya eklendi",
-          message: `"${app.title}" başvurusuna yeni bir dosya yüklendi: ${file.name}`,
+          title: isJuryPresentation ? "Jüri sunumu yüklendi" : "Başvuruya dosya eklendi",
+          message: isJuryPresentation
+            ? `"${app.title}" başvurusu için jüri sunumu yüklendi.`
+            : `"${app.title}" başvurusuna yeni bir dosya yüklendi: ${file.name}`,
           link: `/admin/applications/${applicationId}`,
         })
       }

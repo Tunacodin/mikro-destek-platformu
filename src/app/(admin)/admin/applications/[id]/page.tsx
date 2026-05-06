@@ -9,6 +9,7 @@ import { ApplicationDecisionButtons } from "@/components/admin/ApplicationDecisi
 import { LockEvaluationsButton } from "@/components/admin/LockEvaluationsButton"
 import { EditGrantButton } from "@/components/admin/EditGrantButton"
 import { PresentationDateCard } from "@/components/admin/PresentationDateCard"
+import { JuryPresentationCard } from "@/components/application/JuryPresentationCard"
 import { ProcessTracker } from "@/components/ui/ProcessTracker"
 import { ApplicationDetailTabs } from "@/components/application/ApplicationDetailTabs"
 import { JuryEvaluationTabs } from "@/components/admin/JuryEvaluationTabs"
@@ -106,6 +107,10 @@ export default async function AdminApplicationDetailPage({
   ])
 
   if (!application) notFound()
+
+  // Sunum dosyasını ayır
+  const juryPresentationFile = application.files.find((f) => f.type === "JURY_PRESENTATION") ?? null
+  const applicationFiles = application.files.filter((f) => f.type !== "JURY_PRESENTATION")
 
   // Evaluation aggregations — toplam bazlı (35+5=40 üzerinden)
   const allScores = application.evaluations.flatMap((e) => e.scores)
@@ -210,10 +215,26 @@ export default async function AdminApplicationDetailPage({
           <ApplicationDetailTabs
             application={{ ...application, supportNotes: application.supportNotes as Record<string, string> | null }}
             userProfile={application.user}
-            files={application.files}
+            files={applicationFiles}
             showFileNotes
             showAuthor
           />
+
+          {/* Jüri sunumu — admin yükleyip silebilir, IN_REVIEW/EVALUATED'da düzenleme açık */}
+          {(application.status === "IN_REVIEW" ||
+            application.status === "EVALUATED" ||
+            juryPresentationFile) && (
+            <JuryPresentationCard
+              applicationId={application.id}
+              presentationDate={application.presentationDate?.toISOString() ?? null}
+              file={juryPresentationFile}
+              canEdit={
+                application.status === "IN_REVIEW" ||
+                application.status === "EVALUATED"
+              }
+              variant="admin"
+            />
+          )}
 
           {/* Değerlendirme bölümü */}
           {application.evaluations.length > 0 && (

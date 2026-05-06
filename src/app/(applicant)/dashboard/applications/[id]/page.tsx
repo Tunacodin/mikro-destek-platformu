@@ -7,6 +7,7 @@ import { ApplicationEditForm } from "@/components/application/ApplicationEditFor
 import { ApplicationDetailTabs } from "@/components/application/ApplicationDetailTabs"
 import { InlineCountdown } from "@/components/ui/InlineCountdown"
 import { HorizontalProcess } from "@/components/ui/HorizontalProcess"
+import { JuryPresentationCard } from "@/components/application/JuryPresentationCard"
 import { ChevronLeft, Lock, PencilLine, RotateCcw, Calendar, FileText, Layers } from "lucide-react"
 import type { ApplicationStatus } from "@prisma/client"
 
@@ -76,6 +77,10 @@ export default async function ApplicationDetailPage({
 
   if (!application || application.userId !== session.user.id) notFound()
 
+  // Sunum dosyasını ayır
+  const juryPresentationFile = application.files.find((f) => f.type === "JURY_PRESENTATION") ?? null
+  const applicationFiles = application.files.filter((f) => f.type !== "JURY_PRESENTATION")
+
   const now = Date.now()
   const periodOrProgram = application.period ?? application.program
   const presentationHoursLeft = application.presentationDate
@@ -129,7 +134,7 @@ export default async function ApplicationDetailPage({
                 </span>
               )}
               <span className="inline-flex items-center gap-1">
-                <FileText className="w-3 h-3 text-[#aeaeb2]" /> {application.files.length} belge
+                <FileText className="w-3 h-3 text-[#aeaeb2]" /> {applicationFiles.length} belge
               </span>
               {periodOrProgram && (
                 <span className="inline-flex items-center gap-1">
@@ -192,6 +197,20 @@ export default async function ApplicationDetailPage({
         )}
       </div>
 
+      {/* Jüri Sunumu — IN_REVIEW/EVALUATED'da en üstte göze çarpacak şekilde */}
+      {(application.status === "IN_REVIEW" ||
+        application.status === "EVALUATED" ||
+        juryPresentationFile) && (
+        <JuryPresentationCard
+          applicationId={application.id}
+          presentationDate={application.presentationDate?.toISOString() ?? null}
+          file={juryPresentationFile}
+          canEdit={
+            application.status === "IN_REVIEW" || application.status === "EVALUATED"
+          }
+        />
+      )}
+
       {/* Yatay süreç çizgisi */}
       {!isDraft && (
         <HorizontalProcess status={application.status} hasJury={hasJury} hasEvaluation={hasEvaluation} />
@@ -239,7 +258,7 @@ export default async function ApplicationDetailPage({
             divisionContribution: application.divisionContribution,
             supportTypes: application.supportTypes,
             supportNotes: application.supportNotes as Record<string, string> | null,
-            files: application.files,
+            files: applicationFiles,
           }}
         />
       ) : (canEditByGrant || canEditByPresentation) ? (
@@ -275,7 +294,7 @@ export default async function ApplicationDetailPage({
         <ApplicationDetailTabs
           application={{ ...application, supportNotes: application.supportNotes as Record<string, string> | null }}
           userProfile={userProfile}
-          files={application.files}
+          files={applicationFiles}
         />
       )}
     </div>

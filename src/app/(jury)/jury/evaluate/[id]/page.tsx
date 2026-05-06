@@ -40,6 +40,14 @@ export default async function JuryEvaluatePage({
   // sadece admin `evaluationsLocked` ile bu yetkiyi kapatıp açabilir.
   const canEvaluate = !application.evaluationsLocked
 
+  // Sunum dosyasını ayır — jüri yalnızca sunum tarihi geçtikten SONRA görebilir
+  const presentationFinished =
+    !!application.presentationDate && application.presentationDate.getTime() <= Date.now()
+  const juryPresentationFile = presentationFinished
+    ? application.files.find((f) => f.type === "JURY_PRESENTATION") ?? null
+    : null
+  const applicationFiles = application.files.filter((f) => f.type !== "JURY_PRESENTATION")
+
   return (
     <JuryEvaluateClient
       application={{
@@ -73,7 +81,13 @@ export default async function JuryEvaluatePage({
         title: application.period?.title ?? application.program?.title ?? "—",
         endDate: (application.period?.endDate ?? application.program?.endDate ?? new Date()).toISOString(),
       }}
-      files={application.files}
+      files={applicationFiles}
+      juryPresentationFile={juryPresentationFile ? {
+        id: juryPresentationFile.id,
+        name: juryPresentationFile.name,
+        size: juryPresentationFile.size,
+        mimeType: juryPresentationFile.mimeType,
+      } : null}
       canEvaluate={canEvaluate}
       assignedAt={assignment.assignedAt.toISOString()}
       presentationDate={application.presentationDate?.toISOString() ?? null}

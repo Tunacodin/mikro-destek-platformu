@@ -11,6 +11,7 @@ import { ApplicationAccordion } from "@/components/application/ApplicationAccord
 import { EvaluationForm } from "@/components/jury/EvaluationForm"
 import { JuryGuideModal } from "@/components/jury/JuryGuidePanel"
 import { LiveCountdown } from "@/components/ui/LiveCountdown"
+import { JuryPresentationCard } from "@/components/application/JuryPresentationCard"
 
 type AppData = {
   id: string
@@ -37,6 +38,7 @@ type AppData = {
 }
 
 type FileItem = { id: string; name: string; size: number; mimeType: string; type?: string | null; url?: string | null }
+type JuryPresentation = { id: string; name: string; size: number; mimeType: string }
 
 type ExistingEvaluation = {
   id: string
@@ -53,6 +55,7 @@ export function JuryEvaluateClient({
   applicant,
   period,
   files,
+  juryPresentationFile,
   canEvaluate,
   assignedAt,
   presentationDate,
@@ -62,6 +65,7 @@ export function JuryEvaluateClient({
   applicant: { name: string | null; email: string }
   period: { title: string; endDate: string }
   files: FileItem[]
+  juryPresentationFile: JuryPresentation | null
   canEvaluate: boolean
   assignedAt: string
   presentationDate: string | null
@@ -130,7 +134,7 @@ export function JuryEvaluateClient({
                   <BookOpen className="w-4 h-4 text-[#fab758]" />
                   Rehber
                 </button>
-                {canEvaluate && (
+                {canEvaluate ? (
                   <button
                     onClick={() => setMode("evaluate")}
                     className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1c1c1c] text-white text-[13px] font-semibold rounded-xl shadow-sm hover:bg-[#383838] transition-colors cursor-pointer"
@@ -138,11 +142,35 @@ export function JuryEvaluateClient({
                     <ClipboardList className="w-4 h-4" />
                     {existingEvaluation ? "Düzenle" : "Değerlendir"}
                   </button>
-                )}
+                ) : existingEvaluation ? (
+                  <button
+                    onClick={() => setMode("evaluate")}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-black/[0.1] text-[#1c1c1c] text-[13px] font-semibold rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer"
+                  >
+                    <ClipboardList className="w-4 h-4 text-[#6e6e73]" />
+                    Değerlendirmemi Gör
+                  </button>
+                ) : null}
               </div>
             </div>
           </div>
         </div>
+
+        {/* Jüri sunumu — yalnızca sunum tarihi geçtiyse göster */}
+        {(() => {
+          const finished =
+            !!presentationDate && new Date(presentationDate).getTime() <= Date.now()
+          if (!finished) return null
+          return (
+            <JuryPresentationCard
+              applicationId={application.id}
+              presentationDate={presentationDate}
+              file={juryPresentationFile}
+              canEdit={false}
+              variant="viewer"
+            />
+          )
+        })()}
 
         {/* Tab'li basvuru detaylari */}
         <ApplicationDetailTabs
@@ -200,9 +228,17 @@ export function JuryEvaluateClient({
               Rehber
             </button>
             <span className={`text-[11px] font-semibold px-3 py-1.5 rounded-full ${
-              canEvaluate ? "bg-amber-50 text-amber-600" : "bg-emerald-50 text-emerald-700"
+              canEvaluate
+                ? "bg-amber-50 text-amber-600"
+                : existingEvaluation
+                  ? "bg-slate-100 text-slate-600"
+                  : "bg-emerald-50 text-emerald-700"
             }`}>
-              {canEvaluate ? (existingEvaluation ? "Düzenleniyor" : "Değerlendirme Modu") : "Jüri Değerlendirme Sürecinde"}
+              {canEvaluate
+                ? (existingEvaluation ? "Düzenleniyor" : "Değerlendirme Modu")
+                : existingEvaluation
+                  ? "Salt Okunur — Düzenleme Kapalı"
+                  : "Jüri Değerlendirme Sürecinde"}
             </span>
           </div>
         </div>

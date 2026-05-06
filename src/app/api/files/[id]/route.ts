@@ -79,8 +79,13 @@ export async function DELETE(
     return NextResponse.json({ error: "Dosya bulunamadı." }, { status: 404 })
   }
 
-  // Yalnızca dosyanın sahibi başvuru sahibi silebilir (admin/jüri için ayrı endpoint gerekirse)
-  if (session.user.role !== "APPLICANT" || file.application?.userId !== session.user.id) {
+  // Yalnızca dosya sahibi (APPLICANT) veya — sadece jüri sunumu için — ADMIN silebilir
+  const isOwner =
+    session.user.role === "APPLICANT" && file.application?.userId === session.user.id
+  const isAdminDeletingPresentation =
+    session.user.role === "ADMIN" && file.type === "JURY_PRESENTATION"
+
+  if (!isOwner && !isAdminDeletingPresentation) {
     return NextResponse.json({ error: "Erişim reddedildi." }, { status: 403 })
   }
 
