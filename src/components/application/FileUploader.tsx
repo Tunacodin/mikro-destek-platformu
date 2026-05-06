@@ -30,11 +30,11 @@ export function FileUploader({
     setUploading(true)
 
     const newFiles: UploadedFile[] = [...files]
-    const MAX_SIZE = 25 * 1024 * 1024
+    const MAX_SIZE = 50 * 1024 * 1024
 
     for (const file of Array.from(selected)) {
       if (file.size > MAX_SIZE) {
-        setError(`${file.name} 25 MB sınırını aşıyor.`)
+        setError(`${file.name} 50 MB sınırını aşıyor.`)
         continue
       }
       if (file.size === 0) {
@@ -142,7 +142,7 @@ export function FileUploader({
         <p className="text-[13px] font-semibold text-[#6e6e73] mt-2.5">
           {uploading ? "Yukleniyor..." : "Tiklayın veya surukleyin"}
         </p>
-        <p className="text-[11px] text-[#aeaeb2] mt-0.5">PDF, Word, Excel · maks. 25 MB</p>
+        <p className="text-[11px] text-[#aeaeb2] mt-0.5">PDF, Word, Excel · maks. 50 MB</p>
         <input
           ref={inputRef} type="file" multiple className="hidden"
           accept="application/pdf,.pdf,application/msword,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx,application/vnd.ms-excel,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsx,image/png,.png,image/jpeg,.jpg,.jpeg"

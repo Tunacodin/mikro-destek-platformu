@@ -5,7 +5,7 @@ import { uploadFile, BUCKETS } from "@/lib/minio"
 import { randomUUID } from "crypto"
 import { notifyAdmins } from "@/lib/notifications"
 
-const MAX_SIZE_MB = 25
+const MAX_SIZE_MB = 50
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024
 
 // Bazı tarayıcı/işletim sistemleri PDF için "application/x-pdf", "application/octet-stream"

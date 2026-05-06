@@ -114,6 +114,8 @@ export function JuryPresentationCard({
 
   // Başvuru sahibinde dosya yokken yükseltilmiş tasarım
   const promoteApplicant = isApplicant && !file
+  // Admin: viewer gibi sade, yükleme/silme tali aksiyonlar olarak görünsün
+  const showAdminActions = isAdmin && canEdit
 
   return (
     <div
@@ -175,13 +177,11 @@ export function JuryPresentationCard({
                 : "text-[12px] text-[#6e6e73] mt-0.5 leading-relaxed"
             }
           >
-            {isViewer
+            {isViewer || isAdmin
               ? "Başvuru sahibinin jüri sunumu için yüklediği dosya."
-              : isAdmin
-                ? "Şablonu indirip başvuru sahibine iletebilir veya gerekirse onun adına sunum yükleyebilirsiniz."
-                : promoteApplicant
-                  ? "Aşağıdaki şablonu indirin, doldurun ve jüri sunumunuzdan önce sisteme yükleyin."
-                  : "Aşağıdaki şablonu indirip doldurun, jüri sunumunuzdan önce buradan yükleyin."}
+              : promoteApplicant
+                ? "Aşağıdaki şablonu indirin, doldurun ve jüri sunumunuzdan önce sisteme yükleyin."
+                : "Aşağıdaki şablonu indirip doldurun, jüri sunumunuzdan önce buradan yükleyin."}
           </p>
           {dueLabel && (
             <p
@@ -201,8 +201,8 @@ export function JuryPresentationCard({
         </div>
       </div>
 
-      {/* Şablon indirme — sadece başvuru sahibi ve admin görür */}
-      {!isViewer && (
+      {/* Şablon indirme — sadece başvuru sahibi görür (admin alt satırda görür) */}
+      {isApplicant && (
         <a
           href={TEMPLATE_URL}
           download={TEMPLATE_NAME}
@@ -255,7 +255,7 @@ export function JuryPresentationCard({
               <p className="text-[11px] text-[#6e6e73]">{formatSize(file.size)}</p>
             </div>
           </div>
-          {canEdit && !isViewer && (
+          {canEdit && isApplicant && (
             <button
               onClick={handleDelete}
               disabled={deleting}
@@ -267,7 +267,7 @@ export function JuryPresentationCard({
           )}
         </div>
       ) : (
-        !isViewer && canEdit && (
+        isApplicant && canEdit && (
           <button
             onClick={() => inputRef.current?.click()}
             disabled={uploading}
@@ -292,15 +292,49 @@ export function JuryPresentationCard({
         )
       )}
 
-      {/* Sahibi değilse + dosya yoksa */}
-      {isViewer && !file && (
+      {/* Admin: tali aksiyonlar — şablon indir + yükle/sil */}
+      {showAdminActions && (
+        <div className="pt-3 border-t border-black/[0.06] flex flex-wrap items-center gap-2">
+          <a
+            href={TEMPLATE_URL}
+            download={TEMPLATE_NAME}
+            className="inline-flex items-center gap-1.5 text-[11px] text-[#6e6e73] hover:text-[#1c1c1c] px-2 py-1 rounded-md hover:bg-[#f5f5f5] transition-colors cursor-pointer"
+          >
+            <Download className="w-3 h-3" />
+            Şablonu indir
+          </a>
+          <span className="text-[#e0e0e0]">·</span>
+          {file ? (
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="inline-flex items-center gap-1.5 text-[11px] text-red-600 hover:bg-red-50 px-2 py-1 rounded-md disabled:opacity-50 transition-colors cursor-pointer"
+            >
+              {deleting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+              Sunumu sil
+            </button>
+          ) : (
+            <button
+              onClick={() => inputRef.current?.click()}
+              disabled={uploading}
+              className="inline-flex items-center gap-1.5 text-[11px] text-[#1c1c1c] hover:bg-[#f5f5f5] px-2 py-1 rounded-md disabled:opacity-50 transition-colors cursor-pointer"
+            >
+              {uploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
+              {uploading ? "Yükleniyor…" : "Sunum yükle (yönetici)"}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Sahibi değilse / admin — dosya yoksa bilgi */}
+      {(isViewer || isAdmin) && !file && (
         <p className="text-[12px] text-[#aeaeb2] italic">
           Henüz sunum yüklenmedi.
         </p>
       )}
 
-      {/* Düzenleme kapalı uyarısı */}
-      {!isViewer && !canEdit && !file && (
+      {/* Düzenleme kapalı uyarısı — sadece başvuru sahibi */}
+      {isApplicant && !canEdit && !file && (
         <div className="flex items-start gap-2 px-3 py-2.5 bg-amber-50 border border-amber-200 rounded-lg">
           <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
           <p className="text-[11px] text-amber-700 leading-relaxed">
