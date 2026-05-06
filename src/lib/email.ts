@@ -1,6 +1,6 @@
 import { Resend } from "resend"
 
-const FROM = process.env.EMAIL_FROM ?? "noreply@mikrodestekfonu.com"
+const FROM = process.env.EMAIL_FROM ?? "Mikro Destek Fonu <noreply@mikrodestek.divizyon.org>"
 
 export async function sendJuryInviteEmail({
   to,
