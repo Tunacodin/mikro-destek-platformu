@@ -6,7 +6,7 @@ import { z } from "zod"
 const createSchema = z.object({
   periodId:  z.string().optional(),
   programId: z.string().optional(),
-  title:         z.string().min(1, "Proje adı zorunludur"),
+  title:         z.string().min(1, "Proje adı zorunludur").max(30, "Proje adı en fazla 30 karakter olabilir"),
   teamName:      z.string().optional().default(""),
   teamInfo:      z.string().optional().default(""),
   summary:       z.string().max(1500).optional().default(""),

@@ -7,7 +7,7 @@ import { createNotification, notifyAdmins } from "@/lib/notifications"
 const scoreSchema = z.object({
   criteria: z.string().min(1),
   score: z.number().int().min(1).max(5),
-  justification: z.string().min(10, "Gerekçe en az 10 karakter olmalı."),
+  justification: z.string().optional().default(""),
 })
 
 const evaluationSchema = z.object({

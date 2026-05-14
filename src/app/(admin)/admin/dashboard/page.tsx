@@ -11,6 +11,7 @@ import {
   AlertCircle,
   CheckCircle2,
 } from "lucide-react"
+import { truncate } from "@/lib/utils"
 
 export const metadata = { title: "Yönetim Paneli — Mikro Destek Fonu" }
 
@@ -282,7 +283,7 @@ export default async function AdminDashboardPage() {
                     className="flex items-center justify-between px-5 py-3.5 hover:bg-[#f4f4f4] transition-colors cursor-pointer"
                   >
                     <div className="min-w-0">
-                      <p className="text-[13px] font-medium text-[#1c1c1c] truncate">{app.title}</p>
+                      <p className="text-[13px] font-medium text-[#1c1c1c] truncate" title={app.title}>{truncate(app.title, 30)}</p>
                       <p className="text-[11px] text-[#aeaeb2] mt-0.5">
                         {app.user.name ?? app.user.email} · {fmt(app.createdAt)}
                       </p>

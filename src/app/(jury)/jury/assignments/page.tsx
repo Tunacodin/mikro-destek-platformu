@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import type { ApplicationStatus } from "@prisma/client"
+import { truncate } from "@/lib/utils"
 
 export const metadata = { title: "Atamalarım — Mikro Destek Fonu" }
 
@@ -119,7 +120,7 @@ function AssignmentRow({
     <div className="px-4 sm:px-5 py-4 hover:bg-[#f4f4f4] transition-colors">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-1 flex-1">
-          <p className="text-[14px] font-semibold text-[#1c1c1c] truncate">{app.title}</p>
+          <p className="text-[14px] font-semibold text-[#1c1c1c] truncate" title={app.title}>{truncate(app.title, 30)}</p>
           <p className="text-[12px] text-[#6e6e73] truncate">
             {app.user.name ?? app.user.email} · {app.period?.title ?? app.program?.title ?? "—"} · {app._count.files} dosya
           </p>

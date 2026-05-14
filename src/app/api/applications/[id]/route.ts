@@ -5,7 +5,7 @@ import { z } from "zod"
 import { notifyAdmins } from "@/lib/notifications"
 
 const updateSchema = z.object({
-  title:          z.string().min(1, "Proje adı zorunludur").optional(),
+  title:          z.string().min(1, "Proje adı zorunludur").max(30, "Proje adı en fazla 30 karakter olabilir").optional(),
   teamName:       z.string().optional(),
   teamInfo:       z.string().optional(),
   summary:        z.string().max(1500).optional(),

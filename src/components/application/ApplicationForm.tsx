@@ -668,11 +668,12 @@ export function ApplicationForm({
             {/* Proje Adı */}
             <div>
               <FieldLabel
-                hint="Projenizi en iyi tanımlayan, akılda kalıcı ve net bir isim belirtiniz."
+                hint="Projenizi en iyi tanımlayan, akılda kalıcı ve net bir isim belirtiniz. (En fazla 30 karakter)"
               >
                 Proje Adı <Req />
               </FieldLabel>
-              <input className={inputCls} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Projenizin adı" />
+              <input className={inputCls} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Projenizin adı" maxLength={30} />
+              <p className="text-[11px] text-[#aeaeb2] mt-1 tabular-nums">{title.length}/30</p>
             </div>
 
             {/* Ekip Adı */}

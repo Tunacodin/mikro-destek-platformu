@@ -7,6 +7,7 @@ import {
   FolderOpen, ArrowRight, FileText, Send, Search,
   Layers, Zap, Star, CheckCircle2, Clock, Archive,
 } from "lucide-react"
+import { truncate } from "@/lib/utils"
 
 type Project = {
   id: string
@@ -188,8 +189,8 @@ export function AdminProjectList({
                   <div className="flex items-start gap-3 min-w-0 flex-1">
                     {(() => { const Icon = SCOPE_ICON[p.decision.scope] ?? Layers; return <Icon className="mt-0.5 w-3.5 h-3.5 shrink-0 text-[#aeaeb2]" /> })()}
                     <div className="min-w-0">
-                      <p className="text-[13px] font-semibold text-[#1c1c1c] truncate leading-snug group-hover:text-[#000]">
-                        {p.application.title}
+                      <p className="text-[13px] font-semibold text-[#1c1c1c] truncate leading-snug group-hover:text-[#000]" title={p.application.title}>
+                        {truncate(p.application.title, 30)}
                       </p>
                       <div className="flex items-center gap-2.5 mt-1 flex-wrap">
                         <p className="text-[11px] text-[#6e6e73]">

@@ -8,6 +8,7 @@ import {
 } from "lucide-react"
 import type { ApplicationStatus } from "@prisma/client"
 import { PeriodHeroCountdown } from "@/components/ui/PeriodHeroCountdown"
+import { truncate } from "@/lib/utils"
 
 export const metadata = { title: "Panelim — Mikro Destek Fonu" }
 
@@ -165,7 +166,7 @@ export default async function ApplicantDashboardPage() {
                   <Link key={app.id} href={`/dashboard/applications/${app.id}`}
                     className="flex items-center justify-between bg-white rounded-xl border border-amber-100 px-4 py-3 hover:bg-amber-50/50 transition-colors cursor-pointer">
                     <div className="min-w-0">
-                      <p className="text-[13px] font-medium text-[#1c1c1c] truncate">{app.title}</p>
+                      <p className="text-[13px] font-medium text-[#1c1c1c] truncate" title={app.title}>{truncate(app.title, 30)}</p>
                       <p className="text-[11px] text-amber-600 mt-0.5">{app._count.files} belge · tamamlanmayı bekliyor</p>
                     </div>
                     <ArrowRight className="w-3.5 h-3.5 text-amber-400 shrink-0 ml-2" />
@@ -210,7 +211,7 @@ export default async function ApplicantDashboardPage() {
                         <Icon className="w-3.5 h-3.5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium text-[#1c1c1c] truncate">{app.title}</p>
+                        <p className="text-[13px] font-medium text-[#1c1c1c] truncate" title={app.title}>{truncate(app.title, 30)}</p>
                         <p className="text-[11px] text-[#aeaeb2] mt-0.5">{app.period?.title ?? app.program?.title ?? "—"} · {app._count.files} belge</p>
                       </div>
                       <div className="text-right shrink-0">

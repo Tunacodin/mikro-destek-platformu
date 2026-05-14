@@ -476,10 +476,14 @@ export function ApplicationEditForm({
             <SectionTitle>Proje Kimliği</SectionTitle>
 
             <div>
-              <FieldLabel hint="Projenizi en iyi tanımlayan, akılda kalıcı ve net bir isim belirtiniz.">
+              <FieldLabel hint="Projenizi en iyi tanımlayan, akılda kalıcı ve net bir isim belirtiniz. (En fazla 30 karakter)">
                 Proje Adı
               </FieldLabel>
-              <input className={inputCls} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Projenizin adı" />
+              <input className={inputCls} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Projenizin adı" maxLength={30} />
+              <p className={`text-[11px] mt-1 tabular-nums ${title.length > 30 ? "text-red-500" : "text-[#aeaeb2]"}`}>
+                {title.length}/30
+                {title.length > 30 && " — Kaydedebilmek için kısaltın"}
+              </p>
             </div>
 
             <div>

@@ -8,6 +8,7 @@ import {
 } from "lucide-react"
 import { JuryGuidePanel } from "@/components/jury/JuryGuidePanel"
 import { LiveCountdown } from "@/components/ui/LiveCountdown"
+import { truncate } from "@/lib/utils"
 
 export const metadata = { title: "Jüri Paneli — Mikro Destek Fonu" }
 
@@ -163,8 +164,8 @@ export default async function JuryDashboardPage() {
                     <div className="p-5 space-y-3">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="text-[14px] font-semibold text-[#1c1c1c] leading-snug line-clamp-2 group-hover:text-[#000]">
-                            {app.title}
+                          <p className="text-[14px] font-semibold text-[#1c1c1c] leading-snug line-clamp-2 group-hover:text-[#000]" title={app.title}>
+                            {truncate(app.title, 30)}
                           </p>
                           <div className="flex items-center gap-2.5 mt-1.5 flex-wrap text-[11px] text-[#6e6e73]">
                             <span className="inline-flex items-center gap-1">
@@ -220,8 +221,8 @@ export default async function JuryDashboardPage() {
                     <div className="p-5 space-y-3">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="text-[14px] font-semibold text-[#1c1c1c] leading-snug line-clamp-2">
-                            {app.title}
+                          <p className="text-[14px] font-semibold text-[#1c1c1c] leading-snug line-clamp-2" title={app.title}>
+                            {truncate(app.title, 30)}
                           </p>
                           <div className="flex items-center gap-2.5 mt-1.5 flex-wrap text-[11px] text-[#6e6e73]">
                             <span className="inline-flex items-center gap-1">

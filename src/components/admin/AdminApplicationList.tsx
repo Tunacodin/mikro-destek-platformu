@@ -8,6 +8,7 @@ import {
   FileText, Users, Search, ChevronDown, ArrowRight,
   PenLine, Send, Eye, ClipboardCheck, CheckCircle2, XCircle, Trash2,
 } from "lucide-react"
+import { truncate } from "@/lib/utils"
 
 type App = {
   id: string
@@ -297,8 +298,8 @@ export function AdminApplicationList({
                 <div className="flex items-start gap-3 min-w-0 flex-1">
                   {(() => { const Icon = STATUS_ICON[app.status]; return <Icon className="mt-0.5 w-3.5 h-3.5 shrink-0 text-[#aeaeb2]" /> })()}
                   <div className="min-w-0">
-                    <p className="text-[13px] font-semibold text-[#1c1c1c] leading-snug truncate group-hover:text-[#000]">
-                      {app.title}
+                    <p className="text-[13px] font-semibold text-[#1c1c1c] leading-snug truncate group-hover:text-[#000]" title={app.title}>
+                      {truncate(app.title, 30)}
                     </p>
                     <div className="flex items-center gap-2.5 mt-1 flex-wrap">
                       <p className="text-[11px] text-[#6e6e73]">

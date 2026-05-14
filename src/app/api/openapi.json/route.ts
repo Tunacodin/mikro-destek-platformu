@@ -160,7 +160,7 @@ const spec = {
                 required: ["periodId", "title", "description"],
                 properties: {
                   periodId: { type: "string", example: "clxyz..." },
-                  title: { type: "string", minLength: 3, example: "AI Destekli Tarım Projesi" },
+                  title: { type: "string", minLength: 1, maxLength: 30, example: "AI Destekli Tarım Projesi" },
                   description: {
                     type: "string",
                     minLength: 50,
@@ -527,13 +527,12 @@ const spec = {
                     minItems: 1,
                     items: {
                       type: "object",
-                      required: ["criteria", "score", "justification"],
+                      required: ["criteria", "score"],
                       properties: {
                         criteria: { type: "string", example: "Yenilikçilik" },
                         score: { type: "integer", minimum: 1, maximum: 5, example: 4 },
                         justification: {
                           type: "string",
-                          minLength: 10,
                           example: "Proje mevcut çözümlere kıyasla özgün bir yaklaşım sunuyor.",
                         },
                       },

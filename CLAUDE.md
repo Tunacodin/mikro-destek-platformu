@@ -44,7 +44,7 @@ Min. VPS: 4 GB RAM, 2 vCPU, 40 GB SSD, Ubuntu 22/24 LTS (Türkiye)
 
 1. **Kayıt:** Yalnızca Circle platformundaki e-posta ile eşleşen komünite üyeleri kayıt olabilir.
 2. **Protokol Onayı:** Belge sonuna scroll etmeden onay butonu aktif olmaz. Onay audit log'a yazılır.
-3. **Puanlama:** Her kriter (1–5) için metin gerekçe zorunlu. Gerekçesiz form gönderilemez.
+3. **Puanlama:** Her ana kriter (1–5) puanlanması zorunludur. Metin gerekçe alanı opsiyoneldir.
 4. **48 Saat Kuralı:** Düzenleme yetkisi ve arşiv erişimi deadline'dan 48 saat önce otomatik kapanır.
 5. **Jüri Erişimi:** Jüri yalnızca kendisine atanan başvuruları görür.
 6. **Değerlendirme Ekranı:** Split view — sol panel dosyalar, sağ panel puanlama cetveli.

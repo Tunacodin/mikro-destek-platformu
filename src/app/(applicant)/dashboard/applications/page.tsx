@@ -7,6 +7,7 @@ import {
   FileText, Calendar, Send,
 } from "lucide-react"
 import type { ApplicationStatus } from "@prisma/client"
+import { truncate } from "@/lib/utils"
 
 export const metadata = { title: "Başvurularım — Mikro Destek Fonu" }
 
@@ -155,8 +156,8 @@ export default async function ApplicationsPage({
 
                   {/* Başlık */}
                   <div>
-                    <p className="text-[15px] font-semibold text-[#1c1c1c] leading-snug line-clamp-2 group-hover:text-[#000]">
-                      {app.title}
+                    <p className="text-[15px] font-semibold text-[#1c1c1c] leading-snug line-clamp-2 group-hover:text-[#000]" title={app.title}>
+                      {truncate(app.title, 30)}
                     </p>
                     <p className="text-[12px] text-[#aeaeb2] mt-1">{STATUS_HINT[app.status]}</p>
                   </div>

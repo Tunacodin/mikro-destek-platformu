@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { FolderOpen, ArrowRight, FileText } from "lucide-react"
+import { truncate } from "@/lib/utils"
 
 export const metadata = { title: "Desteklerim — Mikro Destek Fonu" }
 
@@ -98,8 +99,8 @@ export default async function ProjectsListPage() {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-[14px] font-semibold text-[#1c1c1c] truncate">
-                        {p.application.title}
+                      <p className="text-[14px] font-semibold text-[#1c1c1c] truncate" title={p.application.title}>
+                        {truncate(p.application.title, 30)}
                       </p>
                       <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${scopeStyle}`}>
                         {scopeLabel}

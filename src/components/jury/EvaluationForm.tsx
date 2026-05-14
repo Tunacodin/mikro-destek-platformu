@@ -257,7 +257,7 @@ export function EvaluationForm({
     // İlk yüklemede yalnızca ilk doldurulmamış kriteri açık başlat
     const firstIncomplete = CRITERIA.find((c) => {
       const ex = existingEvaluation?.scores.find((s) => s.criteria === c.key)
-      return !ex || !ex.score || ex.justification.trim().length < 10
+      return !ex || !ex.score
     })
     return firstIncomplete ? new Set([firstIncomplete.key]) : new Set()
   })
@@ -267,7 +267,7 @@ export function EvaluationForm({
   const bonusTotal = BONUS_CRITERIA.reduce((s, c) => s + (scores[c.key].score || 0), 0)
   const grandTotal = mainTotal + bonusTotal
   const mainFilled = MAIN_CRITERIA.filter((c) => scores[c.key].score > 0).length
-  const allMainFilled = MAIN_CRITERIA.every((c) => scores[c.key].score > 0 && scores[c.key].justification.trim().length >= 10)
+  const allMainFilled = MAIN_CRITERIA.every((c) => scores[c.key].score > 0)
   const band = mainFilled > 0 ? getBand(mainTotal) : null
 
   function isCriterionExpanded(key: string) {
@@ -328,11 +328,9 @@ export function EvaluationForm({
   }
 
   async function saveDraft() {
-    const completedScores = CRITERIA.filter(
-      (c) => scores[c.key].score > 0 && scores[c.key].justification.trim().length >= 10
-    )
+    const completedScores = CRITERIA.filter((c) => scores[c.key].score > 0)
     if (completedScores.length === 0) {
-      setError("Taslak kaydedebilmek için en az bir kriteri puanlayın ve gerekçe yazın.")
+      setError("Taslak kaydedebilmek için en az bir kriteri puanlayın.")
       return
     }
     setDraftSaving(true)
@@ -551,9 +549,7 @@ function CriterionBlock({
   onUpdate: (field: keyof ScoreEntry, value: string | number) => void
 }) {
   const hasScore = entry.score > 0
-  const hasJustification = entry.justification.trim().length >= 10
-  const isComplete = hasScore && hasJustification
-  const justTooShort = !hasJustification && entry.justification.length > 0
+  const isComplete = hasScore
   const scoreLabel = hasScore ? criterion.scoreLabels[entry.score] : null
 
   // ── Kapalı (compact) görünüm — tüm kapalı kriterler ──────────────────────
@@ -686,19 +682,15 @@ function CriterionBlock({
           ))}
         </div>
 
-        {/* Gerekçe */}
+        {/* Gerekçe (opsiyonel) */}
         <textarea
           disabled={!canEvaluate}
           value={entry.justification}
           onChange={(e) => onUpdate("justification", e.target.value)}
-          placeholder="Gerekçe ve gözlemleriniz (en az 10 karakter)…"
+          placeholder="Gerekçe ve gözlemleriniz (opsiyonel)…"
           rows={2}
-          className={`w-full px-3 py-2 bg-[#f5f5f5] border-0 rounded-lg text-[12px] text-[#1c1c1c] placeholder:text-[#aeaeb2] resize-none focus:outline-none focus:ring-1 transition-all disabled:opacity-50
-            ${justTooShort ? "ring-1 ring-red-400/60" : "focus:ring-[#fab758]/40 focus:bg-white"}`}
+          className="w-full px-3 py-2 bg-[#f5f5f5] border-0 rounded-lg text-[12px] text-[#1c1c1c] placeholder:text-[#aeaeb2] resize-none focus:outline-none focus:ring-1 focus:ring-[#fab758]/40 focus:bg-white transition-all disabled:opacity-50"
         />
-        {justTooShort && (
-          <p className="text-[11px] text-red-500">En az 10 karakter gerekli.</p>
-        )}
       </div>
     </div>
   )
