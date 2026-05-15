@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Check, ChevronRight, ChevronLeft, Save, AlertCircle } from "lucide-react"
+import { FileUploader } from "./FileUploader"
 
 // ── Sabitler ──────────────────────────────────────────────────────────────────
 
@@ -83,6 +84,16 @@ type Application = {
   divisionContribution:  string | null
   supportTypes:          string[]
   supportNotes:          Record<string, string> | null
+  files:                 UploadedFile[]
+}
+
+type UploadedFile = {
+  id:       string
+  name:     string
+  size:     number
+  mimeType: string
+  type?:    string
+  url?:     string
 }
 
 type UserProfile = {
@@ -258,6 +269,7 @@ export function ApplicationEditForm({
   const [divisionContribution,   setDivisionContribution]   = useState(application.divisionContribution   ?? "")
   const [supportTypes,           setSupportTypes]           = useState<string[]>(application.supportTypes ?? [])
   const [supportNotes,           setSupportNotes]           = useState<Record<string, string>>(application.supportNotes ?? {})
+  const [files,                  setFiles]                  = useState<UploadedFile[]>(application.files ?? [])
 
   function toggleProjectField(field: string) {
     setProjectFields((prev) =>
@@ -750,6 +762,15 @@ export function ApplicationEditForm({
                   )
                 })}
               </div>
+            </div>
+
+            {/* Belge yükleme */}
+            <div className="p-5 sm:p-6">
+              <SectionTitle>Belgeler</SectionTitle>
+              <p className="text-[12px] text-[#6e6e73] mb-4">
+                Revize sürecinde yeni dosya ekleyebilir veya mevcut dosyaları silebilirsiniz.
+              </p>
+              <FileUploader applicationId={application.id} initialFiles={files} onFilesChange={setFiles} />
             </div>
 
             <div className="px-5 sm:px-6 py-4 bg-[#fafafa]">

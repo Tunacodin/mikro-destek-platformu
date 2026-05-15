@@ -286,6 +286,7 @@ export default async function ApplicationDetailPage({
             divisionContribution: application.divisionContribution,
             supportTypes: application.supportTypes,
             supportNotes: application.supportNotes as Record<string, string> | null,
+            files: applicationFiles,
           }}
           userProfile={userProfile!}
           locked={false}

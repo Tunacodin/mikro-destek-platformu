@@ -51,7 +51,13 @@ export async function POST(req: NextRequest) {
         { status: 403 }
       )
     }
-    if (!["DRAFT", "SUBMITTED"].includes(application.status)) {
+    const isDraftOrSubmitted = ["DRAFT", "SUBMITTED"].includes(application.status)
+    const hoursToPresentation = application.presentationDate
+      ? (application.presentationDate.getTime() - Date.now()) / 3_600_000
+      : Infinity
+    const canEditByGrant = application.editGranted && hoursToPresentation >= 48
+    const canEditByPresentation = !!application.presentationDate && hoursToPresentation >= 48
+    if (!isDraftOrSubmitted && !canEditByGrant && !canEditByPresentation) {
       return NextResponse.json(
         { error: "Bu basvuruya artik dosya/link eklenemez." },
         { status: 400 }
