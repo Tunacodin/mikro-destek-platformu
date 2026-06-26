@@ -279,11 +279,13 @@ model SupportDecision {
   decidedAt DateTime @default(now())
 
   // Bildiri formu alanları (admin tarafından doldurulur)
-  strategicReason      String?  @db.Text // Stratejik Uyum Gerekçesi
-  expectedOutputs      String?  @db.Text // Beklenen Somut Çıktılar
-  supportDuration      String?           // Destek Süresi (örn. "6 ay")
-  additionalConditions String?  @db.Text // Ek Açıklamalar ve Şartlar
-  riskFramework        String?  @db.Text // Risk ve Sorumluluk Çerçevesi
+  strategicReason             String?  @db.Text // Stratejik Uyum Gerekçesi
+  approvedConditionalSupports String?  @db.Text // Kesin Onaylı Destekler ve Koşullu Destekler
+  expectedOutputs             String?  @db.Text // Beklenen Somut Çıktı ve Aksiyonlar
+  supportDuration             String?           // Destek Süresi (Sayfa 1 tablosunda gösterilir)
+  monitoringObligations       String?  @db.Text // İzleme, Raporlama ve Değerlendirme Yükümlülükleri
+  riskFramework               String?  @db.Text // Risk ve Sorumluluk Çerçevesi
+  additionalConditions        String?  @db.Text // (Legacy) eski "Ek Açıklamalar ve Şartlar" — veri korunur, formda gösterilmez
 
   applicationId String      @unique
   application   Application @relation(fields: [applicationId], references: [id])

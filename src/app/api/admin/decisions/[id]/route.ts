@@ -4,11 +4,12 @@ import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 
 const schema = z.object({
-  strategicReason:      z.string().optional(),
-  expectedOutputs:      z.string().optional(),
-  supportDuration:      z.string().optional(),
-  additionalConditions: z.string().optional(),
-  riskFramework:        z.string().optional(),
+  strategicReason:             z.string().optional(),
+  approvedConditionalSupports: z.string().optional(),
+  expectedOutputs:             z.string().optional(),
+  supportDuration:             z.string().optional(),
+  monitoringObligations:       z.string().optional(),
+  riskFramework:               z.string().optional(),
 })
 
 export async function PATCH(
@@ -35,11 +36,12 @@ export async function PATCH(
   const updated = await prisma.supportDecision.update({
     where: { id },
     data: {
-      strategicReason:      parsed.data.strategicReason      ?? decision.strategicReason,
-      expectedOutputs:      parsed.data.expectedOutputs      ?? decision.expectedOutputs,
-      supportDuration:      parsed.data.supportDuration      ?? decision.supportDuration,
-      additionalConditions: parsed.data.additionalConditions ?? decision.additionalConditions,
-      riskFramework:        parsed.data.riskFramework        ?? decision.riskFramework,
+      strategicReason:             parsed.data.strategicReason             ?? decision.strategicReason,
+      approvedConditionalSupports: parsed.data.approvedConditionalSupports ?? decision.approvedConditionalSupports,
+      expectedOutputs:             parsed.data.expectedOutputs             ?? decision.expectedOutputs,
+      supportDuration:             parsed.data.supportDuration             ?? decision.supportDuration,
+      monitoringObligations:       parsed.data.monitoringObligations       ?? decision.monitoringObligations,
+      riskFramework:               parsed.data.riskFramework               ?? decision.riskFramework,
     },
   })
 

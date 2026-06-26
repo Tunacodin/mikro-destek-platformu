@@ -11,17 +11,6 @@ const SCOPE_OPTIONS: { value: string; label: string }[] = [
   { value: "PRIORITY",    label: "Öncelikli Proje (Showcase / Vitrinleme / Hızlandırılmış Erişim)" },
 ]
 
-const SUPPORT_TYPES_ALL = [
-  "Üretim ve Altyapı Desteği",
-  "Yazılım ve Teknik Araç Desteği",
-  "Materyal ve Envanter Desteği",
-  "Mentorluk ve Uzmanlık Desteği",
-  "Akademik Üretim Desteği",
-  "Görünürlük ve Mikrofonlama Desteği",
-  "Telif, Hak ve Yayıncılık Desteği",
-  "Dış Temsil ve Seyahat Desteği",
-]
-
 /* ─── Tipler ─── */
 type Page1 = {
   projectTitle:  string
@@ -36,25 +25,24 @@ type Page1 = {
 }
 
 type Page2 = {
-  strategicReason:      string
-  expectedOutputs:      string
-  supportDuration:      string
-  additionalConditions: string
-  riskFramework:        string
+  strategicReason:             string
+  approvedConditionalSupports: string
+  expectedOutputs:             string
+  supportDuration:             string
+  monitoringObligations:       string
+  riskFramework:               string
 }
 
 export function DecisionReportClient({
   decisionId,
   initial,
-  approvedSupportTypes,
   border,
   labelBg,
 }: {
-  decisionId:           string
-  initial:              Page1 & Page2
-  approvedSupportTypes: string[]
-  border:               string
-  labelBg:              string
+  decisionId: string
+  initial:    Page1 & Page2
+  border:     string
+  labelBg:    string
 }) {
   /* Page 1 — yalnızca oturum içinde geçerli (baskı için düzenleme) */
   const [p1, setP1] = useState<Page1>({
@@ -69,17 +57,15 @@ export function DecisionReportClient({
     decisionDate:  initial.decisionDate,
   })
 
-  /* Page 2 — veritabanına kaydedilir */
+  /* Page 2 + Destek Süresi — veritabanına kaydedilir */
   const [p2, setP2] = useState<Page2>({
-    strategicReason:      initial.strategicReason,
-    expectedOutputs:      initial.expectedOutputs,
-    supportDuration:      initial.supportDuration,
-    additionalConditions: initial.additionalConditions,
-    riskFramework:        initial.riskFramework,
+    strategicReason:             initial.strategicReason,
+    approvedConditionalSupports: initial.approvedConditionalSupports,
+    expectedOutputs:             initial.expectedOutputs,
+    supportDuration:             initial.supportDuration,
+    monitoringObligations:       initial.monitoringObligations,
+    riskFramework:               initial.riskFramework,
   })
-
-  /* Onaylanan destek türleri — baskı için düzenlenebilir */
-  const [supportTypes, setSupportTypes] = useState<string[]>(approvedSupportTypes)
 
   const [saving, setSaving] = useState(false)
   const [saved,  setSaved]  = useState(false)
@@ -91,11 +77,6 @@ export function DecisionReportClient({
   function setP2Field(key: keyof Page2, value: string) {
     setP2((p) => ({ ...p, [key]: value }))
     setSaved(false)
-  }
-  function toggleSupportType(type: string) {
-    setSupportTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
-    )
   }
 
   async function handleSave() {
@@ -176,7 +157,7 @@ export function DecisionReportClient({
             </span>
           )}
           <p className="text-[12px] text-[#aeaeb2]">
-            Tüm alanlar düzenlenebilir. Sayfa 2 içeriği veritabanına kaydedilir.
+            Tüm alanlar düzenlenebilir. Destek Süresi ve Sayfa 2 içeriği veritabanına kaydedilir.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -339,6 +320,21 @@ export function DecisionReportClient({
               </td>
             </tr>
 
+            {/* Destek Süresi */}
+            <tr style={rowBorder}>
+              <td style={tdLabel}>Destek Süresi:</td>
+              <td style={tdValue}>
+                <input
+                  type="text"
+                  value={p2.supportDuration}
+                  onChange={(e) => setP2Field("supportDuration", e.target.value)}
+                  placeholder="örn. 3 ay, 6 ay…"
+                  className={inputCls}
+                />
+                <p className={valCls}>{p2.supportDuration}</p>
+              </td>
+            </tr>
+
           </tbody>
         </table>
 
@@ -433,78 +429,48 @@ export function DecisionReportClient({
                 </td>
               </tr>
 
-              {/* Beklenen Somut Çıktılar */}
+              {/* Kesin Onaylı Destekler ve Koşullu Destekler */}
               <tr style={rowBorder}>
-                <td style={tdLabel}>Beklenen Somut Çıktılar:</td>
+                <td style={tdLabel}>Kesin Onaylı Destekler ve Koşullu Destekler:</td>
+                <td style={tdValue}>
+                  <textarea
+                    value={p2.approvedConditionalSupports}
+                    onChange={(e) => setP2Field("approvedConditionalSupports", e.target.value)}
+                    placeholder="Kesin onaylanan destekler ile koşula bağlı destekleri ve bağlı oldukları koşulları belirtin…"
+                    rows={4}
+                    className={textareaCls}
+                  />
+                  <p className={valCls}>{p2.approvedConditionalSupports}</p>
+                </td>
+              </tr>
+
+              {/* Beklenen Somut Çıktı ve Aksiyonlar */}
+              <tr style={rowBorder}>
+                <td style={tdLabel}>Beklenen Somut Çıktı ve Aksiyonlar:</td>
                 <td style={tdValue}>
                   <textarea
                     value={p2.expectedOutputs}
                     onChange={(e) => setP2Field("expectedOutputs", e.target.value)}
-                    placeholder="Destek sonucunda beklenen ürün, eser veya katkılar…"
-                    rows={3}
+                    placeholder="Destek sonucunda beklenen ürün, eser veya katkılar ve atılacak somut aksiyonlar…"
+                    rows={4}
                     className={textareaCls}
                   />
                   <p className={valCls}>{p2.expectedOutputs}</p>
                 </td>
               </tr>
 
-              {/* Onaylanan Destek Türleri */}
+              {/* İzleme, Raporlama ve Değerlendirme Yükümlülükleri */}
               <tr style={rowBorder}>
-                <td style={tdLabel}>Onaylanan Destek Türleri:</td>
-                <td style={{ ...tdValue, padding: "10px 12px" }}>
-                  <div className="space-y-1.5">
-                    {SUPPORT_TYPES_ALL.map((type) => {
-                      const checked = supportTypes.includes(type)
-                      return (
-                        <div
-                          key={type}
-                          className="flex items-start gap-2 cursor-pointer select-none"
-                          onClick={() => toggleSupportType(type)}
-                        >
-                          <Checkbox checked={checked} />
-                          <span className={`text-[12px] ${checked ? "font-semibold text-[#1c1c1c]" : "text-[#555]"}`}>
-                            {type}
-                          </span>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </td>
-              </tr>
-
-              {/* Destek Süresi */}
-              <tr style={rowBorder}>
-                <td style={tdLabel}>Destek Süresi:</td>
-                <td style={tdValue}>
-                  <input
-                    type="text"
-                    value={p2.supportDuration}
-                    onChange={(e) => setP2Field("supportDuration", e.target.value)}
-                    placeholder="örn. 3 ay, 6 ay…"
-                    className={inputCls}
-                  />
-                  <p className={valCls}>{p2.supportDuration}</p>
-                </td>
-              </tr>
-
-              {/* Ek Açıklamalar */}
-              <tr style={rowBorder}>
-                <td style={tdLabel}>
-                  <p className="font-medium text-[#1c1c1c]">Ek Açıklamalar ve Şartlar:</p>
-                  <p className="text-[10px] text-[#888] mt-1 leading-relaxed">
-                    (Destek kapsamına ilişkin özel notlar, süre, kullanım şartları, raporlama
-                    yükümlülükleri, sınırlı destek kapsamı ve içeriği vb.)
-                  </p>
-                </td>
-                <td style={{ ...tdValue, minHeight: "180px" }}>
+                <td style={tdLabel}>İzleme, Raporlama ve Değerlendirme Yükümlülükleri:</td>
+                <td style={{ ...tdValue, minHeight: "150px" }}>
                   <textarea
-                    value={p2.additionalConditions}
-                    onChange={(e) => setP2Field("additionalConditions", e.target.value)}
-                    placeholder="Özel şartlar, kısıtlamalar, raporlama yükümlülükleri…"
-                    rows={8}
+                    value={p2.monitoringObligations}
+                    onChange={(e) => setP2Field("monitoringObligations", e.target.value)}
+                    placeholder="Raporlama sıklığı, izleme yöntemi ve değerlendirme yükümlülükleri…"
+                    rows={6}
                     className={textareaCls}
                   />
-                  <p className={`${valCls} min-h-[160px]`}>{p2.additionalConditions}</p>
+                  <p className={`${valCls} min-h-[130px]`}>{p2.monitoringObligations}</p>
                 </td>
               </tr>
 

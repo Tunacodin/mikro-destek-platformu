@@ -125,6 +125,14 @@ export default async function ProjectDetailPage({
                 <FileText className="w-3 h-3 text-[#aeaeb2]" /> {project.files.length} dosya
               </span>
             </div>
+            <div className="pt-1">
+              <Link
+                href={`/dashboard/projects/${applicationId}/decision-report`}
+                className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#1c1c1c] bg-[#f0f0f0] hover:bg-[#e8e8e8] px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+              >
+                <FileText className="w-3.5 h-3.5" /> Destek Sonuç Bildirimi
+              </Link>
+            </div>
           </div>
 
           {/* Sağ: geri sayım */}

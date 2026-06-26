@@ -35,9 +35,10 @@ export default async function DecisionReportPage({
           notes: true,
           decidedAt: true,
           strategicReason: true,
+          approvedConditionalSupports: true,
           expectedOutputs: true,
           supportDuration: true,
-          additionalConditions: true,
+          monitoringObligations: true,
           riskFramework: true,
           decidedBy: { select: { name: true, email: true } },
         },
@@ -88,7 +89,6 @@ export default async function DecisionReportPage({
       <div className="report-wrap max-w-3xl mx-auto px-4 py-6 sm:py-10">
         <DecisionReportClient
           decisionId={application.decision.id}
-          approvedSupportTypes={application.supportTypes}
           border={BORDER}
           labelBg={LABEL_BG}
           initial={{
@@ -102,12 +102,13 @@ export default async function DecisionReportPage({
             scope:       application.decision.scope,
             authorName,
             decisionDate,
-            /* Sayfa 2 — veritabanına kaydedilir */
-            strategicReason:      application.decision.strategicReason      ?? "",
-            expectedOutputs:      application.decision.expectedOutputs      ?? "",
-            supportDuration:      application.decision.supportDuration      ?? "",
-            additionalConditions: application.decision.additionalConditions ?? "",
-            riskFramework:        application.decision.riskFramework        ?? "",
+            /* Sayfa 2 + Destek Süresi — veritabanına kaydedilir */
+            strategicReason:             application.decision.strategicReason             ?? "",
+            approvedConditionalSupports: application.decision.approvedConditionalSupports ?? "",
+            expectedOutputs:             application.decision.expectedOutputs             ?? "",
+            supportDuration:             application.decision.supportDuration             ?? "",
+            monitoringObligations:       application.decision.monitoringObligations       ?? "",
+            riskFramework:               application.decision.riskFramework               ?? "",
           }}
         />
       </div>
